@@ -1,4 +1,4 @@
-package controller;
+package controller.chatbot;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

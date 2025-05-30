@@ -11,9 +11,8 @@
 <html>
     <head>
         <title>My Profile</title>
-        <link rel="stylesheet" href="css/profile.css">
+       <link rel="stylesheet" href="${pageContext.request.contextPath}/Profile/profile.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     </head>
     <body>
         <div class="container">
@@ -24,7 +23,7 @@
                 <h3><%= user.getFullName()%></h3>
                 <p class="title">User ID: <%= user.getUserID()%></p>
                 <ul class="menu">
-                    <li><a href="index.jsp">Home</a></li>
+                    <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
                     <li><a href="profile-edit.jsp">Edit Profile</a></li>
                     <li><a href="LoginJSP/ChangePassword.jsp">Change Password</a></li>
                     <li><a href="logout">Logout</a></li>

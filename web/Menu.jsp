@@ -38,12 +38,17 @@
                
                 <c:if test="${sessionScope.acc != null}">
                     <li class="nav-item">
-                        <a class="nav-link" href="EditProfile.jsp">Edit Profile</a>
+                        <a class="nav-link" href="Profile/EditProfile.jsp">Edit Profile</a>
                     </li>
                 </c:if>
                 <c:if test="${sessionScope.acc == null}">
                     <li class="nav-item">
-                        <a class="nav-link" href="profile-view.jsp">My Profile</a>
+                        <a class="nav-link" href="Profile/profile-view.jsp">My Profile</a>
+                    </li>
+                </c:if>
+                     <c:if test="${sessionScope.acc == null}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="VideoCall/call.jsp">call video</a>
                     </li>
                 </c:if>
                 <%--  <c:if test="${sessionScope.acc.isAdmin == 1}">

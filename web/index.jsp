@@ -13,13 +13,13 @@
     </head><!-- comment -->
     <body>
         <div class="page-wrapper">
-            <%@include file="search.jsp" %>
+            <%@include file="Search/search.jsp" %>
 
             <div class="main-content">
                 <jsp:include page="Menu.jsp"></jsp:include>
 
                 
-               <%@include file="chatBox.jsp" %> 
+               <%@include file="chatBoxjsp/chatBox.jsp" %> 
                 <%@include file="jitsi.jsp" %>  
                
             </div>

@@ -4,7 +4,7 @@
 <%
     User user = (User) session.getAttribute("authUser");
     if (user == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("LoginJSP/LoginIndex.jsp");
         return;
     }
 %>
@@ -12,7 +12,7 @@
 <html>
     <head>
         <title>Edit Profile</title>
-        <link rel="stylesheet" href="css/profile.css">
+          <link rel="stylesheet" href="${pageContext.request.contextPath}/Profile/profile.css">
         <script src="js/suggest-address.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </head>

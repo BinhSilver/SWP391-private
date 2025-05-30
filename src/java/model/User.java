@@ -23,6 +23,26 @@ public class User {
     private String address;
     private String country;
     private String avatar;
+    private String gender;
+
+    public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, String avatar, String gender) {
+        this.userID = userID;
+        this.roleID = roleID;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.googleID = googleID;
+        this.fullName = fullName;
+        this.createdAt = createdAt;
+        this.isActive = isActive;
+        this.isLocked = isLocked;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
+        this.japaneseLevel = japaneseLevel;
+        this.address = address;
+        this.country = country;
+        this.avatar = avatar;
+        this.gender = gender;
+    }
 
     public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked) {
         this.userID = userID;
@@ -61,6 +81,14 @@ public class User {
 // Getter/setter
     public Date getBirthDate() {
         return birthDate;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public void setBirthDate(Date birthDate) {
@@ -109,10 +137,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "userID=" + userID + ", roleID=" + roleID + ", email=" + email + ", passwordHash=" + passwordHash + ", googleID=" + googleID + ", fullName=" + fullName + ", createdAt=" + createdAt + ", isActive=" + isActive + ", isLocked=" + isLocked + ", birthDate=" + birthDate + ", phoneNumber=" + phoneNumber + ", japaneseLevel=" + japaneseLevel + ", address=" + address + ", country=" + country + ", avatar=" + avatar + '}';
+        return "User{" + "userID=" + userID + ", roleID=" + roleID + ", email=" + email + ", passwordHash=" + passwordHash + ", googleID=" + googleID + ", fullName=" + fullName + ", createdAt=" + createdAt + ", isActive=" + isActive + ", isLocked=" + isLocked + ", birthDate=" + birthDate + ", phoneNumber=" + phoneNumber + ", japaneseLevel=" + japaneseLevel + ", address=" + address + ", country=" + country + ", avatar=" + avatar + ", gender=" + gender + '}';
     }
 
-   
+  
 
     public User() {
     }
