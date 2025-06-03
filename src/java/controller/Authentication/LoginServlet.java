@@ -83,9 +83,14 @@ public class LoginServlet extends HttpServlet {
             } else {
                 clearRememberMeCookies(response);
             }
-
-            // Chuyển hướng về trang chủ
-            response.sendRedirect("index.jsp");
+            // sẽ làm cho các trang khác với các role khác nhau
+            // Kiểm tra nếu là admin thì chuyển đến trang admin
+            if (user.isAdmin()) {
+                response.sendRedirect("adminHome");
+            } else {
+                // Nếu không phải admin thì chuyển về trang chủ
+                response.sendRedirect("index.jsp");
+            }
         } else {
             // Đăng nhập thất bại
             request.setAttribute("message", "Invalid email or password!");

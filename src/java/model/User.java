@@ -232,4 +232,8 @@ public class User {
     public void setIsLocked(boolean isLocked) {
         this.isLocked = isLocked;
     }
+
+    public boolean isAdmin() {
+        return this.roleID == 4; // RoleID 4 là Admin trong database
+    }
 }

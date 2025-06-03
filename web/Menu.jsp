@@ -23,6 +23,13 @@
 
                 <!-- Nếu ĐÃ đăng nhập -->
                 <c:if test="${sessionScope.authUser != null}">
+                    <!-- Nếu là admin -->
+                    <c:if test="${sessionScope.authUser.isAdmin()}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="adminHome">Admin Dashboard</a>
+                        </li>
+                    </c:if>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="logout">Logout</a>
                     </li>

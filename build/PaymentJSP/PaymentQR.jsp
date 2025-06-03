@@ -93,7 +93,9 @@
             </div>
         </div>
 
-    
+        <div class="qr-container">
+            <img src="<%= request.getAttribute("qrCode") %>" alt="Mã QR Thanh Toán" class="qr-code">
+        </div>
 
         <div class="timer">
             Mã QR có hiệu lực trong <span id="countdown">15:00</span>

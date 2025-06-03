@@ -7,7 +7,8 @@ public class PremiumPlan {
     private int durationInMonths;
     private String description;
 
-    public PremiumPlan() {}
+    public PremiumPlan() {
+    }
 
     public PremiumPlan(int planID, String planName, double price, int durationInMonths, String description) {
         this.planID = planID;
@@ -56,5 +57,4 @@ public class PremiumPlan {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }
