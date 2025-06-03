@@ -10,7 +10,7 @@
   <div class="container">
     <h2>Nâng Cấp Tài Khoản Premium</h2>
 
-    <form id="planForm" action="/CreatePayment" method="post">
+    <form id="planForm" action="/abc/CreatePayment" method="Post">
       <div class="plans">
         <!-- Gói tháng -->
         <div class="plan" data-value="month">
