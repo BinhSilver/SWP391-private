@@ -125,7 +125,7 @@
                                     </thead>
                                     <tbody>
                                         <c:forEach items="${premiumPlans}" var="plan">
-                                            <tr>
+                                            <tr data-plan-id="${plan.planID}">
                                                 <td>${plan.planID}</td>
                                                 <td>${plan.planName}</td>
                                                 <td>${plan.price}</td>
@@ -159,7 +159,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addPremiumForm" action="admin/premium" method="POST">
+                        <form id="addPremiumForm" action="premium" method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Tên Gói</label>
                                 <input type="text" class="form-control" name="planName" required>
@@ -186,19 +186,91 @@
             </div>
         </div>
 
+        <!-- Modal Sửa Gói Premium -->
+        <div class="modal fade" id="editPremiumModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa Gói Premium</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editPremiumForm" action="premium" method="POST">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="planId" id="editPlanId">
+                            <div class="mb-3">
+                                <label class="form-label">Tên Gói</label>
+                                <input type="text" class="form-control" name="planName" id="editPlanName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Giá (VNĐ)</label>
+                                <input type="number" class="form-control" name="price" id="editPrice" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Thời Hạn (Tháng)</label>
+                                <input type="number" class="form-control" name="duration" id="editDuration" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả</label>
+                                <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" form="editPremiumForm" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form xóa ẩn -->
+        <form id="deletePremiumForm" action="premium" method="POST" style="display: none;">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="planId" id="deletePlanId">
+        </form>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
+            // Hiển thị thông báo lỗi nếu có
+            <c:if test="${not empty error}">
+                alert("${error}");
+            </c:if>
+
             function editPlan(planId) {
-                // Implement edit functionality
-                console.log('Edit plan:', planId);
+                // Lấy thông tin gói premium từ dòng được chọn
+                const row = document.querySelector(`tr[data-plan-id="${planId}"]`);
+                const planName = row.querySelector('td:nth-child(2)').textContent;
+                const price = row.querySelector('td:nth-child(3)').textContent;
+                const duration = row.querySelector('td:nth-child(4)').textContent;
+                const description = row.querySelector('td:nth-child(5)').textContent;
+
+                // Điền thông tin vào form
+                document.getElementById('editPlanId').value = planId;
+                document.getElementById('editPlanName').value = planName;
+                document.getElementById('editPrice').value = price;
+                document.getElementById('editDuration').value = duration;
+                document.getElementById('editDescription').value = description;
+
+                // Hiển thị modal
+                new bootstrap.Modal(document.getElementById('editPremiumModal')).show();
             }
             
             function deletePlan(planId) {
                 if(confirm('Bạn có chắc chắn muốn xóa gói premium này?')) {
-                    // Implement delete functionality
-                    console.log('Delete plan:', planId);
+                    document.getElementById('deletePlanId').value = planId;
+                    document.getElementById('deletePremiumForm').submit();
                 }
             }
+
+            // Thêm data-plan-id vào các dòng trong bảng
+            document.addEventListener('DOMContentLoaded', function() {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const planId = row.querySelector('td:first-child').textContent;
+                    row.setAttribute('data-plan-id', planId);
+                });
+            });
         </script>
     </body>
 </html> 
