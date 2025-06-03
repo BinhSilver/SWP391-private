@@ -1,0 +1,35 @@
+# NetBeans specific files
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+nbactions.xml
+nb-configuration.xml
+
+# Build directories
+build/
+dist/
+
+# Compiled class files
+*.class
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Maven or Gradle (in case project structure includes them)
+target/
+.gradle/
+.idea/
+*.iml
+
+# Others (optional)
+*.war
+*.jar
+*.zip
