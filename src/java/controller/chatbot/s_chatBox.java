@@ -20,7 +20,6 @@ public class s_chatBox extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-   
         BufferedReader reader = request.getReader();
         StringBuilder requestData = new StringBuilder();
         String line;

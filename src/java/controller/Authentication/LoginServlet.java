@@ -1,7 +1,7 @@
 package controller.Authentication;
 
 import controller.Email.EmailUtil;
-import dao.UserDAO;
+import Dao.UserDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -69,11 +69,13 @@ public class LoginServlet extends HttpServlet {
         String rememberMe = request.getParameter("rememberMe");
 
         User user = new UserDAO().getUserByEmail(email);
+        
 
         if (user != null && checkPassword(password, user.getPasswordHash())) {
             // Đăng nhập thành công
             HttpSession session = request.getSession();
             session.setAttribute("authUser", user);
+            session.setAttribute("user", user); // Thêm để dùng trong các JSP
             session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
 
             if ("on".equals(rememberMe)) {
@@ -146,7 +148,7 @@ public class LoginServlet extends HttpServlet {
     request.setAttribute("message_signup", "Registration successful!");
     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 }
- 
+
 //Quen mat khau
     protected void handleForgotPassword(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, MessagingException {
@@ -176,7 +178,7 @@ public class LoginServlet extends HttpServlet {
     }
 }
 
-//Cap nhat mat khau moi  
+//Cap nhat mat khau moi
 private void handleResetPassword(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
     response.setContentType("application/json");

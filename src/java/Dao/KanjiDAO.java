@@ -1,4 +1,4 @@
-package dao;
+package Dao;
 
 import java.sql.*;
 import model.Kanji;
@@ -11,7 +11,7 @@ public class KanjiDAO {
     public void add(Kanji k) throws SQLException {
         String sql = "INSERT INTO Kanji (Character, Onyomi, Kunyomi, Meaning, StrokeCount, LessonID) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, k.getCharacter());
             stmt.setString(2, k.getOnyomi());
             stmt.setString(3, k.getKunyomi());
@@ -25,7 +25,7 @@ public class KanjiDAO {
     public void update(Kanji k) throws SQLException {
         String sql = "UPDATE Kanji SET Character=?, Onyomi=?, Kunyomi=?, Meaning=?, StrokeCount=?, LessonID=? WHERE KanjiID=?";
         try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, k.getCharacter());
             stmt.setString(2, k.getOnyomi());
             stmt.setString(3, k.getKunyomi());
@@ -40,17 +40,18 @@ public class KanjiDAO {
     public void delete(int kanjiID) throws SQLException {
         String sql = "DELETE FROM Kanji WHERE KanjiID=?";
         try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, kanjiID);
             stmt.executeUpdate();
         }
     }
-     public static ArrayList<Kanji> searchKanji(String keyword) {
+
+    public static ArrayList<Kanji> searchKanji(String keyword) {
         ArrayList<Kanji> list = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Kanji] WHERE character LIKE ? OR meaning LIKE ?";
 
         try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, "%" + keyword + "%");
             stmt.setString(2, "%" + keyword + "%");
@@ -74,7 +75,8 @@ public class KanjiDAO {
 
         return list;
     }
-     public static void main(String[] args) {
+
+    public static void main(String[] args) {
         KanjiDAO k = new KanjiDAO();
         test.Testcase.printlist(k.searchKanji("日"));
     }

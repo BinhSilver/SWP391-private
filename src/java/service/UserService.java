@@ -17,8 +17,8 @@ public class UserService {
         String sql = "SELECT UserID, RoleID, Email, PasswordHash, FullName, CreatedAt, IsActive, IsLocked FROM Users";
 
         try (Connection conn = new JDBCConnection().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 User user = new User();
@@ -45,11 +45,12 @@ public class UserService {
         String sql = "UPDATE Users SET RoleID = ?, Email = ?, PasswordHash = ?, FullName = ?, IsActive = ?, IsLocked = ? WHERE UserID = ?";
 
         try (Connection conn = new JDBCConnection().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, user.getRoleID());
             pstmt.setString(2, user.getEmail());
-            pstmt.setString(3, user.getPasswordHash()); // Nếu cần, hãy đảm bảo password đã được hash trước khi gọi hàm này
+            pstmt.setString(3, user.getPasswordHash()); // Nếu cần, hãy đảm bảo password đã được hash trước khi gọi hàm
+                                                        // này
             pstmt.setString(4, user.getFullName());
             pstmt.setBoolean(5, user.isActive());
             pstmt.setBoolean(6, user.isLocked());
@@ -65,7 +66,8 @@ public class UserService {
     }
 
     // Nếu bạn dùng IDENTITY (auto-increment), không cần hàm generateUserId
-    // Nhưng nếu vẫn muốn tạo manual ID kiểu chuỗi, bạn có thể giữ nguyên hoặc viết lại phù hợp với kiểu chuỗi
+    // Nhưng nếu vẫn muốn tạo manual ID kiểu chuỗi, bạn có thể giữ nguyên hoặc viết
+    // lại phù hợp với kiểu chuỗi
     // Dưới đây là ví dụ nếu userId là int auto-increment thì bỏ hàm này
 
 }

@@ -1,7 +1,7 @@
 package controller.Callvideo;
 
-import dao.RoomDAO;
-import dao.RoomParticipantDAO;
+import Dao.RoomDAO;
+import Dao.RoomParticipantDAO;
 
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
