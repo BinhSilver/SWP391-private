@@ -84,6 +84,7 @@ public class LoginServlet extends HttpServlet {
 
             // Chuyển hướng về trang chủ
             response.sendRedirect("index.jsp");
+            
         } else {
             // Đăng nhập thất bại
             request.setAttribute("message", "Invalid email or password!");

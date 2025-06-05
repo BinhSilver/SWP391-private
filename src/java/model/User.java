@@ -4,6 +4,9 @@
  */
 package model;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class User {
@@ -232,4 +235,12 @@ public class User {
     public void setIsLocked(boolean isLocked) {
         this.isLocked = isLocked;
     }
+    public int getAge() {
+    if (birthDate == null) return -1;
+
+    LocalDate birth = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    LocalDate today = LocalDate.now();
+
+    return Period.between(birth, today).getYears();
+}
 }

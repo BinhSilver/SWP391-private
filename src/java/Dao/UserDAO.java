@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import model.User;
 import DB.JDBCConnection;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -222,5 +224,27 @@ public class UserDAO {
         for (User u : users) {
             System.out.println(u);
         }
+    }
+    public JsonArray getRegistrationsByPeriod(String periodType) {
+        JsonArray jsonArray = new JsonArray();
+        String sql = periodType.equals("month") ?
+                "SELECT FORMAT(CreatedAt, 'yyyy-MM') AS Period, COUNT(*) AS RegistrationCount " +
+                "FROM Users GROUP BY FORMAT(CreatedAt, 'yyyy-MM') ORDER BY Period" :
+                "SELECT YEAR(CreatedAt) AS Period, COUNT(*) AS RegistrationCount " +
+                "FROM Users GROUP BY YEAR(CreatedAt) ORDER BY Period";
+
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("period", rs.getString("Period"));
+                obj.addProperty("count", rs.getInt("RegistrationCount"));
+                jsonArray.add(obj);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return jsonArray;
     }
 }

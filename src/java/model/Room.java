@@ -1,79 +1,48 @@
 package model;
 
-import java.util.Date;
-
 public class Room {
-    private int roomId;
-    private int hostUserId;
+    private int roomID;
+    private int hostUserID;
     private String languageLevel;
     private String genderPreference;
     private int minAge;
     private int maxAge;
-    private Date createdAt;
+    private boolean allowApproval;
     private boolean isActive;
 
-    // Getters & Setters
-    public int getRoomId() {
-        return roomId;
-    }
+    public Room() {}
 
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
-    }
-
-    public int getHostUserId() {
-        return hostUserId;
-    }
-
-    public void setHostUserId(int hostUserId) {
-        this.hostUserId = hostUserId;
-    }
-
-    public String getLanguageLevel() {
-        return languageLevel;
-    }
-
-    public void setLanguageLevel(String languageLevel) {
+    public Room(int hostUserID, String languageLevel, String genderPreference, int minAge, int maxAge, boolean allowApproval) {
+        this.hostUserID = hostUserID;
         this.languageLevel = languageLevel;
-    }
-
-    public String getGenderPreference() {
-        return genderPreference;
-    }
-
-    public void setGenderPreference(String genderPreference) {
         this.genderPreference = genderPreference;
-    }
-
-    public int getMinAge() {
-        return minAge;
-    }
-
-    public void setMinAge(int minAge) {
         this.minAge = minAge;
-    }
-
-    public int getMaxAge() {
-        return maxAge;
-    }
-
-    public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
+        this.allowApproval = allowApproval;
+        this.isActive = true; // Mặc định là true
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+    public int getRoomID() { return roomID; }
+    public void setRoomID(int roomID) { this.roomID = roomID; }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+    public int getHostUserID() { return hostUserID; }
+    public void setHostUserID(int hostUserID) { this.hostUserID = hostUserID; }
 
-    public boolean getIsActive() {
-        return isActive;
-    }
+    public String getLanguageLevel() { return languageLevel; }
+    public void setLanguageLevel(String languageLevel) { this.languageLevel = languageLevel; }
 
-    public void setIsActive(boolean active) {
-        isActive = active;
-    }
+    public String getGenderPreference() { return genderPreference; }
+    public void setGenderPreference(String genderPreference) { this.genderPreference = genderPreference; }
+
+    public int getMinAge() { return minAge; }
+    public void setMinAge(int minAge) { this.minAge = minAge; }
+
+    public int getMaxAge() { return maxAge; }
+    public void setMaxAge(int maxAge) { this.maxAge = maxAge; }
+
+    public boolean isAllowApproval() { return allowApproval; }
+    public void setAllowApproval(boolean allowApproval) { this.allowApproval = allowApproval; }
+
+    public boolean isActive() { return isActive; }
+    public void setIsActive(boolean isActive) { this.isActive = isActive; }
 }

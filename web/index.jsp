@@ -20,7 +20,7 @@
 
                 
                <%@include file="chatBoxjsp/chatBox.jsp" %> 
-                <%@include file="jitsi.jsp" %>  
+              
                
             </div>
         </div>
