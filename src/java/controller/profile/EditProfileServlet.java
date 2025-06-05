@@ -56,16 +56,16 @@ public class EditProfileServlet extends HttpServlet {
 
             if (success) {
                 session.setAttribute("authUser", currentUser); // Cập nhật session
-                response.sendRedirect("profile-view.jsp"); // Hoặc redirect lại trang profile
+                response.sendRedirect("Profile/profile-view.jsp"); // Redirect về trang xem profile
             } else {
                 request.setAttribute("error", "Cập nhật không thành công.");
-                request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+                request.getRequestDispatcher("Profile/editprofile.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+            request.getRequestDispatcher("Profile/editprofile.jsp").forward(request, response);
         }
     }
 }

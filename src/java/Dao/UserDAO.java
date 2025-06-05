@@ -42,6 +42,12 @@ public class UserDAO {
                 user.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 user.setActive(rs.getBoolean("IsActive"));
                 user.setLocked(rs.getBoolean("IsLocked"));
+                user.setBirthDate(rs.getDate("BirthDate"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setJapaneseLevel(rs.getString("JapaneseLevel"));
+                user.setAddress(rs.getString("Address"));
+                user.setCountry(rs.getString("Country"));
+                user.setAvatar(rs.getString("Avatar"));
                 return user;
             }
         }
@@ -126,7 +132,7 @@ public class UserDAO {
 
     public User getUserByEmail(String email) {
         User user = null;
-        String sql = "SELECT userID, roleID, email, passwordHash, googleID, fullName, createdAt, isActive, isLocked FROM Users WHERE email = ?";
+        String sql = "SELECT * FROM Users WHERE email = ?";
 
         try (Connection conn = JDBCConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -145,6 +151,12 @@ public class UserDAO {
                 user.setCreatedAt(rs.getDate("createdAt"));
                 user.setActive(rs.getBoolean("isActive"));
                 user.setLocked(rs.getBoolean("isLocked"));
+                user.setBirthDate(rs.getDate("BirthDate"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setJapaneseLevel(rs.getString("JapaneseLevel"));
+                user.setAddress(rs.getString("Address"));
+                user.setCountry(rs.getString("Country"));
+                user.setAvatar(rs.getString("Avatar"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

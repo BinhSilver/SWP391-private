@@ -79,7 +79,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn primary">Save Changes</button>
-                <button type="button" class="btn secondary" onclick="window.location.href='../Profile/profile-view.jsp'">Cancel</button>
+                <button type="button" class="btn secondary" onclick="window.location.href='..qew.jsp'">Cancel</button>
             </div>
         </form>
     </div>
