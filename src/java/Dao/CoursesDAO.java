@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.*;
-
 import DB.JDBCConnection;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -10,16 +9,13 @@ import java.util.List;
 import model.Course;
 
 public class CoursesDAO {
-      public static ArrayList<Course> searchCourse(String keyword) {
+    public static ArrayList<Course> searchCourse(String keyword) {
         ArrayList<Course> list = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Courses] WHERE title LIKE ?";
 
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setString(1, "%" + keyword + "%");
-      
-
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -33,7 +29,6 @@ public class CoursesDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
@@ -47,6 +42,7 @@ public class CoursesDAO {
             stmt.executeUpdate();
         }
     }
+
     public void update(Course c) throws SQLException {
         String sql = "UPDATE [dbo].[Courses] SET Title=?, Description=?, IsHidden=? WHERE CourseID=?";
         try (Connection conn = JDBCConnection.getConnection();
@@ -67,7 +63,8 @@ public class CoursesDAO {
             stmt.executeUpdate();
         }
     }
-        public List<Course> getAllCoursesforchatbox() throws SQLException {
+
+    public List<Course> getAllCoursesforchatbox() throws SQLException {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Courses]";
         try (Connection conn = JDBCConnection.getConnection();
@@ -76,21 +73,21 @@ public class CoursesDAO {
             while (rs.next()) {
                 Course course = new Course();
                 course.setCourseID(rs.getInt("CourseID"));
-               course.setTitle(rs.getNString("Title"));
-               course.setDescription(rs.getNString("Description"));
+                course.setTitle(rs.getNString("Title"));
+                course.setDescription(rs.getNString("Description"));
                 courses.add(course);
             }
         }
         return courses;
     }
-           public JsonArray getAllCoursesforchatboxt() {
+
+    public JsonArray getAllCoursesforchatboxt() {
         JsonArray jsonArray = new JsonArray();
         String sql = "SELECT * FROM Courses";
 
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 JsonObject obj = new JsonObject();
                 obj.addProperty("CourseID", rs.getInt("CourseID"));
@@ -98,12 +95,40 @@ public class CoursesDAO {
                 obj.addProperty("Description", rs.getNString("Description"));
                 jsonArray.add(obj);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return jsonArray;
     }
+
+    // New method to get total courses
+    public int getTotalCourses() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Courses]";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Total");
+            }
+        }
+        return 0;
+    }
+
+    // New method to get course count for a specific month and year
+    public int getCoursesByMonthAndYear(int month, int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
     public static void main(String[] args) throws SQLException {
         CoursesDAO testcourse = new CoursesDAO();
         test.Testcase.printlist(testcourse.searchCourse("Tiếng Nhật Sơ Cấp N5: Khởi đầu hoàn hảo"));

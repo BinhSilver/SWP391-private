@@ -4,6 +4,7 @@ import java.sql.*;
 
 import DB.JDBCConnection;
 import model.UserPremium;
+import org.checkerframework.checker.units.qual.A;
 
 public class UserPremiumDAO {
 
@@ -38,5 +39,27 @@ public class UserPremiumDAO {
             stmt.setInt(2, planID);
             stmt.executeUpdate();
         }
+    }
+    
+    /**
+     * Lấy số người dùng Premium trong một tháng và năm cụ thể từ bảng UserPremium
+     */
+    public int getPremiumUsersByMonthAndYear(int month, int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[UserPremium] WHERE MONTH(StartDate) = ? AND YEAR(StartDate) = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Count");
+                }
+            }
+        }
+        return 0;
+    }
+    public static void main(String[] args) throws SQLException {
+        UserPremiumDAO d = new UserPremiumDAO();
+        System.out.println(d.getPremiumUsersByMonthAndYear(5, 2025));
     }
 }

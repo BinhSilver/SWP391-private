@@ -1,24 +1,23 @@
-package servlet;
+package controller.chart;
 
+import dao.CoursesDAO;
 import dao.UserDAO;
 import dao.UserPremiumDAO;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import DB.JDBCConnection;
+import java.time.LocalDate;
 
 @WebServlet("/UserStatsServlet")
 public class UserStatsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Khởi tạo biến
         int totalUsers = 0;
         int currentMonthUsers = 0;
         int previousMonthUsers = 0;
@@ -26,70 +25,114 @@ public class UserStatsServlet extends HttpServlet {
         int currentMonthPremium = 0;
         int previousMonthPremium = 0;
         double premiumGrowthRate = 0.0;
+        int totalCourses = 0;
+        int currentMonthCourses = 0;
+        int previousMonthCourses = 0;
+        double courseGrowthRate = 0.0;
 
-        try (Connection conn = JDBCConnection.getConnection()) {
-            // Total users
-            String totalSql = "SELECT COUNT(*) AS Total FROM Users";
-            PreparedStatement totalStmt = conn.prepareStatement(totalSql);
-            ResultSet totalRs = totalStmt.executeQuery();
-            if (totalRs.next()) {
-                totalUsers = totalRs.getInt("Total");
-            }
+        // Log bắt đầu xử lý yêu cầu
+        System.out.println("Bắt đầu xử lý yêu cầu UserStatsServlet: " + request.getQueryString());
 
-            // Current month users (June 2025)
-            String currentUserSql = "SELECT COUNT(*) AS Count FROM Users WHERE MONTH(CreatedAt) = 6 AND YEAR(CreatedAt) = 2025";
-            PreparedStatement currentUserStmt = conn.prepareStatement(currentUserSql);
-            ResultSet currentUserRs = currentUserStmt.executeQuery();
-            if (currentUserRs.next()) {
-                currentMonthUsers = currentUserRs.getInt("Count");
-            }
+        // Luôn sử dụng tháng và năm hiện tại
+        LocalDate today = LocalDate.now();
+        int currentMonth = today.getMonthValue();
+        int currentYear = today.getYear();
+        System.out.println("Tháng/năm hiện tại: currentMonth=" + currentMonth + ", currentYear=" + currentYear);
 
-            // Previous month users (May 2025)
-            String previousUserSql = "SELECT COUNT(*) AS Count FROM Users WHERE MONTH(CreatedAt) = 5 AND YEAR(CreatedAt) = 2025";
-            PreparedStatement previousUserStmt = conn.prepareStatement(previousUserSql);
-            ResultSet previousUserRs = previousUserStmt.executeQuery();
-            if (previousUserRs.next()) {
-                previousMonthUsers = previousUserRs.getInt("Count");
-            }
+        // Tính tháng và năm trước đó
+        LocalDate currentDate = LocalDate.of(currentYear, currentMonth, 1);
+        LocalDate previousMonthDate = currentDate.minusMonths(1);
+        int previousMonth = previousMonthDate.getMonthValue();
+        int previousYear = previousMonthDate.getYear();
+        System.out.println("Tháng/năm trước đó: previousMonth=" + previousMonth + ", previousYear=" + previousYear);
 
-            // Calculate user growth rate
+        UserPremiumDAO userp = new UserPremiumDAO();
+        UserDAO user = new UserDAO();
+        try {
+            // Lấy dữ liệu người dùng
+            totalUsers = user.getTotalUsers();
+            System.out.println("Tổng số người dùng: totalUsers=" + totalUsers);
+            currentMonthUsers = user.getUsersByMonthAndYear(currentMonth, currentYear);
+            System.out.println("Người dùng tháng hiện tại: currentMonthUsers=" + currentMonthUsers);
+            previousMonthUsers = user.getUsersByMonthAndYear(previousMonth, previousYear);
+            System.out.println("Người dùng tháng trước: previousMonthUsers=" + previousMonthUsers);
+
+            // Tính tỷ lệ tăng trưởng người dùng
             if (previousMonthUsers > 0) {
-                userGrowthRate = ((double)(currentMonthUsers - previousMonthUsers) / previousMonthUsers) * 100;
+                userGrowthRate = ((double) (currentMonthUsers - previousMonthUsers) / previousMonthUsers) * 100;
             } else if (currentMonthUsers > 0) {
-                userGrowthRate = 100.0;
+                userGrowthRate = 100.0; // 100% nếu tháng trước = 0 và tháng hiện tại > 0
+            } 
+            if (userGrowthRate<=0){
+                userGrowthRate = 0.0; // 0% nếu cả hai tháng đều = 0
             }
+            System.out.println("Tỷ lệ tăng trưởng người dùng: userGrowthRate=" + userGrowthRate);
 
-            // Current month premium registrations (June 2025)
-            String currentPremiumSql = "SELECT COUNT(*) AS Count FROM UserPremium WHERE MONTH(StartDate) = 6 AND YEAR(StartDate) = 2025";
-            PreparedStatement currentPremiumStmt = conn.prepareStatement(currentPremiumSql);
-            ResultSet currentPremiumRs = currentPremiumStmt.executeQuery();
-            if (currentPremiumRs.next()) {
-                currentMonthPremium = currentPremiumRs.getInt("Count");
-            }
+            // Lấy dữ liệu người dùng Premium
+            currentMonthPremium = userp.getPremiumUsersByMonthAndYear(currentMonth, currentYear);
+            System.out.println("Người dùng Premium tháng hiện tại: currentMonthPremium=" + currentMonthPremium);
+            previousMonthPremium = userp.getPremiumUsersByMonthAndYear(previousMonth, previousYear);
+            System.out.println("Người dùng Premium tháng trước: previousMonthPremium=" + previousMonthPremium);
 
-            // Previous month premium registrations (May 2025)
-            String previousPremiumSql = "SELECT COUNT(*) AS Count FROM UserPremium WHERE MONTH(StartDate) = 5 AND YEAR(StartDate) = 2025";
-            PreparedStatement previousPremiumStmt = conn.prepareStatement(previousPremiumSql);
-            ResultSet previousPremiumRs = previousPremiumStmt.executeQuery();
-            if (previousPremiumRs.next()) {
-                previousMonthPremium = previousPremiumRs.getInt("Count");
-            }
-
-            // Calculate premium growth rate
+            // Tính tỷ lệ tăng trưởng Premium
             if (previousMonthPremium > 0) {
-                premiumGrowthRate = ((double)(currentMonthPremium - previousMonthPremium) / previousMonthPremium) * 100;
+                premiumGrowthRate = ((double) (currentMonthPremium - previousMonthPremium) / previousMonthPremium) * 100;
             } else if (currentMonthPremium > 0) {
-                premiumGrowthRate = 100.0;
+                premiumGrowthRate = 100.0; // 100% nếu tháng trước = 0 và tháng hiện tại > 0
+            } else {
+                premiumGrowthRate = 0.0; // 0% nếu cả hai tháng đều = 0
             }
+            System.out.println("Tỷ lệ tăng trưởng Premium: premiumGrowthRate=" + premiumGrowthRate);
+
+            // Lấy dữ liệu khóa học
+            CoursesDAO coursesDAO = new CoursesDAO();
+            totalCourses = coursesDAO.getTotalCourses();
+            System.out.println("Tổng số khóa học: totalCourses=" + totalCourses);
+            currentMonthCourses = coursesDAO.getCoursesByMonthAndYear(currentMonth, currentYear);
+            System.out.println("Khóa học tháng hiện tại: currentMonthCourses=" + currentMonthCourses);
+            previousMonthCourses = coursesDAO.getCoursesByMonthAndYear(previousMonth, previousYear);
+            System.out.println("Khóa học tháng trước: previousMonthCourses=" + previousMonthCourses);
+
+            // Tính tỷ lệ tăng trưởng khóa học
+            if (previousMonthCourses > 0) {
+                courseGrowthRate = ((double) (currentMonthCourses - previousMonthCourses) / previousMonthCourses) * 100;
+            } else if (currentMonthCourses > 0) {
+                courseGrowthRate = 100.0; // 100% nếu tháng trước = 0 và tháng hiện tại > 0
+            } else {
+                courseGrowthRate = 0.0; // 0% nếu cả hai tháng đều = 0
+            }
+            System.out.println("Tỷ lệ tăng trưởng khóa học: courseGrowthRate=" + courseGrowthRate);
 
         } catch (SQLException e) {
+            System.out.println("Lỗi SQL: " + e.getMessage());
             e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"Lỗi truy vấn cơ sở dữ liệu: " + e.getMessage() + "\"}");
+            return;
+        } catch (Exception e) {
+            System.out.println("Lỗi khác: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"Lỗi server: " + e.getMessage() + "\"}");
+            return;
         }
 
-        request.setAttribute("totalUsers", totalUsers);
-        request.setAttribute("userGrowthRate", String.format("%.1f", userGrowthRate));
-        request.setAttribute("currentMonthPremium", currentMonthPremium);
-        request.setAttribute("premiumGrowthRate", String.format("%.1f", premiumGrowthRate));
-        request.getRequestDispatcher("/dashboard.jsp").forward(request, response);
+        // Trả về JSON
+        System.out.println("Trả về JSON: ");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String json = String.format(
+                "{ \"totalUsers\": %d, \"userGrowthRate\": %.1f, \"currentMonthPremium\": %d, \"premiumGrowthRate\": %.1f, \"totalCourses\": %d, \"courseGrowthRate\": %.1f }",
+                totalUsers, userGrowthRate, currentMonthPremium, premiumGrowthRate, totalCourses, courseGrowthRate
+        );
+        System.out.println(json);
+
+        response.getWriter().write(json);
+        System.out.println("Hoàn tất xử lý yêu cầu UserStatsServlet");
     }
 }

@@ -4,8 +4,10 @@
  */
 package controller.search;
 
+
 import com.google.gson.Gson;
 import dao.CoursesDAO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;

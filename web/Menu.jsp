@@ -51,9 +51,14 @@
                         <a class="nav-link" href="video.jsp">call video</a>
                     </li>
                 </c:if>
-    <c:if test="${sessionScope.acc == null}">
+                <c:if test="${sessionScope.acc == null}">
                     <li class="nav-item">
-                        <a class="nav-link" href="statis.jsp">Statis</a>
+                        <a class="nav-link" href="statis.jsp">admin</a>
+                    </li>
+                </c:if>
+                <c:if test="${sessionScope.acc == null}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="userManagement">user</a>
                     </li>
                 </c:if>
                 <%--  <c:if test="${sessionScope.acc.isAdmin == 1}">

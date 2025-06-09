@@ -11,6 +11,38 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class UserDAO {
+ /**
+     * Lấy tổng số người dùng từ bảng Users
+     */
+    public int getTotalUsers() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Users]";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Total");
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Lấy số người dùng trong một tháng và năm cụ thể từ bảng Users
+     */
+    public int getUsersByMonthAndYear(int month, int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Users] WHERE MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Count");
+                }
+            }
+        }
+        return 0;
+    }
 
     public void insertUser(User user) throws SQLException {
         String sql = "INSERT INTO [dbo].[Users] (RoleID, Email, PasswordHash, GoogleID, FullName, IsActive, IsLocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -187,43 +219,9 @@ public class UserDAO {
     }
 
     public static void main(String[] args) throws SQLException {
-        UserDAO dao = new UserDAO();
-
-        // In danh sách user hiện tại
-        List<User> userstrc = dao.getAllUsers();
-        for (User u : userstrc) {
-            System.out.println(u);
-        }
-
-        // Thử cập nhật profile người dùng có ID = 1
-        try {
-            User user = new User();
-            user.setUserID(1); // ⚠️ Đảm bảo ID này tồn tại trong DB
-
-            user.setEmail("jdk22_test@example.com");
-            user.setFullName("Test User JDK21");
-            user.setPhoneNumber("0909123456");
-
-            String birthDateStr = "2000-01-01";
-            Date birthDate = new SimpleDateFormat("yyyy-MM-dd").parse(birthDateStr);
-            user.setBirthDate(birthDate);
-
-            user.setJapaneseLevel("N3");
-            user.setAddress("1-2-3 Tokyo");
-            user.setCountry("Japan");
-            user.setAvatar("https://example.com/avatar.png");
-
-            boolean updated = dao.updateProfile(user);
-            System.out.println(updated ? "✅ Update thành công" : "❌ Update thất bại");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-           // In danh sách user hiện tại
-        List<User> users = dao.getAllUsers();
-        for (User u : users) {
-            System.out.println(u);
-        }
+       UserDAO dao = new UserDAO();
+     
+       
     }
     public JsonArray getRegistrationsByPeriod(String periodType) {
         JsonArray jsonArray = new JsonArray();
@@ -247,4 +245,5 @@ public class UserDAO {
         }
         return jsonArray;
     }
+
 }
