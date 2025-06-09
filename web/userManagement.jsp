@@ -11,7 +11,7 @@
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex space-x-4">
                 <a href="index.jsp" class="text-blue-600">Home</a>
-                <a href="#" class="text-blue-600">Static</a>
+                <a href="userstatistic.jsp" class="text-blue-600">Static</a>
             </div>
             <div>
                 <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-full">
