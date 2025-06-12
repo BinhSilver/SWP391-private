@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.User" %>
 <%
@@ -19,22 +18,22 @@
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-4">User Registrations Chart</h1>
+        <h1 class="text-2xl font-bold mb-6">Biểu đồ đăng ký người dùng</h1>
 
         <!-- Chart Container -->
-        <div class="bg-white p-4 rounded-lg shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Registrations by Period</h2>
-                <select id="timePeriod" class="border p-2 rounded">
-                    <option value="month">Monthly</option>
-                    <option value="week">Weekly</option>
-                    <option value="day">Daily</option>
-                </select>
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-semibold">Đăng ký theo kỳ</h2>
+                
+               <select id="timePeriod" class="border p-2 rounded">
+    <option value="month" selected>Tháng</option>
+    <option value="year">Năm</option>              
+</select>
+
             </div>
             <canvas id="registrationChart" height="200"></canvas>
         </div>
     </div>
-
     <script>
         // Initialize chart
         const registrationCtx = document.getElementById('registrationChart').getContext('2d');
@@ -43,7 +42,7 @@
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'User Registrations',
+                    label: 'Người dùng ',
                     data: [],
                     backgroundColor: 'rgba(153, 102, 255, 0.5)',
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -54,10 +53,10 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Number of Registrations' }
+                        title: { display: true, text: 'Số lượng đăng ký' }
                     },
                     x: {
-                        title: { display: true, text: 'Time Period' }
+                        title: { display: true, text: 'Khoảng thời gian' }
                     }
                 }
             }
@@ -65,17 +64,27 @@
 
         // Fetch and update chart data
         async function fetchChartData(period) {
+            const validPeriod = period || 'month'; // Dự phòng nếu period rỗng
+            console.log('Gọi fetchChartData với period:', validPeriod);
+            const url = '/SWP_HUY/api/userstats?period=' + validPeriod; // Dùng nối chuỗi
+            console.log('URL yêu cầu:', url);
             try {
-                const contextPath = '<%= request.getContextPath() %>';
-                const response = await fetch(`api/registrations?period=${period}`);
+                const response = await fetch(url, {
+                    cache: 'no-store' // Prevent caching
+                });
+                console.log('Trạng thái phản hồi:', response.status, response.statusText);
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json();
                 console.log('Registration Data:', data);
 
-                registrationChart.data.labels = data.map(item => item.period);
-                registrationChart.data.datasets[0].data = data.map(item => item.count);
+                // Ensure data is in correct format
+                const labels = data.map(item => item.period || 'Unknown');
+                const counts = data.map(item => item.count || 0);
+
+                registrationChart.data.labels = labels;
+                registrationChart.data.datasets[0].data = counts;
                 registrationChart.update();
             } catch (error) {
                 console.error('Error fetching registration data:', error.message);
@@ -84,13 +93,16 @@
         }
 
         // Initial data fetch
-        window.onload = function() {
-            fetchChartData('month');
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, gọi fetchChartData với month');
+            fetchChartData('month'); // Default to month
+        });
 
         // Update chart on period change
         document.getElementById('timePeriod').addEventListener('change', function() {
-            fetchChartData(this.value);
+            const selectedPeriod = this.value;
+            console.log('Khoảng thời gian được chọn:', selectedPeriod);
+            fetchChartData(selectedPeriod);
         });
     </script>
 </body>
