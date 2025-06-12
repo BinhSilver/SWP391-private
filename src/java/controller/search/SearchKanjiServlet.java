@@ -6,7 +6,7 @@ package controller.search;
 import java.sql.*;
 import DB.JDBCConnection;
 import com.google.gson.Gson;
-import dao.KanjiDAO;
+import Dao.KanjiDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

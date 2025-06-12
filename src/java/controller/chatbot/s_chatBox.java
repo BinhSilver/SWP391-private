@@ -28,7 +28,8 @@ public class s_chatBox extends HttpServlet {
             requestData.append(line);
         }
 
-        JsonObject requestJson = JsonParser.parseString(requestData.toString()).getAsJsonObject();
+        JsonParser parser = new JsonParser();
+        JsonObject requestJson = parser.parse(requestData.toString()).getAsJsonObject();
         String userMessage = requestJson.has("message") ? requestJson.get("message").getAsString().trim() : "";
 
         if (userMessage.isEmpty()) {
@@ -106,7 +107,7 @@ public class s_chatBox extends HttpServlet {
 
         String aiResponseText = "Không thể xử lý phản hồi từ AI.";
         try {
-            JsonObject jsonResponse = JsonParser.parseString(responseStr.toString()).getAsJsonObject();
+            JsonObject jsonResponse = parser.parse(responseStr.toString()).getAsJsonObject();
             if (jsonResponse.has("choices")) {
                 JsonArray choices = jsonResponse.getAsJsonArray("choices");
                 if (choices.size() > 0) {

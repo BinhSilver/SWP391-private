@@ -1,4 +1,4 @@
-package controller.profile;
+package Dao;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
-import dao.UserDAO;
+import Dao.UserDAO;
 
 @WebServlet("/editprofile")
 public class EditProfileServlet extends HttpServlet {

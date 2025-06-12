@@ -235,6 +235,11 @@ public class User {
     public void setIsLocked(boolean isLocked) {
         this.isLocked = isLocked;
     }
+
+    public boolean isAdmin() {
+        return this.roleID == 4; // Assuming roleID 4 is for admin -- chỉnh chỗ này theo code của mng. T set để test 
+    }
+
     public int getAge() {
     if (birthDate == null) return -1;
 
@@ -244,3 +249,4 @@ public class User {
     return Period.between(birth, today).getYears();
 }
 }
+
