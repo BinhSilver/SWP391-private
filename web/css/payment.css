@@ -1,0 +1,130 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  h2 {
+    text-align: center;
+    color: #1f2937;
+    margin-bottom: 30px;
+  }
+  
+  .plans {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: nowrap; /* Giữ nằm ngang */
+  }
+  
+  .plan {
+    flex: 1 1 50%;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #d1fae5;
+    background-color: #ecfdf5;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    min-height: 280px;
+  }
+  
+  .plan h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #065f46;
+  }
+  
+  .plan .badge {
+    background-color: #10b981;
+    color: white;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 5px;
+  }
+  
+  .price {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  .original-price {
+    text-decoration: line-through;
+    color: #9ca3af;
+    margin-right: 6px;
+  }
+  
+  .plan ul {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+    color: #374151;
+  }
+  
+  .plan ul li {
+    margin-bottom: 5px;
+  }
+  
+  .plan::after {
+    content: "Mua dịch vụ";
+    display: block;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: bold;
+  }
+  
+  .plan.selected {
+    background-color: #bbf7d0;
+    border-color: #22c55e;
+  }
+  
+  .plan.selected::after {
+    content: "Chọn gói này";
+    background-color: #22c55e;
+    color: white;
+  }
+  
+  .next-btn {
+    display: block;
+    width: fit-content;
+    margin: 30px auto 0;
+    padding: 12px 30px;
+    font-size: 16px;
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .next-btn:hover {
+    background-color: #15803d;
+  }
+  
+  /* Responsive fallback nếu cần */
+  @media (max-width: 720px) {
+    .plans {
+      flex-direction: column;
+    }
+  
+    .plan {
+      flex: 1 1 100%;
+    }
+  }
+  

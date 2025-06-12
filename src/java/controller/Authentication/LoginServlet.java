@@ -1,7 +1,7 @@
 package controller.Authentication;
 
 import controller.Email.EmailUtil;
-import dao.UserDAO;
+import Dao.UserDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import jakarta.servlet.ServletException;

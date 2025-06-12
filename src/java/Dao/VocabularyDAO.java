@@ -1,4 +1,4 @@
-package dao;
+package Dao;
 
 import java.sql.*;
 import model.Vocabulary;

@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!--begin of menu-->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark" style="position: fixed; top: 0; width:100%;  z-index: 100000;">
     <div class="container">
@@ -12,60 +12,37 @@
             <ul class="navbar-nav m-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="home">Home</a>
-                </li> 
-                <li class="nav-item">
-                    <a class="nav-link" href="shop">Shop</a>
-                </li> 
+                </li>
 
-                <%--  <c:if test="${sessionScope.acc.isSell == 1}">
-                     <li class="nav-item">
-                         <a class="nav-link" href="manager">Manager Product</a>
-                     </li>
-                 </c:if> --%>
-                <c:if test="${sessionScope.acc != null}">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Hello ${sessionScope.acc.user}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logout">Logout</a>
-                    </li> 
-                </c:if>
-                <c:if test="${sessionScope.acc == null}">
+                <!-- Nếu CHƯA đăng nhập -->
+                <c:if test="${sessionScope.authUser == null}">
                     <li class="nav-item">
                         <a class="nav-link" href="LoginJSP/LoginIndex.jsp">Login</a>
                     </li>
                 </c:if>
 
-                <c:if test="${sessionScope.acc != null}">
+                <!-- Nếu ĐÃ đăng nhập -->
+                <c:if test="${sessionScope.authUser != null}">
+                    <!-- Nếu là admin -->
+                    <c:if test="${sessionScope.authUser.isAdmin()}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="adminHome">Admin Dashboard</a>
+                        </li>
+                    </c:if>
+                    
                     <li class="nav-item">
-                        <a class="nav-link" href="Profile/EditProfile.jsp">Edit Profile</a>
+                        <a class="nav-link" href="logout">Logout</a>
                     </li>
-                </c:if>
-                <c:if test="${sessionScope.acc == null}">
                     <li class="nav-item">
                         <a class="nav-link" href="Profile/profile-view.jsp">My Profile</a>
                     </li>
-                </c:if>
-                <c:if test="${sessionScope.acc == null}">
                     <li class="nav-item">
-                        <a class="nav-link" href="video.jsp">call video</a>
+                        <a class="nav-link" href="VideoCall/call.jsp">Video Call</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="PaymentJSP/Payment.jsp">Upgrade Premium</a>
                     </li>
                 </c:if>
-                <c:if test="${sessionScope.acc == null}">
-                    <li class="nav-item">
-                        <a class="nav-link" href="statis.jsp">admin</a>
-                    </li>
-                </c:if>
-                <c:if test="${sessionScope.acc == null}">
-                    <li class="nav-item">
-                        <a class="nav-link" href="userManagement">user</a>
-                    </li>
-                </c:if>
-                <%--  <c:if test="${sessionScope.acc.isAdmin == 1}">
-                     <li class="nav-item">
-                         <a class="nav-link" href="statistic">Statistic</a>
-                     </li>
-                 </c:if> --%>
             </ul>
         </div>
     </div>
