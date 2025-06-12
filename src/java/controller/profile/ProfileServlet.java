@@ -89,12 +89,12 @@ public class ProfileServlet extends HttpServlet {
             // Gửi lại thông tin để hiển thị
             request.setAttribute("user", user);
             request.setAttribute("successMessage", "Cập nhật thành công!");
-            request.getRequestDispatcher("/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Profile/profile-view.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Đã xảy ra lỗi khi cập nhật.");
-            request.getRequestDispatcher("/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Profile/profile-view.jsp").forward(request, response);
         }
     }
 }
