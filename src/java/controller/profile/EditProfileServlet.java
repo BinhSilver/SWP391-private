@@ -1,4 +1,4 @@
-package Dao;
+package controller.profile;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
