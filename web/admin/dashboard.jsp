@@ -24,6 +24,13 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Premium Management</h5>
+                        <p class="card-text">Manage premium plans and subscriptions.</p>
+                        <a href="${pageContext.request.contextPath}/premiumManagement" class="btn btn-primary">Go to Premium Management</a>
+            </div>
             
             <!-- Add more admin features here -->
         </div>
