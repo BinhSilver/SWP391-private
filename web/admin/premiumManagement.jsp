@@ -77,7 +77,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="admin/premium">
+                        <a class="nav-link active" href="${pageContext.request.contextPath}/premiumManagement">
                             <i class="fas fa-users me-2"></i>
                             Quản lý các gói premium
                         </a>
@@ -132,13 +132,14 @@
                                                 <td>${plan.durationInMonths}</td>
                                                 <td>${plan.description}</td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-primary btn-action" onclick="editPlan(${plan.planID})">
+                                                    <button class="btn btn-sm btn-primary btn-action" onclick="editPlan('${plan.planID}')">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger btn-action" onclick="deletePlan(${plan.planID})">
+                                                    <button class="btn btn-sm btn-danger btn-action" onclick="deletePlan('${plan.planID}')">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
+                                                
                                             </tr>
                                         </c:forEach>
                                     </tbody>
@@ -159,7 +160,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addPremiumForm" action="premium" method="POST">
+                        <form id="addPremiumForm" action="${pageContext.request.contextPath}/premiumManagement" method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Tên Gói</label>
                                 <input type="text" class="form-control" name="planName" required>
@@ -195,7 +196,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editPremiumForm" action="premium" method="POST">
+                        <form id="editPremiumForm" action="${pageContext.request.contextPath}/premiumManagement" method="POST">
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="planId" id="editPlanId">
                             <div class="mb-3">
@@ -225,7 +226,7 @@
         </div>
 
         <!-- Form xóa ẩn -->
-        <form id="deletePremiumForm" action="premium" method="POST" style="display: none;">
+        <form id="deletePremiumForm" action="${pageContext.request.contextPath}/premiumManagement" method="POST" style="display: none;">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="planId" id="deletePlanId">
         </form>
