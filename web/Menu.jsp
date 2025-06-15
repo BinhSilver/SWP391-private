@@ -20,7 +20,16 @@
                         <a class="nav-link" href="LoginJSP/LoginIndex.jsp">Login</a>
                     </li>
                 </c:if>
-
+                <c:if test="${sessionScope.acc == null}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="statis.jsp">admin</a>
+                    </li>
+                </c:if>
+                <c:if test="${sessionScope.acc == null}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="userManagement">user</a>
+                    </li>
+                </c:if>
                 <!-- Nếu ĐÃ đăng nhập -->
                 <c:if test="${sessionScope.authUser != null}">
                     <!-- Nếu là admin -->
@@ -29,7 +38,7 @@
                             <a class="nav-link" href="adminHome">Admin Dashboard</a>
                         </li>
                     </c:if>
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="logout">Logout</a>
                     </li>

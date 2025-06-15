@@ -5,6 +5,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="css/usermanagecss.css">
 </head>
 <body class="bg-gray-100">
     <nav class="bg-white p-4 shadow">
@@ -63,65 +64,66 @@
             </c:if>
             <c:if test="${not empty users}">
                 <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="p-2">User</th>
-                            <th class="p-2">Email</th>
-                            <th class="p-2">Phone Number</th>
-                            <th class="p-2">Role</th>
-                            <th class="p-2">Status</th>
-                            <th class="p-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="user" items="${users}">
-                            <tr class="border-t">
-                                <td class="p-2">
-                                    <img src="${user.avatar != null ? user.avatar : 'https://via.placeholder.com/40'}" 
-                                         alt="Avatar" class="rounded-full mr-2 inline-block">
-                                    ${user.fullName} <br> ID: #${user.userID}
-                                </td>
-                                <td class="p-2">${user.email}</td>
-                                <td class="p-2">${user.phoneNumber}</td>
-                                <td class="p-2">
-                                    <span class="px-2 py-1 rounded ${user.roleID == 2 ? 'bg-yellow-100 text-yellow-800' : user.roleID == 3 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
-                                        ${user.roleID == 1 ? 'Free' : user.roleID == 2 ? 'Premium' : 'Teacher'}
-                                    </span>
-                                </td>
-                                <td class="p-2">
-                                    <span class="px-2 py-1 rounded ${user.isActive && !user.isLocked ? 'bg-green-100 text-green-800' : !user.isActive ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}">
-                                        ${user.isActive && !user.isLocked ? 'Active' : !user.isActive ? 'Inactive' : 'Suspended'}
-                                    </span>
-                                </td>
-                                <td class="p-2">
-                                    <a href="${pageContext.request.contextPath}/userDetail?userId=${user.userID}" 
-                                       class="text-blue-600 mr-2">View Details</a>
-                                    <form action="${pageContext.request.contextPath}/userManagement" method="post" style="display:inline;">
-                                        <input type="hidden" name="userId" value="${user.userID}">
-                                        <c:choose>
-                                            <c:when test="${user.isLocked}">
-                                                <input type="hidden" name="action" value="active">
-                                                <button type="submit" 
-                                                        onclick="return confirm('Bạn có chắc chắn muốn kích hoạt người dùng này?')"
-                                                        class="text-green-600">
-                                                    Active
-                                                </button>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input type="hidden" name="action" value="block">
-                                                <button type="submit" 
-                                                        onclick="return confirm('Bạn có chắc chắn muốn khóa người dùng này?')"
-                                                        class="text-red-600">
-                                                    Block
-                                                </button>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </form>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="p-2">Avatar</th>
+            <th class="p-2">Full Name</th>
+            <th class="p-2">Email</th>
+            <th class="p-2">Phone Number</th>
+            <th class="p-2">Role</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <c:forEach var="user" items="${users}">
+            <tr class="border-t">
+                <td class="p-2">
+                    <img src="${user.avatar != null ? user.avatar : 'https://via.placeholder.com/60'}" 
+                         alt="Avatar" class="rounded-full mr-2 inline-block">
+                </td>
+                <td class="p-2">${user.fullName}</td>
+                <td class="p-2">${user.email}</td>
+                <td class="p-2">${user.phoneNumber}</td>
+                <td class="p-2">
+                    <span class="px-2 py-1 rounded ${user.roleID == 2 ? 'bg-yellow-100 text-yellow-800' : user.roleID == 3 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
+                        ${user.roleID == 1 ? 'Free' : user.roleID == 2 ? 'Premium' : 'Teacher'}
+                    </span>
+                </td>
+                <td class="p-2">
+                    <span class="px-2 py-1 rounded ${user.isActive && !user.isLocked ? 'bg-green-100 text-green-800' : !user.isActive ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}">
+                        ${user.isActive && !user.isLocked ? 'Active' : !user.isActive ? 'Inactive' : 'Suspended'}
+                    </span>
+                </td>
+                <td class="p-2">
+                    <a href="${pageContext.request.contextPath}/userDetail?userId=${user.userID}" 
+                       class="text-blue-600 mr-2">View Details</a>
+                    <form action="${pageContext.request.contextPath}/userManagement" method="post" style="display:inline;">
+                        <input type="hidden" name="userId" value="${user.userID}">
+                        <c:choose>
+                            <c:when test="${user.isLocked}">
+                                <input type="hidden" name="action" value="active">
+                                <button type="submit" 
+                                        onclick="return confirm('Bạn có chắc chắn muốn kích hoạt người dùng này?')"
+                                        class="text-green-600">
+                                    Active
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="hidden" name="action" value="block">
+                                <button type="submit" 
+                                        onclick="return confirm('Bạn có chắc chắn muốn khóa người dùng này?')"
+                                        class="text-red-600">
+                                    Block
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </form>
+                </td>
+            </tr>
+        </c:forEach>
+    </tbody>
+</table>
                 <div class="mt-4 flex justify-between items-center">
                     <form action="${pageContext.request.contextPath}/userManagement" method="get">
                         <input type="hidden" name="search" value="${searchTerm}">
