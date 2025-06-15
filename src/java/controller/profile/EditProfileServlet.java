@@ -56,8 +56,10 @@ public class EditProfileServlet extends HttpServlet {
 
             if (success) {
                 session.setAttribute("authUser", currentUser); // Cập nhật session
+                // Điều hướng về trang xem hồ sơ (profile-view.jsp)
                 response.sendRedirect(request.getContextPath() + "/Profile/profile-view.jsp");
             } else {
+                // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");
                 request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
             }
