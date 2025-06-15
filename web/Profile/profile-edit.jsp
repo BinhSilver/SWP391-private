@@ -18,7 +18,7 @@
     </head>
     <body>
         <div class="container">
-            <form action="editprofile" method="post" class="edit-form">
+            <form action="${pageContext.request.contextPath}/Profile/profile-view.jsp" method="post" class="edit-form">
                 <h2>Edit Profile</h2>
                 <% if (request.getAttribute("error") != null) {%>
                 <p style="color: red;"><%= request.getAttribute("error")%></p>
