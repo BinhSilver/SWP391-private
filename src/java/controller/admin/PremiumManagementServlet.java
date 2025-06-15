@@ -43,6 +43,8 @@ public class PremiumManagementServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        boolean success = false;
+
         if (action == null) {
             // Thêm mới gói premium
             String planName = request.getParameter("planName");
@@ -50,38 +52,27 @@ public class PremiumManagementServlet extends HttpServlet {
             int duration = Integer.parseInt(request.getParameter("duration"));
             String description = request.getParameter("description");
 
-            boolean success = premiumPlanDAO.addPremiumPlan(planName, price, duration, description);
-            if (success) {
-                response.sendRedirect(request.getContextPath() + "/premiumManagement");
-            } else {
-                request.setAttribute("error", "Không thể thêm gói premium");
-                doGet(request, response);
-            }
-        } else if (action.equals("update")) {
+            success = premiumPlanDAO.addPremiumPlan(planName, price, duration, description);
+        } else if (action.equals("edit")) {
             // Cập nhật gói premium
-            int planId = Integer.parseInt(request.getParameter("planId"));
+            int planID = Integer.parseInt(request.getParameter("planID"));
             String planName = request.getParameter("planName");
             double price = Double.parseDouble(request.getParameter("price"));
             int duration = Integer.parseInt(request.getParameter("duration"));
             String description = request.getParameter("description");
 
-            boolean success = premiumPlanDAO.updatePremiumPlan(planId, planName, price, duration, description);
-            if (success) {
-                response.sendRedirect(request.getContextPath() + "/premiumManagement");
-            } else {
-                request.setAttribute("error", "Không thể cập nhật gói premium");
-                doGet(request, response);
-            }
+            success = premiumPlanDAO.updatePremiumPlan(planID, planName, price, duration, description);
         } else if (action.equals("delete")) {
             // Xóa gói premium
-            int planId = Integer.parseInt(request.getParameter("planId"));
-            boolean success = premiumPlanDAO.deletePremiumPlan(planId);
-            if (success) {
-                response.sendRedirect(request.getContextPath() + "/premiumManagement");
-            } else {
-                request.setAttribute("error", "Không thể xóa gói premium");
-                doGet(request, response);
-            }
+            int planID = Integer.parseInt(request.getParameter("planID"));
+            success = premiumPlanDAO.deletePremiumPlan(planID);
+        }
+
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/premiumManagement");
+        } else {
+            request.setAttribute("error", "Không thể thực hiện thao tác");
+            doGet(request, response);
         }
     }
 } 
