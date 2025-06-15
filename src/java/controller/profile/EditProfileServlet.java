@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
-import dao.UserDAO;
+import Dao.UserDAO;
 
 @WebServlet("/editprofile")
 public class EditProfileServlet extends HttpServlet {
@@ -56,16 +56,18 @@ public class EditProfileServlet extends HttpServlet {
 
             if (success) {
                 session.setAttribute("authUser", currentUser); // Cập nhật session
-                response.sendRedirect("profile-view.jsp"); // Hoặc redirect lại trang profile
+                // Điều hướng về trang xem hồ sơ (profile-view.jsp)
+                response.sendRedirect(request.getContextPath() + "/Profile/profile-view.jsp");
             } else {
+                // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");
-                request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+                request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+            request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
         }
     }
 }

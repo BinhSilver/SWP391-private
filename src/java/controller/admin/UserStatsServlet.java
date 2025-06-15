@@ -2,7 +2,7 @@ package controller.admin;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import dao.UserDAO;
+import Dao.UserDAO;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

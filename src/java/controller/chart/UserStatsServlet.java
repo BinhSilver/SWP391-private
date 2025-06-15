@@ -1,8 +1,8 @@
 package controller.chart;
 
-import dao.CoursesDAO;
-import dao.UserDAO;
-import dao.UserPremiumDAO;
+import Dao.CoursesDAO;
+import Dao.UserDAO;
+import Dao.UserPremiumDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import jakarta.servlet.ServletException;

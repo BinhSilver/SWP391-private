@@ -1,7 +1,7 @@
 package controller.chart;
 
 import com.google.gson.Gson;
-import dao.UserDAO;
+import Dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

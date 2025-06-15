@@ -1,4 +1,4 @@
-package dao;
+package Dao;
 
 import model.Role;
 import DB.JDBCConnection;

@@ -1,6 +1,6 @@
 package controller.admin;
 
-import dao.UserDAO;
+import Dao.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

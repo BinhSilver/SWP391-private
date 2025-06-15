@@ -4,7 +4,7 @@
  */
 package controller.profile;
 
-import dao.UserDAO;
+import Dao.UserDAO;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
