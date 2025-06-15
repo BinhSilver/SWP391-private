@@ -57,13 +57,12 @@ public class UserStatsServlet extends HttpServlet {
             previousMonthUsers = user.getUsersByMonthAndYear(previousMonth, previousYear);
             System.out.println("Người dùng tháng trước: previousMonthUsers=" + previousMonthUsers);
 
-            // Tính tỷ lệ tăng trưởng người dùng
+            // Tính tỷ lệ tăng trưởng người dùng theo công thức mới
             if (previousMonthUsers > 0) {
                 userGrowthRate = ((double) (currentMonthUsers - previousMonthUsers) / previousMonthUsers) * 100;
             } else if (currentMonthUsers > 0) {
                 userGrowthRate = 100.0; // 100% nếu tháng trước = 0 và tháng hiện tại > 0
-            } 
-            if (userGrowthRate<=0){
+            } else {
                 userGrowthRate = 0.0; // 0% nếu cả hai tháng đều = 0
             }
             System.out.println("Tỷ lệ tăng trưởng người dùng: userGrowthRate=" + userGrowthRate);
@@ -74,7 +73,7 @@ public class UserStatsServlet extends HttpServlet {
             previousMonthPremium = userp.getPremiumUsersByMonthAndYear(previousMonth, previousYear);
             System.out.println("Người dùng Premium tháng trước: previousMonthPremium=" + previousMonthPremium);
 
-            // Tính tỷ lệ tăng trưởng Premium
+            // Tính tỷ lệ tăng trưởng Premium theo công thức mới
             if (previousMonthPremium > 0) {
                 premiumGrowthRate = ((double) (currentMonthPremium - previousMonthPremium) / previousMonthPremium) * 100;
             } else if (currentMonthPremium > 0) {
@@ -93,7 +92,7 @@ public class UserStatsServlet extends HttpServlet {
             previousMonthCourses = coursesDAO.getCoursesByMonthAndYear(previousMonth, previousYear);
             System.out.println("Khóa học tháng trước: previousMonthCourses=" + previousMonthCourses);
 
-            // Tính tỷ lệ tăng trưởng khóa học
+            // Tính tỷ lệ tăng trưởng khóa học theo công thức mới
             if (previousMonthCourses > 0) {
                 courseGrowthRate = ((double) (currentMonthCourses - previousMonthCourses) / previousMonthCourses) * 100;
             } else if (currentMonthCourses > 0) {
