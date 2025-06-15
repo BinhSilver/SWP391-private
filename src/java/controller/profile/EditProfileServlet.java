@@ -1,4 +1,4 @@
-package Dao;
+package controller.profile;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
 import Dao.UserDAO;
+import java.sql.SQLException;
 
 @WebServlet("/editprofile")
 public class EditProfileServlet extends HttpServlet {
@@ -51,21 +52,27 @@ public class EditProfileServlet extends HttpServlet {
             currentUser.setCountry(country);
             currentUser.setAvatar(avatar);
 
-            UserDAO dao = new UserDAO();
-            boolean success = dao.updateProfile(currentUser);
-
-            if (success) {
-                session.setAttribute("authUser", currentUser); // Cập nhật session
-                response.sendRedirect("profile-view.jsp"); // Hoặc redirect lại trang profile
-            } else {
-                request.setAttribute("error", "Cập nhật không thành công.");
-                request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+            // Update user in database
+            UserDAO userDAO = new UserDAO();
+            try {
+                boolean success = userDAO.updateProfile(currentUser);
+                if (success) {
+                    // Update session with new user data
+                    session.setAttribute("authUser", currentUser);
+                    response.sendRedirect(request.getContextPath() + "/Profile/profile-view.jsp");
+                } else {
+                    request.setAttribute("error", "Failed to update profile. Please try again.");
+                    request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                request.setAttribute("error", "An error occurred while updating profile. Please try again.");
+                request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("editprofile.jsp").forward(request, response);
+            request.setAttribute("error", "An error occurred. Please try again.");
+            request.getRequestDispatcher("/Profile/profile-edit.jsp").forward(request, response);
         }
     }
 }
