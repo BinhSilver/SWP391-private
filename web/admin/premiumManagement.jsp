@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -108,6 +109,12 @@
                     </button>
                 </div>
                 
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" role="alert">
+                        ${error}
+                    </div>
+                </c:if>
+                
                 <div class="row">
                     <div class="col-12">
                         <div class="premium-card">
@@ -132,10 +139,15 @@
                                                 <td>${plan.durationInMonths}</td>
                                                 <td>${plan.description}</td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-primary btn-action" onclick="editPlan(${plan.planID})">
+                                                    <button class="btn btn-sm btn-primary edit-plan-btn" 
+                                                            data-plan-id="${plan.planID}"
+                                                            data-plan-name="${plan.planName}"
+                                                            data-price="${plan.price}"
+                                                            data-duration="${plan.durationInMonths}"
+                                                            data-description="${plan.description}">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger btn-action" onclick="deletePlan(${plan.planID})">
+                                                    <button class="btn btn-sm btn-danger delete-plan-btn" data-plan-id="${plan.planID}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
@@ -159,7 +171,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addPremiumForm" action="premium" method="POST">
+                        <form id="addPremiumForm" action="${pageContext.request.contextPath}/premiumManagement" method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Tên Gói</label>
                                 <input type="text" class="form-control" name="planName" required>
@@ -176,11 +188,11 @@
                                 <label class="form-label">Mô tả</label>
                                 <textarea class="form-control" name="description" rows="3"></textarea>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Thêm</button>
+                            </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" form="addPremiumForm" class="btn btn-primary">Thêm</button>
                     </div>
                 </div>
             </div>
@@ -195,9 +207,9 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editPremiumForm" action="premium" method="POST">
-                            <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="planId" id="editPlanId">
+                        <form id="editPremiumForm" action="${pageContext.request.contextPath}/premiumManagement" method="POST">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="planID" id="editPlanID">
                             <div class="mb-3">
                                 <label class="form-label">Tên Gói</label>
                                 <input type="text" class="form-control" name="planName" id="editPlanName" required>
@@ -214,61 +226,61 @@
                                 <label class="form-label">Mô tả</label>
                                 <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                            </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" form="editPremiumForm" class="btn btn-primary">Cập nhật</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Form xóa ẩn -->
-        <form id="deletePremiumForm" action="premium" method="POST" style="display: none;">
-            <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="planId" id="deletePlanId">
-        </form>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Hiển thị thông báo lỗi nếu có
-            <c:if test="${not empty error}">
-                alert("${error}");
-            </c:if>
+            // Add event listeners for edit buttons
+            document.querySelectorAll('.edit-plan-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const planID = this.dataset.planId;
+                    const planName = this.dataset.planName;
+                    const price = this.dataset.price;
+                    const duration = this.dataset.duration;
+                    const description = this.dataset.description;
 
-            function editPlan(planId) {
-                // Lấy thông tin gói premium từ dòng được chọn
-                const row = document.querySelector(`tr[data-plan-id="${planId}"]`);
-                const planName = row.querySelector('td:nth-child(2)').textContent;
-                const price = row.querySelector('td:nth-child(3)').textContent;
-                const duration = row.querySelector('td:nth-child(4)').textContent;
-                const description = row.querySelector('td:nth-child(5)').textContent;
+                    document.getElementById('editPlanID').value = planID;
+                    document.getElementById('editPlanName').value = planName;
+                    document.getElementById('editPrice').value = price;
+                    document.getElementById('editDuration').value = duration;
+                    document.getElementById('editDescription').value = description;
+                    
+                    new bootstrap.Modal(document.getElementById('editPremiumModal')).show();
+                });
+            });
 
-                // Điền thông tin vào form
-                document.getElementById('editPlanId').value = planId;
-                document.getElementById('editPlanName').value = planName;
-                document.getElementById('editPrice').value = price;
-                document.getElementById('editDuration').value = duration;
-                document.getElementById('editDescription').value = description;
-
-                // Hiển thị modal
-                new bootstrap.Modal(document.getElementById('editPremiumModal')).show();
-            }
-            
-            function deletePlan(planId) {
-                if(confirm('Bạn có chắc chắn muốn xóa gói premium này?')) {
-                    document.getElementById('deletePlanId').value = planId;
-                    document.getElementById('deletePremiumForm').submit();
-                }
-            }
-
-            // Thêm data-plan-id vào các dòng trong bảng
-            document.addEventListener('DOMContentLoaded', function() {
-                const rows = document.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const planId = row.querySelector('td:first-child').textContent;
-                    row.setAttribute('data-plan-id', planId);
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-plan-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const planID = this.dataset.planId;
+                    if (confirm('Bạn có chắc chắn muốn xóa gói premium này?')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '${pageContext.request.contextPath}/premiumManagement';
+                        
+                        const actionInput = document.createElement('input');
+                        actionInput.type = 'hidden';
+                        actionInput.name = 'action';
+                        actionInput.value = 'delete';
+                        
+                        const planIDInput = document.createElement('input');
+                        planIDInput.type = 'hidden';
+                        planIDInput.name = 'planID';
+                        planIDInput.value = planID;
+                        
+                        form.appendChild(actionInput);
+                        form.appendChild(planIDInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
                 });
             });
         </script>
