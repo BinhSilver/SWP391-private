@@ -61,11 +61,11 @@ public class LoginServlet extends HttpServlet {
         } else {
             if (checkEmailExist == null) {
                 request.setAttribute("message", "Email does not exist!");
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
             request.setAttribute("message", "Incorrect old password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
 
@@ -87,7 +87,7 @@ public class LoginServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
 
@@ -111,7 +111,7 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         } else {
             request.setAttribute("message", "Invalid email or password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
 
@@ -127,20 +127,20 @@ public class LoginServlet extends HttpServlet {
 
         if (!password.equals(repass)) {
             request.setAttribute("message_signup", "Passwords do not match!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
         User existingUser = new UserDAO().getUserByEmail(email);
         if (existingUser != null) {
             request.setAttribute("message_signup", "Email already exists!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
         new UserDAO().createNewUser(email, password);
         request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
     }
 
     private boolean checkPassword(String rawPassword, String hashedPassword) {
