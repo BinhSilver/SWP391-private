@@ -59,7 +59,7 @@
                                 <h4>${course.title}
                                     <span style="color: #28a745;">
                                         <c:choose>
-                                            <c:when test="${course.isHidden}">Hidden</c:when>
+                                            <c:when test="${course.hidden}">Hidden</c:when>
                                             <c:otherwise>Visible</c:otherwise>
                                         </c:choose>
                                     </span>

@@ -36,7 +36,7 @@ public class CoursesDAO {
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.isHidden());
+            stmt.setBoolean(3, c.getHidden());
             stmt.setBoolean(4, c.isSuggested()); // ✅
             stmt.executeUpdate();
         }
@@ -47,7 +47,7 @@ public class CoursesDAO {
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.isHidden());
+            stmt.setBoolean(3, c.getHidden());
             stmt.setBoolean(4, c.isSuggested()); // ✅
             stmt.setInt(5, c.getCourseID());
             stmt.executeUpdate();
@@ -148,7 +148,7 @@ public class CoursesDAO {
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.isHidden());
+            stmt.setBoolean(3, c.getHidden());
             stmt.setBoolean(4, c.isSuggested());
 
             ResultSet rs = stmt.executeQuery();

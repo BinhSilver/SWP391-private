@@ -12,7 +12,7 @@
             <!-- Navigation Links -->
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
-                    <a class="nav-link px-2" href="<c:url value='/index.jsp'/>">Trang Chủ</a>
+                    <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
@@ -49,7 +49,7 @@
                                 </li>
                                 <c:if test="${authUser.roleID == 3 || authUser.roleID == 4}">
                                     <li>
-                                        <a class="dropdown-item" href="<c:url value='/teacher_dashboard'/>">Dashboard</a>
+                                        <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
                                     </li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>

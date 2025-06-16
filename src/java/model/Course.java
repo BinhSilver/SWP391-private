@@ -60,7 +60,7 @@ public class Course {
         this.description = description;
     }
 
-    public boolean isHidden() {
+    public boolean getHidden() {
         return isHidden;
     }
 
