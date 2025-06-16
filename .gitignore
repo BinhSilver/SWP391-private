@@ -46,3 +46,9 @@ replay_pid*
 # VS Code (nếu dùng song song)
 .vscode/
 
+# Ignore JDBCConnection.java
+src/java/DB/JDBCConnection.java
+
+# Ignore build.xml
+build.xml
+

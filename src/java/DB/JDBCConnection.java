@@ -10,10 +10,10 @@ import java.sql.SQLException;
 
 public class JDBCConnection {
 
-    private static final String URL = "jdbc:sqlserver://THAONGUYENN\\SQLEXPRESS:1433;databaseName=Wasabii;encrypt=true;trustServerCertificate=true";
+    private static final String URL = "jdbc:sqlserver://DESKTOP-FT5JB2G\\SQLEXPRESS:1433;databaseName=Wasabii;encrypt=true;trustServerCertificate=true";
 
     private static final String USER = "sa";
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "123456789";
 
     public static Connection getConnection() {
         try {
