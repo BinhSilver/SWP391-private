@@ -11,6 +11,15 @@ import Dao.UserDAO;
 
 @WebServlet("/editprofile")
 public class EditProfileServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        User currentUser = (User) session.getAttribute("authUser");
+        session.setAttribute("authUser", currentUser);
+        req.getRequestDispatcher("/Profile/profile-edit.jsp").forward(req, resp);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -57,7 +66,8 @@ public class EditProfileServlet extends HttpServlet {
             if (success) {
                 session.setAttribute("authUser", currentUser); // Cập nhật session
                 // Điều hướng về trang xem hồ sơ (profile-view.jsp)
-                response.sendRedirect(request.getContextPath() + "/Profile/profile-view.jsp");
+                request.getRequestDispatcher("/Profile/profile-view.jsp").forward(request, response);
+
             } else {
                 // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");

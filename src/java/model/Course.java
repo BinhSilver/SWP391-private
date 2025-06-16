@@ -1,13 +1,15 @@
 package model;
 
 public class Course {
+
     private int courseID;
     private String title;
     private String description;
     private boolean isHidden;
     private boolean isSuggested; // thêm thuộc tính mới
 
-    public Course() {}
+    public Course() {
+    }
 
     public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested) {
         this.courseID = courseID;
@@ -25,13 +27,13 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course{" +
-                "courseID=" + courseID +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", isHidden=" + isHidden +
-                ", isSuggested=" + isSuggested +
-                '}';
+        return "Course{"
+                + "courseID=" + courseID
+                + ", title='" + title + '\''
+                + ", description='" + description + '\''
+                + ", isHidden=" + isHidden
+                + ", isSuggested=" + isSuggested
+                + '}';
     }
 
     public int getCourseID() {
@@ -58,19 +60,20 @@ public class Course {
         this.description = description;
     }
 
-    public boolean isIsHidden() {
+    public boolean isHidden() {
         return isHidden;
     }
 
-    public void setIsHidden(boolean isHidden) {
+    public void setHidden(boolean isHidden) {
         this.isHidden = isHidden;
     }
 
-    public boolean isIsSuggested() {
+    public boolean isSuggested() {
         return isSuggested;
     }
 
-    public void setIsSuggested(boolean isSuggested) {
-        this.isSuggested = isSuggested;
+    public void setSuggested(boolean suggested) {
+        this.isSuggested = suggested;
     }
+
 }

@@ -6,6 +6,7 @@ dist/
 nbdist/
 .netbeans/
 *.orig
+src/DB/db.properties
 
 # Cache files
 *.class

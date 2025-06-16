@@ -1,26 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DB;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.Properties;
 
 public class JDBCConnection {
-
-    private static final String URL = "jdbc:sqlserver://THAONGUYENN\\SQLEXPRESS:1433;databaseName=Wasabii;encrypt=true;trustServerCertificate=true";
-
-    private static final String USER = "sa";
-    private static final String PASSWORD = "123";
+    private static final String PROPERTIES_FILE = "/DB/db.properties";
 
     public static Connection getConnection() {
-        try {
+        try (InputStream input = JDBCConnection.class.getResourceAsStream(PROPERTIES_FILE)) {
+            Properties prop = new Properties();
+            prop.load(input);
+
+            String url = prop.getProperty("db.url");
+            String user = prop.getProperty("db.user");
+            String password = prop.getProperty("db.password");
+
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            return DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException("Error connecting to the database", e);
+            return DriverManager.getConnection(url, user, password);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot load DB config or connect to database", e);
         }
     }
 }

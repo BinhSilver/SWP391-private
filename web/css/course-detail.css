@@ -1,0 +1,79 @@
+/* Cấu trúc tổng quát */
+.page-wrapper {
+    font-family: 'JetBrains Mono', monospace;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+/* Tiêu đề chính của khóa học */
+.course-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0069d9;
+}
+
+/* Khung thông tin khóa học */
+.course-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Trạng thái và đề xuất */
+.course-status {
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.course-suggested {
+    font-weight: bold;
+    color: #198754;
+}
+
+/* Accordion bài học */
+.accordion-button {
+    font-weight: 500;
+    font-size: 1.1rem;
+    background-color: #e9f5ff;
+}
+
+.accordion-body {
+    background-color: #ffffff;
+}
+
+/* Tài liệu học */
+.material-item {
+    margin-bottom: 8px;
+}
+
+.material-item .btn {
+    font-size: 0.85rem;
+    padding: 3px 10px;
+}
+
+/* Quiz */
+.quiz-question {
+    font-weight: bold;
+    color: #333333;
+}
+
+.quiz-answer-list {
+    padding-left: 20px;
+}
+
+.quiz-answer-list li {
+    margin-bottom: 5px;
+}
+
+.quiz-answer-list .correct {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Quay lại */
+.back-button {
+    margin-top: 20px;
+}
