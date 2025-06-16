@@ -17,6 +17,7 @@ public class JDBCConnection {
             String user = prop.getProperty("db.user");
             String password = prop.getProperty("db.password");
 
+
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             return DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
