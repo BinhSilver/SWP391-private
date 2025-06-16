@@ -5,7 +5,6 @@ import Dao.UserDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -22,7 +21,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+        request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
     }
 
     @Override
@@ -53,68 +52,74 @@ public class LoginServlet extends HttpServlet {
         String oldpass = request.getParameter("oldPassword");
         String newpass = request.getParameter("newPassword");
 
-        // Gọi dịch vụ để thay đổi mật khẩu
+// Gọi dịch vụ để thay đổi mật khẩu
         boolean isPasswordChanged = new PasswordService().changePassword(email, oldpass, newpass);
         User checkEmailExist = new UserDAO().getUserByEmail(email);
         if (isPasswordChanged) {
             request.setAttribute("message", "Password has been successfully changed!");
-            request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
         } else {
             if (checkEmailExist == null) {
                 request.setAttribute("message", "Email does not exist!");
-                request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
             request.setAttribute("message", "Incorrect old password!");
-            request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
 //Dang nhap
+
     private void handleSignIn(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
 
-    String email = request.getParameter("email");
-    String password = request.getParameter("password");
-    String rememberMe = request.getParameter("rememberMe");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String rememberMe = request.getParameter("rememberMe");
 
-    UserDAO dao = new UserDAO();
-    User user = dao.getUserByEmail(email);
+        UserDAO dao = new UserDAO();
+        User user = dao.getUserByEmail(email);
 
-    if (user != null && checkPassword(password, user.getPasswordHash())) {
-        // Đăng nhập thành công
-        // Lấy lại user mới nhất từ DB (để đảm bảo luôn đồng bộ thông tin)
-        User fullUser = null;
-try {
-    fullUser = dao.getUserById(user.getUserID());
-} catch (SQLException e) {
-    e.printStackTrace(); // log lỗi hoặc chuyển hướng đến trang báo lỗi
-    request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
-    request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
-    return;
-}
+        if (user != null && checkPassword(password, user.getPasswordHash())) {
+            // Kiểm tra nếu tài khoản chưa được kích hoạt (IsActive = 0)
+            if (!user.isActive()) {  // Sử dụng phương thức getter isActive() nếu trường là boolean
+                request.setAttribute("message", "Your account is not active. Please verify OTP.");
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                return;
+            }
+            // Đăng nhập thành công
+            // Lấy lại user mới nhất từ DB (để đảm bảo luôn đồng bộ thông tin)
+            User fullUser = null;
+            try {
+                fullUser = dao.getUserById(user.getUserID());
+            } catch (SQLException e) {
+                e.printStackTrace(); // log lỗi hoặc chuyển hướng đến trang báo lỗi
+                request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                return;
+            }
 
-        HttpSession session = request.getSession();
-        session.setAttribute("authUser", fullUser); // Cập nhật lại phiên bản user đầy đủ
-        session.setAttribute("userID", fullUser.getUserID()); // Có thể dùng để truy xuất lại sau này
-        session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
+            HttpSession session = request.getSession();
+            session.setAttribute("authUser", fullUser); // Cập nhật lại phiên bản user đầy đủ
+            session.setAttribute("userID", fullUser.getUserID()); // Có thể dùng để truy xuất lại sau này
+            session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
 
-        if ("on".equals(rememberMe)) {
-            setRememberMeCookies(response, email);
+            if ("on".equals(rememberMe)) {
+                setRememberMeCookies(response, email);
+            } else {
+                clearRememberMeCookies(response);
+            }
+
+            // Chuyển hướng về trang chủ
+            response.sendRedirect("index.jsp");
         } else {
-            clearRememberMeCookies(response);
+            // Đăng nhập thất bại
+            request.setAttribute("message", "Invalid email or password!");
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
         }
-
-        // Chuyển hướng về trang chủ
-        response.sendRedirect("index.jsp");
-    } else {
-        // Đăng nhập thất bại
-        request.setAttribute("message", "Invalid email or password!");
-        request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
     }
-}
 
-
-    // Đăng ký
+// Đăng ký
     private void handleSignUp(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String email = request.getParameter("email");
@@ -128,7 +133,7 @@ try {
         // Kiểm tra mật khẩu có khớp không
         if (!password.equals(repass)) {
             request.setAttribute("message_signup", "Passwords do not match!");
-            request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
@@ -136,15 +141,16 @@ try {
         User existingUser = new UserDAO().getUserByEmail(email);
         if (existingUser != null) {
             request.setAttribute("message_signup", "Email already exists!");
-            request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
         // Nếu không có lỗi, tạo tài khoản mới
         new UserDAO().createNewUser(email, password);
-        request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("LoginIndex.jsp").forward(request, response);
-        
+        request.setAttribute("showOtpForm", true);
+        request.setAttribute("email", email);
+        request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+
     }
 
     private boolean checkPassword(String rawPassword, String hashedPassword) {
