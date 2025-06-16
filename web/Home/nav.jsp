@@ -24,7 +24,7 @@
                     </c:choose>
 
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="#">Premium</a>
+                    <a class="nav-link px-2" href="<c:url value='/PaymentJSP/Payment.jsp'/>">Premium</a>
                     <a class="nav-link px-2" href="#">FlashCard</a>
 
                 </div>

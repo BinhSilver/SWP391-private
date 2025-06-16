@@ -134,14 +134,14 @@ public class LoginServlet extends HttpServlet {
         User existingUser = new UserDAO().getUserByEmail(email);
         if (existingUser != null) {
             request.setAttribute("message_signup", "Email already exists!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
         // Nếu không có lỗi, tạo tài khoản mới
         new UserDAO().createNewUser(email, password);
         request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
     }
 
