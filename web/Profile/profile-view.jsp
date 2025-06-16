@@ -24,7 +24,7 @@
                 <p class="title">User ID: <%= user.getUserID()%></p>
                 <ul class="menu">
                     <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
-                    <li><a href="profile-edit.jsp">Edit Profile</a></li>
+                    <li><a href="${pageContext.request.contextPath}/editprofile">Edit Profile</a></li>
                     <li><a href="LoginJSP/ChangePassword.jsp">Change Password</a></li>
                     <li><a href="logout">Logout</a></li>
                 </ul>

@@ -1,4 +1,3 @@
-// CourseServlet.java
 package controller.courses;
 
 import Dao.CoursesDAO;
@@ -32,14 +31,18 @@ public class CoursesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+
         String title = request.getParameter("title");
         String description = request.getParameter("description");
         boolean isHidden = request.getParameter("isHidden") != null;
+        boolean isSuggested = request.getParameter("isSuggested") != null; // ✅ Thêm dòng này
 
         Course newCourse = new Course();
         newCourse.setTitle(title);
         newCourse.setDescription(description);
-        newCourse.setIsHidden(isHidden);
+        newCourse.setHidden(isHidden);
+        newCourse.setSuggested(isSuggested); // ✅ Áp dụng vào model
 
         CoursesDAO dao = new CoursesDAO();
         try {
