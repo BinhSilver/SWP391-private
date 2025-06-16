@@ -3,16 +3,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package DB;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class JDBCConnection {
-    
-    private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=Wasabii;encrypt=true;trustServerCertificate=true;retryPolicy=none";
+
+    private static final String URL = "jdbc:sqlserver://THAONGUYENN\\SQLEXPRESS:1433;databaseName=Wasabii;encrypt=true;trustServerCertificate=true";
 
     private static final String USER = "sa";
-    private static final String PASSWORD = "123456789";
+    private static final String PASSWORD = "123";
 
     public static Connection getConnection() {
         try {

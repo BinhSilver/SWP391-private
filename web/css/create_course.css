@@ -1,0 +1,200 @@
+/* === RESET === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === GLOBAL STYLES === */
+body {
+  font-family: "JetBrains Mono", monospace;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.container {
+  width: 95%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* === TAB VERTICAL (LESSON SIDEBAR) === */
+.nav-tabs-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.nav-tabs-vertical .nav-link {
+  color: #e94f64;
+  font-weight: 600;
+  padding: 10px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.nav-tabs-vertical .nav-link.active {
+  background-color: #e94f64;
+  color: #fff;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .nav-tabs-vertical {
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .nav-tabs-vertical .nav-link {
+    border-radius: 20px;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+}
+
+/* === SCROLLBAR FOR TAB === */
+.nav-tabs-vertical::-webkit-scrollbar {
+  width: 6px;
+}
+.nav-tabs-vertical::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+.nav-tabs-vertical::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+/* === LESSON BLOCK === */
+.lesson-block {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.lesson-block h6 {
+  font-weight: 700;
+  color: #2d3a4b;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+/* === FORM ELEMENTS === */
+form input[type="text"],
+form textarea,
+form select,
+form input[type="file"] {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+  border-color: #e94f64;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(233, 79, 100, 0.1);
+  background-color: #fff;
+}
+
+/* === BUTTON STYLES === */
+.btn {
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-primary {
+  color: #e94f64;
+  border-color: #e94f64;
+}
+.btn-outline-primary:hover {
+  background-color: #e94f64;
+  color: #fff;
+}
+
+.btn-outline-success {
+  color: #28a745;
+  border-color: #28a745;
+}
+.btn-outline-success:hover {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-outline-info {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+.btn-outline-info:hover {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+/* === QUIZ MODAL === */
+.modal-content {
+  border-radius: 1rem;
+  border: none;
+  overflow: hidden;
+}
+
+.modal-header {
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+  background-color: #e94f64;
+  color: #fff;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+.modal-body {
+  padding-top: 0;
+}
+
+/* === QUIZ QUESTION BLOCK === */
+.quiz-question-block {
+  background-color: #fefefe;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.quiz-question-block h6 {
+  font-weight: 600;
+  color: #e94f64;
+  font-size: 1rem;
+}

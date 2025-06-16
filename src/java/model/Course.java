@@ -5,14 +5,16 @@ public class Course {
     private String title;
     private String description;
     private boolean isHidden;
+    private boolean isSuggested; // thêm thuộc tính mới
 
     public Course() {}
 
-    public Course(int courseID, String title, String description, boolean isHidden) {
+    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested) {
         this.courseID = courseID;
         this.title = title;
         this.description = description;
         this.isHidden = isHidden;
+        this.isSuggested = isSuggested;
     }
 
     public Course(int courseID, String title, String description) {
@@ -23,9 +25,14 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course{" + "courseID=" + courseID + ", title=" + title + ", description=" + description + ", isHidden=" + isHidden + '}';
+        return "Course{" +
+                "courseID=" + courseID +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", isHidden=" + isHidden +
+                ", isSuggested=" + isSuggested +
+                '}';
     }
-    
 
     public int getCourseID() {
         return courseID;
@@ -59,5 +66,11 @@ public class Course {
         this.isHidden = isHidden;
     }
 
-   
+    public boolean isIsSuggested() {
+        return isSuggested;
+    }
+
+    public void setIsSuggested(boolean isSuggested) {
+        this.isSuggested = isSuggested;
+    }
 }

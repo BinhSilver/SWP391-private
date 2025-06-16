@@ -37,6 +37,7 @@ public class KanjiDAO {
         }
     }
 
+    
     public void delete(int kanjiID) throws SQLException {
         String sql = "DELETE FROM Kanji WHERE KanjiID=?";
         try (Connection conn = JDBCConnection.getConnection();
@@ -45,6 +46,8 @@ public class KanjiDAO {
             stmt.executeUpdate();
         }
     }
+    
+    
      public static ArrayList<Kanji> searchKanji(String keyword) {
         ArrayList<Kanji> list = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Kanji] WHERE character LIKE ? OR meaning LIKE ?";

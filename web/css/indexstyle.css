@@ -7,3 +7,401 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Author     : Admin
 */
 
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global */
+body {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background-color: #fafafa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Layout */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  padding: 5px;
+}
+.input-group {
+  max-width: 100%;
+}
+
+.input-group .form-control {
+  border-left: 0;
+  box-shadow: none;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: 0;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.nav-links a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #e94f64;
+}
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-links a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.search-wrapper input {
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  width: 300px;
+  transition: border-color 0.3s;
+}
+
+.search-wrapper input:focus {
+  outline: none;
+  border-color: #e94f64;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #666;
+  font-size: 1rem;
+}
+
+.search-wrapper input:hover {
+  border-color: #e94f64;
+}
+
+/* Hero Section */
+.hero {
+  background: url('https://images.unsplash.com/photo-1549194389-bdedc11043f1?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
+  color: #fff;
+  padding: 5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(250, 17, 126, 0.4);
+}
+
+.hero .container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.hero-text {
+  max-width: 600px;
+  color: #a21d33;
+}
+
+.hero h1 {
+  font-weight: 800;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #e94f64;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #d43e55;
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.hero-image img {
+  max-width: 350px;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Light Streak Animation */
+.light-streak {
+  position: absolute;
+  color: #fff;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: streak linear infinite;
+}
+
+.light-streak::after {
+  content: '';
+  position: absolute;
+  width: 50px; /* Độ dài vệt sáng */
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+  transform: rotate(45deg);
+  top: 50%;
+  left: 100%;
+}
+
+@keyframes streak {
+  0% {
+    transform: translate(-100vw, -100vh) rotate(45deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(100vw, 100vh) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Featured Courses */
+.featured-courses {
+  padding: 4rem 0;
+  text-align: center;
+  background: linear-gradient(180deg, #f9f9f9 0%, #fafafa 100%);
+}
+
+.featured-courses h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2.5rem;
+  color: #e94f64;
+  font-weight: 700;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.course-card {
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.course-card h4 {
+  margin-bottom: 0.5rem;
+  color: #2d3a4b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.course-card p {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.course-meta {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+}
+
+
+
+/* Footer */
+.footer {
+  background-color: #2d3a4b;
+  color: #eee;
+  padding: 3rem 0;
+  margin-top: 3rem;
+}
+
+.footer .container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.footer strong {
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.footer a {
+  color: #e94f64;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer p {
+  font-size: 0.9rem;
+}
+
+.footer .copyright {
+  text-align: center;
+  padding-top: 2rem;
+  font-size: 0.85rem;
+  color: #aaa;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero .container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-image img {
+    max-width: 100%;
+    margin-top: 2rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    margin: 0.5rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .auth-links {
+    justify-content: center;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .search-wrapper input {
+    width: 100%;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+    margin-left: 0;
+  }
+}
+/* Wasabii Button Style */
+.btn-wasabii {
+  background-color: #fff;
+  color: #e94f64;
+  border: 1px solid #a21d33;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-decoration: none;         /* XÓA gạch chân */
+  display: inline-block;         /* Đảm bảo padding hoạt động đúng */
+}
+
+/* Hover effect */
+.btn-wasabii:hover {
+  background-color: #a21d33;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(162, 29, 51, 0.3);
+  text-decoration: none;         /* Đảm bảo hover không hiện gạch chân */
+}

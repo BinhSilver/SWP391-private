@@ -4,7 +4,6 @@
  */
 package controller.search;
 
-
 import com.google.gson.Gson;
 import Dao.CoursesDAO;
 
@@ -17,8 +16,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import model.Course;
+
 @WebServlet("/SearchCourse")
 public class SearchCourseServlet extends HttpServlet {
+
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
@@ -30,4 +31,5 @@ public class SearchCourseServlet extends HttpServlet {
         out.print(new Gson().toJson(result));
         out.flush();
     }
+
 }

@@ -1,0 +1,336 @@
+/* 
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global */
+body {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background-color: #fafafa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Layout */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  padding: 5px;
+}
+
+.input-group {
+  max-width: 100%;
+}
+
+.input-group .form-control {
+  border-left: 0;
+  box-shadow: none;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: 0;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.nav-links a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #e94f64;
+}
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-links a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.search-wrapper input {
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  width: 300px;
+  transition: border-color 0.3s;
+}
+
+.search-wrapper input:focus {
+  outline: none;
+  border-color: #e94f64;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #666;
+  font-size: 1rem;
+}
+
+.search-wrapper input:hover {
+  border-color: #e94f64;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-wasabii {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #e94f64;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.btn-primary:hover,
+.btn-wasabii:hover {
+  background-color: #d43a50;
+  color: #fff;
+}
+
+/* Wasabii Button Style */
+.btn-wasabii {
+  background-color: #fff;
+  color: #e94f64;
+  border: 1px solid #a21d33;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-wasabii:hover {
+  background-color: #a21d33;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(162, 29, 51, 0.3);
+  text-decoration: none;
+}
+
+/* Featured Courses */
+.featured-courses {
+  padding: 4rem 0;
+  text-align: center;
+  background: linear-gradient(180deg, #f9f9f9 0%, #fafafa 100%);
+}
+
+.featured-courses h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2.5rem;
+  color: #e94f64;
+  font-weight: 700;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.course-card {
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.course-card h4 {
+  margin-bottom: 0.5rem;
+  color: #2d3a4b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.course-card p {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 1rem;
+  max-height: 4.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+}
+
+.course-meta {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.course-card .btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+/* Course List Section */
+.course-list {
+  padding: 4rem 0;
+}
+
+.course-list h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2d3a4b;
+  font-weight: 700;
+}
+
+/* Detail button */
+.btn-detail {
+  background-color: transparent;
+  border: 1px solid #e94f64;
+  color: #e94f64;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.btn-detail:hover {
+  background-color: #e94f64;
+  color: #fff;
+}
+
+/* Footer */
+.footer {
+  background-color: #2d3a4b;
+  color: #eee;
+  padding: 3rem 0;
+  margin-top: 3rem;
+}
+
+.footer .container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.footer strong {
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.footer a {
+  color: #e94f64;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer p {
+  font-size: 0.9rem;
+}
+
+.footer .copyright {
+  text-align: center;
+  padding-top: 2rem;
+  font-size: 0.85rem;
+  color: #aaa;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-wrapper input {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .course-card {
+    padding: 1rem;
+  }
+
+  .course-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
+}
