@@ -60,11 +60,11 @@ public class LoginServlet extends HttpServlet {
         } else {
             if (checkEmailExist == null) {
                 request.setAttribute("message", "Email does not exist!");
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
             request.setAttribute("message", "Incorrect old password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
 //Dang nhap
@@ -88,7 +88,7 @@ public class LoginServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace(); // log lỗi hoặc chuyển hướng đến trang báo lỗi
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
 
@@ -108,7 +108,7 @@ public class LoginServlet extends HttpServlet {
         } else {
             // Đăng nhập thất bại
             request.setAttribute("message", "Invalid email or password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
 
@@ -126,7 +126,7 @@ public class LoginServlet extends HttpServlet {
         // Kiểm tra mật khẩu có khớp không
         if (!password.equals(repass)) {
             request.setAttribute("message_signup", "Passwords do not match!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
@@ -134,14 +134,14 @@ public class LoginServlet extends HttpServlet {
         User existingUser = new UserDAO().getUserByEmail(email);
         if (existingUser != null) {
             request.setAttribute("message_signup", "Email already exists!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
         // Nếu không có lỗi, tạo tài khoản mới
         new UserDAO().createNewUser(email, password);
         request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp.jsp").forward(request, response);
+        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
     }
 

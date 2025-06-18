@@ -7,9 +7,9 @@
 
   
     <!-- Welcome File -->
-    <welcome-file-list>
+<!--    <welcome-file-list>
         <welcome-file>teacher_dashboard</welcome-file>
     </welcome-file-list>
-
+-->
 
 </web-app>
