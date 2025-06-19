@@ -23,57 +23,50 @@ public class UserManagementServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            // Lấy các tham số từ request
-            String searchTerm = request.getParameter("search");
-            String selectedRole = request.getParameter("role");
-            String selectedStatus = request.getParameter("status");
-            int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-            int pageSize = request.getParameter("rowsPerPage") != null ? Integer.parseInt(request.getParameter("rowsPerPage")) : 10;
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        // Lấy các tham số từ request
+        String searchTerm = request.getParameter("search");
+        String selectedRole = request.getParameter("role");
+        String selectedStatus = request.getParameter("status");
+        int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+        int pageSize = 10; // Default pageSize set to 50
 
-            // Đếm tổng số bản ghi đã lọc
-            int totalUsers = getTotalFilteredUsers(searchTerm, selectedRole, selectedStatus);
-            int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+        // Đếm tổng số bản ghi đã lọc
+        int totalUsers = getTotalFilteredUsers(searchTerm, selectedRole, selectedStatus);
+        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
 
-            // Giới hạn pageSize không vượt quá tổng số bản ghi
-            if (pageSize > totalUsers && totalUsers > 0) {
-                pageSize = totalUsers; // Nếu pageSize lớn hơn tổng số bản ghi, đặt pageSize = totalUsers
-            } else if (totalUsers == 0) {
-                pageSize = 10; // Mặc định pageSize nếu không có bản ghi
-            }
+        // Đảm bảo page nằm trong phạm vi hợp lệ
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages > 0 ? totalPages : 1;
 
-            // Đảm bảo page nằm trong phạm vi hợp lệ
-            if (page < 1) page = 1;
-            if (page > totalPages) page = totalPages > 0 ? totalPages : 1;
+        // Lấy danh sách người dùng đã lọc và phân trang
+        List<User> users = getFilteredUsers(searchTerm, selectedRole, selectedStatus, page, pageSize);
 
-            // Lấy danh sách người dùng đã lọc và phân trang
-            List<User> users = getFilteredUsers(searchTerm, selectedRole, selectedStatus, page, pageSize);
+        // Đặt các thuộc tính để chuyển tới JSP
+        request.setAttribute("users", users);
+        request.setAttribute("searchTerm", searchTerm != null ? searchTerm : "");
+        request.setAttribute("selectedRole", selectedRole != null ? selectedRole : "All Roles");
+        request.setAttribute("selectedStatus", selectedStatus != null ? selectedStatus : "All Status");
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("totalUsers", totalUsers); // Thêm totalUsers để JSP sử dụng
 
-            // Đặt các thuộc tính để chuyển tới JSP
-            request.setAttribute("users", users);
-            request.setAttribute("searchTerm", searchTerm != null ? searchTerm : "");
-            request.setAttribute("selectedRole", selectedRole != null ? selectedRole : "All Roles");
-            request.setAttribute("selectedStatus", selectedStatus != null ? selectedStatus : "All Status");
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("pageSize", pageSize);
-            request.setAttribute("totalUsers", totalUsers); // Thêm totalUsers để JSP sử dụng
+        // Chuyển hướng đến JSP
+        request.getRequestDispatcher("userManagement.jsp").forward(request, response);
 
-            // Chuyển hướng đến JSP
-            request.getRequestDispatcher("userManagement.jsp").forward(request, response);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("error", "Lỗi khi lấy danh sách người dùng: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/userManagement");
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("error", "Lỗi định dạng tham số: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/userManagement");
-        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Lỗi khi lấy danh sách người dùng: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/userManagement");
+    } catch (NumberFormatException e) {
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Lỗi định dạng tham số: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/userManagement");
     }
+}
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

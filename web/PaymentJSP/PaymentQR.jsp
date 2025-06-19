@@ -78,15 +78,39 @@
             font-size: 18px;
             color: #dc3545;
         }
+        .navbar {
+            background-color: #007bff;
+            padding: 10px 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        .navbar .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .navbar-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <a href="<%= request.getContextPath() %>/index.jsp" class="back-btn">&larr; Quay về Trang Chủ</a>
+        <span class="navbar-title">Thanh Toán</span>
+    </div>
     <div class="container">
         <h2 style="text-align: center;">Quét Mã QR Để Thanh Toán</h2>
         
         <div class="payment-info">
             <div class="amount">
-                Số tiền: <%= String.format("%,d", (Integer)request.getAttribute("amount")) %>₫
+Số tiền: <%= String.format("%,d", (Integer)request.getAttribute("amount")) %>₫
             </div>
             <div class="description">
                 <%= request.getAttribute("description") %>
@@ -136,4 +160,4 @@
         };
     </script>
 </body>
-</html> 
+</html>

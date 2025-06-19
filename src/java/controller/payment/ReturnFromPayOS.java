@@ -20,13 +20,12 @@ public class ReturnFromPayOS extends HttpServlet {
             // Payment successful
             request.getSession().setAttribute("paymentSuccess", true);
             request.getSession().setAttribute("paymentMessage", "Thanh toán thành công!");
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
         } else {
             // Payment failed or cancelled
             request.getSession().setAttribute("paymentSuccess", false);
             request.getSession().setAttribute("paymentMessage", "Thanh toán không thành công hoặc đã bị hủy!");
+            response.sendRedirect(request.getContextPath() + "/PaymentJSP/Payment.jsp");
         }
-        
-        // Redirect to index page
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
     }
-} 
+}

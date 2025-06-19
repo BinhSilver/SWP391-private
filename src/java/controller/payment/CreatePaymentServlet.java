@@ -40,7 +40,7 @@ public class CreatePaymentServlet extends HttpServlet {
                 .amount(amount)
                 .description(description)
                 .returnUrl(Config.returnUrl)
-                .cancelUrl("http://localhost:8080/TestMerge/CancelPayment") //TODO: change to the correct url
+                .cancelUrl("http://localhost:8080/SWP_HUY/CancelPayment") //TODO: change to the correct url
                 .signature(Config.checksumKey)
                 .items(null)
                 .build();

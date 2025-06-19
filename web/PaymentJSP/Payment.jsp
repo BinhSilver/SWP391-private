@@ -10,6 +10,16 @@
   <div class="container">
     <h2>Nâng Cấp Tài Khoản Premium</h2>
 
+    <%-- Hiển thị thông báo lỗi nếu có --%>
+    <c:if test="${not empty sessionScope.paymentMessage && sessionScope.paymentSuccess == false}">
+      <div class="alert alert-danger" role="alert">
+        ${sessionScope.paymentMessage}
+      </div>
+      <%-- Xóa thông báo sau khi hiển thị --%>
+      <c:remove var="paymentMessage" scope="session" />
+      <c:remove var="paymentSuccess" scope="session" />
+    </c:if>
+
     <form id="planForm" action="${pageContext.request.contextPath}/CreatePayment" method="Post">
       <div class="plans">
         <!-- Gói tháng -->
