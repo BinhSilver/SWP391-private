@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -77,7 +76,17 @@
                         <c:forEach var="user" items="${users}">
                             <tr class="border-t">
                                 <td class="p-2">
-                                    <img src="${user.avatar != null ? user.avatar : 'https://via.placeholder.com/40'}" 
+                                    <%
+                                        String defaultAvatar = "assets/avartar/nam.jpg";
+                                        if ("Nữ".equalsIgnoreCase(user.gender)) {
+                                            defaultAvatar = "assets/avartar/nu.jpg";
+                                        }
+                                        String base64 = "";
+                                        if (user.avatar != null && user.avatar.length > 0) {
+                                            base64 = java.util.Base64.getEncoder().encodeToString(user.avatar);
+                                        }
+                                    %>
+                                    <img src="<%= (!base64.isEmpty() ? ("data:image/jpeg;base64," + base64) : defaultAvatar) %>"
                                          alt="Avatar" class="rounded-full mr-2 inline-block">
                                     ${user.fullName} <br> ID: #${user.userID}
                                 </td>

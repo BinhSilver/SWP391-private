@@ -78,13 +78,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-                return;
-            }
-            request.setAttribute("message", "Incorrect old password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-        }
-    }
+
 
 
     private void handleSignIn(HttpServletRequest request, HttpServletResponse response)
@@ -116,9 +110,6 @@ public class LoginServlet extends HttpServlet {
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
 
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
                 return;
             }
 
@@ -145,8 +136,6 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
         }
     }
 
@@ -156,6 +145,7 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String repass = request.getParameter("repass");
+        String gender = request.getParameter("gender");
 
         request.setAttribute("showRegisterForm", true);
         request.setAttribute("registerActive", "active");
@@ -164,8 +154,6 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("message_signup", "Passwords do not match!");
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
             return;
         }
@@ -176,19 +164,16 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
             return;
         }
 
-        new UserDAO().createNewUser(email, password);
+        new UserDAO().createNewUser(email, password, gender);
 
         request.setAttribute("showOtpForm", true);
         request.setAttribute("email", email);
         request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
         request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
     }
 

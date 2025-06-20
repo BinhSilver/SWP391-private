@@ -35,7 +35,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar NVARCHAR(255),
+    Avatar VARBINARY(MAX) NULL, --sua de nguoi dung chon file anh de set avartar
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
@@ -74,6 +74,7 @@ CREATE TABLE Courses (
     Title NVARCHAR(255),
     Description NVARCHAR(MAX),
     IsHidden BIT DEFAULT 0,
+    IsSuggested BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 
@@ -310,8 +311,9 @@ VALUES
 
 
 
-INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
+INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender) 
+VALUES (3, 'teacher@gmail.com', '123456789', NULL, N'Giao vien', '1990-01-01', '1987654321', N'N1', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ'),
+		(1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
        (4, 'admin@gmail.com', '123456789', NULL, N'Quản Trị Viên', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nữ');
 
 
@@ -333,3 +335,60 @@ BEGIN
     INNER JOIN inserted i ON u.UserID = i.UserID
     WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
 END;
+
+
+-- Tạo khóa học
+INSERT INTO Courses (Title, Description, IsHidden, IsSuggested)
+VALUES (N'Tiếng Nhật Sơ Cấp N5 - Cơ bản', N'Khóa học dành cho người mới bắt đầu học tiếng Nhật. Bao gồm từ vựng, kanji, ngữ pháp, tài liệu và bài kiểm tra.', 0, 1);
+
+DECLARE @CourseID INT = SCOPE_IDENTITY();
+
+INSERT INTO Lessons (CourseID, Title)
+VALUES 
+(@CourseID, N'Bài 1: Giới thiệu bản thân'),
+(@CourseID, N'Bài 2: Gia đình'),
+(@CourseID, N'Bài 3: Ngày tháng năm');
+DECLARE @Lesson1 INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 1: Giới thiệu bản thân');
+
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+VALUES 
+(@Lesson1, N'Video', N'mp4', N'Giới thiệu bản thân (video)', 'media/lesson1/intro.mp4'),
+(@Lesson1, N'PDF', N'pdf', N'Tài liệu ngữ pháp', 'media/lesson1/grammar.pdf');
+
+INSERT INTO Vocabulary (Word, Meaning, Reading, Example)
+VALUES 
+(N'わたし', N'Tôi', N'watashi', N'わたしはリンです。'),
+(N'がくせい', N'Học sinh', N'gakusei', N'わたしはがくせいです。');
+
+
+INSERT INTO Kanji (Character, Onyomi, Kunyomi, Meaning, StrokeCount, LessonID)
+VALUES 
+(N'人', N'ジン, ニン', N'ひと', N'Người', 2, @Lesson1),
+(N'名', N'メイ, ミョウ', N'な', N'Tên', 6, @Lesson1);
+
+
+
+INSERT INTO GrammarPoints (LessonID, Title, Explanation)
+VALUES 
+(@Lesson1, N'は (wa) chủ đề câu', N'Dùng để chỉ chủ đề chính của câu. Ví dụ: わたしはリンです。');
+
+
+-- Quiz
+INSERT INTO Quizzes (LessonID, Title)
+VALUES (@Lesson1, N'Quiz - Giới thiệu bản thân');
+
+DECLARE @QuizID INT = SCOPE_IDENTITY();
+
+-- Câu hỏi
+INSERT INTO Questions (QuizID, QuestionText)
+VALUES (@QuizID, N'Từ "わたし" nghĩa là gì?');
+
+DECLARE @QuestionID INT = SCOPE_IDENTITY();
+
+-- Đáp án
+INSERT INTO Answers (QuestionID, AnswerText, IsCorrect)
+VALUES 
+(@QuestionID, N'Tôi', 1),
+(@QuestionID, N'Bạn', 0),
+(@QuestionID, N'Anh ấy', 0);
+

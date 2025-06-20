@@ -8,8 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
 import Dao.UserDAO;
+import jakarta.servlet.annotation.MultipartConfig;
+import java.io.InputStream;
 
 @WebServlet("/editprofile")
+@MultipartConfig
 public class EditProfileServlet extends HttpServlet {
 
     @Override
@@ -58,7 +61,12 @@ public class EditProfileServlet extends HttpServlet {
             currentUser.setJapaneseLevel(japaneseLevel);
             currentUser.setAddress(address);
             currentUser.setCountry(country);
-            currentUser.setAvatar(avatar);
+
+            Part filePart = request.getPart("avatar");
+            if (filePart != null && filePart.getSize() > 0) {
+                byte[] avatarBytes = filePart.getInputStream().readAllBytes();
+                currentUser.setAvatar(avatarBytes);
+            }
 
             UserDAO dao = new UserDAO();
             boolean success = dao.updateProfile(currentUser);

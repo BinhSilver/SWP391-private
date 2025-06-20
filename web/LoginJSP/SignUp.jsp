@@ -24,6 +24,15 @@
             <i class='bx bxs-lock-alt'></i>
         </div>
 
+        <div class="input-box">
+            <label for="gender" style="margin-bottom: 4px; display: block; color: #333;">Giới tính:</label>
+            <select name="gender" id="gender" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+            </select>
+        </div>
+
         <button type="submit" class="btn">Đăng kí</button>
 
         <div class="social-icons" style="margin-top: 10px">
