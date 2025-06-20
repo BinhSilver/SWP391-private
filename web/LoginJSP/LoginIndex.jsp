@@ -20,13 +20,13 @@
             <div class="toggle-box">
                 <div class="toggle-panel toggle-left">
                     <%@include file="/LoginJSP/bear.jsp" %>
-                    <p>Don't have an account?</p>
-                    <button class="btn register-btn" id="registerBtn">Register</button>
+                    <p>Chưa có tài khoản?</p>
+                    <button class="btn register-btn" id="registerBtn">Đăng kí</button>
                 </div>
                 <div class="toggle-panel toggle-right">
-                    <h1>Welcome Back!</h1>
-                    <p>Already have an account?</p>
-                    <button class="btn login-btn" id="loginBtn">Login</button>
+                    <h1>Xin chào</h1>
+                    <p>Đã có sẵn tài khoản?</p>
+                    <button class="btn login-btn" id="loginBtn">Đăng nhập</button>
                 </div>
             </div>
 
