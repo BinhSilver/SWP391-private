@@ -18,24 +18,14 @@
     </head>
     <body>
         <div class="container">
-            <!-- Form upload avatar -->
-            <form action="changeAvatar" method="post" enctype="multipart/form-data" class="edit-form" style="margin-bottom: 24px;">
-                <h2>Đổi ảnh đại diện</h2>
-                <div class="form-group full-width">
-                    <label><i class="fa-solid fa-image"></i> Chọn ảnh mới</label>
-                    <input type="file" name="avatar" accept="image/*" required />
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn primary">Cập nhật Avatar</button>
-                </div>
-            </form>
-            <form action="editprofile" method="post" class="edit-form">
+            <form action="editprofile" method="post" class="edit-form" enctype="multipart/form-data">
                 <h2>Edit Profile</h2>
                 <% if (request.getAttribute("error") != null) {%>
                 <p style="color: red;"><%= request.getAttribute("error")%></p>
                 <% }%>
                 <input type="hidden" name="userID" value="<%= user.getUserID()%>" />
 
+                
                 <div class="form-grid">
                     <div class="form-group">
                         <label><i class="fa-solid fa-envelope"></i> Email</label>
@@ -75,10 +65,10 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label><i class="fa-solid fa-image"></i> Avatar URL</label>
-                        <input type="url" name="avatar" value="" placeholder="(Chỉ dùng nếu muốn dùng link ngoài)" />
+                        <label><i class="fa-solid fa-image"></i> Ảnh đại diện</label>
+                        <input type="file" name="avatar" accept="image/*" />
                     </div>
-
+                    
                     <div class="form-group full-width">
                         <label><i class="fa-solid fa-location-dot"></i> Address</label>
                         <input type="text" id="address" name="address" list="address-options"

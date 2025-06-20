@@ -86,7 +86,7 @@ public class UserDAO {
             stmt.setString(10, user.getJapaneseLevel());
             stmt.setString(11, user.getAddress());
             stmt.setString(12, user.getCountry());
-            stmt.setString(13, user.getAvatar());
+            stmt.setBytes(13, user.getAvatar());
             stmt.setInt(14, user.getUserID());
             stmt.executeUpdate();
         }
@@ -104,7 +104,7 @@ public class UserDAO {
             stmt.setString(5, user.getJapaneseLevel());
             stmt.setString(6, user.getAddress());
             stmt.setString(7, user.getCountry());
-            stmt.setString(8, user.getAvatar());
+            stmt.setBytes(8, user.getAvatar());
             stmt.setInt(9, user.getUserID());
             return stmt.executeUpdate() > 0;
         }
@@ -119,13 +119,14 @@ public class UserDAO {
         }
     }
 
-    public boolean createNewUser(String email, String rawPassword) {
-        String sql = "INSERT INTO Users (RoleID, Email, PasswordHash) VALUES (?, ?, ?)";
+    public boolean createNewUser(String email, String rawPassword, String gender) {
+        String sql = "INSERT INTO Users (RoleID, Email, PasswordHash, Gender) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, 1); // default role
             pstmt.setString(2, email);
             pstmt.setString(3, rawPassword);
+            pstmt.setString(4, gender);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -264,7 +265,7 @@ public class UserDAO {
     }
 
     public void updateAvatarBlob(int userId, InputStream avatarStream) throws SQLException {
-        String sql = "UPDATE Users SET Avatar_Test = ? WHERE UserID = ?";
+        String sql = "UPDATE Users SET Avatar = ? WHERE UserID = ?";
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setBlob(1, avatarStream);
@@ -290,8 +291,7 @@ public class UserDAO {
             user.setJapaneseLevel(rs.getString("JapaneseLevel"));
             user.setAddress(rs.getString("Address"));
             user.setCountry(rs.getString("Country"));
-            user.setAvatar(rs.getString("Avatar"));
-            user.setAvatarTest(rs.getBytes("Avatar_Test"));
+            user.setAvatar(rs.getBytes("Avatar"));
         } catch (SQLException | NullPointerException ignored) {}
         return user;
     }

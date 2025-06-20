@@ -145,6 +145,7 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String repass = request.getParameter("repass");
+        String gender = request.getParameter("gender");
 
         request.setAttribute("showRegisterForm", true);
         request.setAttribute("registerActive", "active");
@@ -166,7 +167,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        new UserDAO().createNewUser(email, password);
+        new UserDAO().createNewUser(email, password, gender);
 
         request.setAttribute("showOtpForm", true);
         request.setAttribute("email", email);

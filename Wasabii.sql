@@ -35,7 +35,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar NVARCHAR(255),
+    Avatar VARBINARY(MAX) NULL, --sua de nguoi dung chon file anh de set avartar
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
@@ -311,8 +311,9 @@ VALUES
 
 
 
-INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
+INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender) 
+VALUES (3, 'teacher@gmail.com', '123456789', NULL, N'Giao vien', '1990-01-01', '1987654321', N'N1', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ'),
+		(1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
        (4, 'admin@gmail.com', '123456789', NULL, N'Quản Trị Viên', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nữ');
 
 
@@ -390,3 +391,4 @@ VALUES
 (@QuestionID, N'Tôi', 1),
 (@QuestionID, N'Bạn', 0),
 (@QuestionID, N'Anh ấy', 0);
+
