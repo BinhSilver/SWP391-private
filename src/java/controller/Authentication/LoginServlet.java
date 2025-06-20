@@ -78,13 +78,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-                return;
-            }
-            request.setAttribute("message", "Incorrect old password!");
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-        }
-    }
+
 
 
     private void handleSignIn(HttpServletRequest request, HttpServletResponse response)
@@ -116,9 +110,6 @@ public class LoginServlet extends HttpServlet {
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
 
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
                 return;
             }
 
@@ -145,8 +136,6 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
         }
     }
 
@@ -165,8 +154,6 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
             return;
         }
 
@@ -175,8 +162,6 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("message_signup", "Email already exists!");
 
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
-            request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
             return;
         }
@@ -188,7 +173,6 @@ public class LoginServlet extends HttpServlet {
         request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
         request.setAttribute("message_signup", "Registration successful!");
-        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
 
     }
 
