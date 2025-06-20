@@ -8,6 +8,7 @@ import model.User;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.io.InputStream;
 
 public class UserDAO {
 
@@ -262,6 +263,16 @@ public class UserDAO {
         return jsonArray;
     }
 
+    public void updateAvatarBlob(int userId, InputStream avatarStream) throws SQLException {
+        String sql = "UPDATE Users SET Avatar_Test = ? WHERE UserID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBlob(1, avatarStream);
+            stmt.setInt(2, userId);
+            stmt.executeUpdate();
+        }
+    }
+
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserID(rs.getInt("UserID"));
@@ -280,6 +291,7 @@ public class UserDAO {
             user.setAddress(rs.getString("Address"));
             user.setCountry(rs.getString("Country"));
             user.setAvatar(rs.getString("Avatar"));
+            user.setAvatarTest(rs.getBytes("Avatar_Test"));
         } catch (SQLException | NullPointerException ignored) {}
         return user;
     }

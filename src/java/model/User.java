@@ -27,6 +27,7 @@ public class User {
     private String country;
     private String avatar;
     private String gender;
+    private byte[] avatarTest;
 
     public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, String avatar, String gender) {
         this.userID = userID;
@@ -136,6 +137,14 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public byte[] getAvatarTest() {
+        return avatarTest;
+    }
+
+    public void setAvatarTest(byte[] avatarTest) {
+        this.avatarTest = avatarTest;
     }
 
     @Override

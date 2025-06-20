@@ -6,6 +6,12 @@
         response.sendRedirect("login.jsp");
         return;
     }
+
+    byte[] avatar = user.getAvatarTest();
+    String base64 = "";
+    if (avatar != null && avatar.length > 0) {
+        base64 = java.util.Base64.getEncoder().encodeToString(avatar);
+    }
 %>
 <!DOCTYPE html>
 <html>
@@ -18,7 +24,7 @@
         <div class="container">
             <div class="sidebar">
                 <div class="profile-pic">
-                    <img src="<%= user.getAvatar()%>" alt="avatar">
+                    <img src="<%= (base64.isEmpty() ? "image/default-avatar.png" : "data:image/jpeg;base64," + base64) %>" alt="avatar" style="width:100px;height:100px;border-radius:50%;">
                 </div>
                 <h3><%= user.getFullName()%></h3>
                 <p class="title">User ID: <%= user.getUserID()%></p>

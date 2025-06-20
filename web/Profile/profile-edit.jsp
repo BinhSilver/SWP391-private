@@ -18,6 +18,17 @@
     </head>
     <body>
         <div class="container">
+            <!-- Form upload avatar -->
+            <form action="changeAvatar" method="post" enctype="multipart/form-data" class="edit-form" style="margin-bottom: 24px;">
+                <h2>Đổi ảnh đại diện</h2>
+                <div class="form-group full-width">
+                    <label><i class="fa-solid fa-image"></i> Chọn ảnh mới</label>
+                    <input type="file" name="avatar" accept="image/*" required />
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Cập nhật Avatar</button>
+                </div>
+            </form>
             <form action="editprofile" method="post" class="edit-form">
                 <h2>Edit Profile</h2>
                 <% if (request.getAttribute("error") != null) {%>
@@ -65,7 +76,7 @@
 
                     <div class="form-group full-width">
                         <label><i class="fa-solid fa-image"></i> Avatar URL</label>
-                        <input type="url" name="avatar" value="<%= user.getAvatar() != null ? user.getAvatar() : ""%>" placeholder="https://example.com/avatar.jpg" />
+                        <input type="url" name="avatar" value="" placeholder="(Chỉ dùng nếu muốn dùng link ngoài)" />
                     </div>
 
                     <div class="form-group full-width">
