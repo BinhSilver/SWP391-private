@@ -46,5 +46,6 @@ public class VerifyOtpServlet extends HttpServlet {
 
         // Trả về kết quả thành công
         response.getWriter().write("{\"success\":true}");
+        request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
     }
 }
