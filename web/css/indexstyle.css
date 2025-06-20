@@ -236,7 +236,7 @@ body {
   left: 100%;
 }
 
-@keyframes streak {
+/*@keyframes streak {
   0% {
     transform: translate(-100vw, -100vh) rotate(45deg);
     opacity: 1;
@@ -248,7 +248,7 @@ body {
     transform: translate(100vw, 100vh) rotate(45deg);
     opacity: 0;
   }
-}
+}*/
 
 /* Featured Courses */
 .featured-courses {

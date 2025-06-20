@@ -329,3 +329,66 @@ form {
         opacity: 0;
     }
 }
+//////
+body {
+    background: #f9f9f9;
+}
+
+body::before {
+    background: url("https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 870w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1170w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1470w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1740w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1770w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2070w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2340w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2370&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2370w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2670w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2940w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 2970w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 3270w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 3540w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 3570w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 3870w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=4140&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 4140w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=4170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 4170w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=4470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 4470w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=4740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 4740w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=4770&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 4770w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5070w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5340w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5370&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5370w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5670w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5940w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=5970&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 5970w, https://images.unsplash.com/photo-1596367407372-96cb88503db6?q=80&w=6000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 6000w") no-repeat center center/cover;
+    filter: blur(10px);
+}
+
+.container {
+    background: #fff;
+}
+
+.form-box h1,
+.form-box {
+    color: #e94f64;
+}
+
+.input-box input {
+    background: #eee;
+    color: #333;
+}
+
+.input-box input::placeholder {
+    color: #999;
+}
+
+.btn {
+    background: #e94f64;
+    color: #fff;
+}
+
+.btn:hover {
+    background: #d43e55;
+}
+
+.social-icons a {
+    border: 2px solid #e0e0e0;
+    color: #e94f64;
+}
+
+.toggle-box::before {
+    background: #e94f64;
+}
+
+.toggle-panel .btn {
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+    color: #e94f64;
+}
+
+.checkbox-group label:hover {
+    color: #e94f64;
+}
+
+.form-box.change-password {
+    background: #fff;
+}
