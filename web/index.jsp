@@ -39,29 +39,24 @@
                 <div class="container">
                     <h2>Khóa học nổi bật</h2>
                     <div class="course-grid">
-                        <div class="course-card">
-                            <h4>Khóa học N5</h4>
-                            <p>Khóa học dành cho người mới bắt đầu với các mẫu câu thực tế.</p>
-                            <div class="course-meta">Sơ cấp - 4 tháng</div>
-                        </div>
-                        <div class="course-card">
-                            <h4>Luyện thi JLPT N5</h4>
-                            <p>Trang bị kiến thức từ vựng, ngữ pháp và kỹ năng làm bài thi.</p>
-                            <div class="course-meta">Sơ cấp - 6 tuần</div>
-                        </div>
-                        <div class="course-card">
-                            <h4>Khóa học N4</h4>
-                            <p>Nắm chắc các mẫu ngữ pháp thường gặp trong giao tiếp và JLPT.</p>
-                            <div class="course-meta">Trung cấp - 5 tháng</div>
-                        </div>
-                        <div class="course-card">
-                            <h4>Luyện thi JLPT N4</h4>
-                            <p>Trang bị kiến thức từ vựng, ngữ pháp và kỹ năng làm bài thi.</p>
-                            <div class="course-meta">Trung cấp - 6 tuần</div>
-                        </div>
+                        <c:forEach var="course" items="${suggestedCourses}">
+                            <div class="course-card suggested">
+                                <h4>${course.title}</h4>
+                                <p>${course.description}</p>
+                                <div class="course-meta text-muted">Khóa học đề xuất</div>
+                                <a href="${pageContext.request.contextPath}/CourseDetailServlet?id=${course.courseID}" class="btn btn-outline-primary mt-2">
+                                    <i class="fa-solid fa-arrow-right"></i> Xem chi tiết
+                                </a>
+
+                            </div>
+                        </c:forEach>
+
                     </div>
                 </div>
             </section>
+
+
+
             <%@ include file="Home/footer.jsp" %>
 
         </div>

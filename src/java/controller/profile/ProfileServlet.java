@@ -39,7 +39,7 @@ public class ProfileServlet extends HttpServlet {
             User user = userDAO.getUserById(userID);
             if (user != null) {
                 request.setAttribute("user", user);
-                request.getRequestDispatcher("/profile.jsp").forward(request, response);
+                request.getRequestDispatcher("/Profile/profile-view.jsp").forward(request, response);
             } else {
                 response.sendRedirect("error.jsp");
             }

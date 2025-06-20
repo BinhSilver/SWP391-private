@@ -18,15 +18,15 @@ import model.Course;
  *
  * @author LAPTOP LENOVO
  */
-@WebServlet(name = "UserHomeServlet", urlPatterns = {"/UserHomeServlet"})
-public class UserHomeServlet extends HttpServlet {
+@WebServlet(name = "HomeServlet", urlPatterns = {"/HomeServlet"})
+public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         CoursesDAO dao = new CoursesDAO();
         List<Course> suggestedCourses = dao.getSuggestedCourses(); // Bạn định nghĩa hàm này
 
         request.setAttribute("suggestedCourses", suggestedCourses);
-        request.getRequestDispatcher("/Home/user_home.jsp").forward(request, response);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 
     @Override

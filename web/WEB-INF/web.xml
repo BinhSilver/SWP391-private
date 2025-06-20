@@ -8,7 +8,7 @@
   
     <!-- Welcome File -->
     <welcome-file-list>
-        <welcome-file>teacher_dashboard</welcome-file>
+        <welcome-file>HomeServlet</welcome-file>
     </welcome-file-list>
 
 

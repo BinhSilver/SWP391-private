@@ -18,4 +18,6 @@ public class Role {
     public void setRoleID(int roleID) { this.roleID = roleID; }
     public String getRoleName() { return roleName; }
     public void setRoleName(String roleName) { this.roleName = roleName; }
+    
+    
 }
