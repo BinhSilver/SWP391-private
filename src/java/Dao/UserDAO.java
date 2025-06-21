@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import model.User;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
 import java.io.InputStream;
 
@@ -296,6 +296,24 @@ public class UserDAO {
         return user;
     }
 
+
+
+    public JsonArray getUserCountByRole() throws SQLException {
+        JsonArray jsonArray = new JsonArray();
+        String sql = "SELECT r.RoleName, COUNT(u.UserID) AS UserCount "
+                + "FROM [dbo].[Roles] r LEFT JOIN [dbo].[Users] u ON r.RoleID = u.RoleID "
+                + "GROUP BY r.RoleName";
+
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("role", rs.getString("RoleName"));
+                obj.addProperty("count", rs.getInt("UserCount"));
+                jsonArray.add(obj);
+            }
+        }
+        return jsonArray;
+    }
     public static void main(String[] args) throws SQLException {
         UserDAO dao = new UserDAO();
         List<User> users = dao.getAllUsers();

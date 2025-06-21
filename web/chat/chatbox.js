@@ -1,32 +1,36 @@
+function toggleChat() {
+    const chat = document.getElementById("chatContainer");
+    const isVisible = chat.style.visibility === "visible";
+
+    if (!isVisible) {
+        chat.style.visibility = "visible";
+        chat.style.opacity = "1";
+        setTimeout(() => {
+            document.getElementById("userInput").focus();
+        }, 100);
+    } else {
+        chat.style.visibility = "hidden";
+        chat.style.opacity = "0";
+    }
+}
+
+
 async function sendMessage() {
     let userInput = document.getElementById("userInput").value.trim();
-    if (userInput === "")
-        return;
-let fullPrompt = `Bạn là một trợ lý AI dạy tiếng Nhật cho người Việt.
-
-Yêu cầu:
-- Chỉ trả lời câu hỏi liên quan đến từ vựng, ngữ pháp hoặc câu mẫu tiếng Nhật.
-- Nếu câu hỏi không liên quan đến tiếng Nhật, hãy trả lời: "Xin lỗi, tôi chỉ hỗ trợ câu hỏi liên quan đến tiếng Nhật."
-- Trả lời bằng tiếng Việt.
-- Trình bày ngắn gọn, rõ ràng bằng gạch đầu dòng.
-- Nếu là từ vựng, đưa từ bằng tiếng Nhật (kanji nếu có, kana, romaji) và nghĩa tiếng Việt.
-- Không được chèn thêm nội dung không liên quan hoặc lặp lại câu hỏi của người dùng.
-- Không dùng dấu ** hoặc ký hiệu markdown nào.
-Câu hỏi: ${userInput}
-`;
-
-    let requestData = {
-        message: fullPrompt
-    };
+    if (userInput === "") return;
 
     let chatBox = document.getElementById("chatBox");
     chatBox.innerHTML += `<div><b>Bạn:</b> ${userInput}</div>`;
     document.getElementById("userInput").value = "";
 
+    let requestData = {
+        message: userInput
+    };
+
     try {
         let response = await fetch("/SWP_HUY/aiGe", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(requestData)
         });
 
@@ -34,18 +38,16 @@ Câu hỏi: ${userInput}
         let botResponse = data.response || "Không có phản hồi từ AI.";
         chatBox.innerHTML += `<div><b>AI:</b> ${botResponse}</div>`;
     } catch (error) {
-        console.error("Lỗi kết nối AI:", error);
+        console.error("Lỗi:", error);
         chatBox.innerHTML += `<div style="color:red;"><b>Lỗi:</b> Không thể kết nối AI!</div>`;
     }
 
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-document.getElementById('chatbot-fab').onclick = function() {
-    var box = document.getElementById('chatbot-box');
-    if (box.style.display === 'none' || box.style.display === '') {
-        box.style.display = 'block';
-    } else {
-        box.style.display = 'none';
+function handleKeyPress(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
     }
-};
+}
