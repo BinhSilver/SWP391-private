@@ -25,10 +25,10 @@ public class User {
     private String japaneseLevel;
     private String address;
     private String country;
-    private String avatar;
+    private byte[] avatar;
     private String gender;
 
-    public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, String avatar, String gender) {
+    public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, byte[] avatar, String gender) {
         this.userID = userID;
         this.roleID = roleID;
         this.email = email;
@@ -63,7 +63,7 @@ public class User {
     public User(int userID, int roleID, String email, String passwordHash, String googleID,
             String fullName, Date createdAt, boolean isActive, boolean isLocked,
             Date birthDate, String phoneNumber, String japaneseLevel, String address,
-            String country, String avatar) {
+            String country, byte[] avatar) {
         this.userID = userID;
         this.roleID = roleID;
         this.email = email;
@@ -130,17 +130,17 @@ public class User {
         this.country = country;
     }
 
-    public String getAvatar() {
+    public byte[] getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(byte[] avatar) {
         this.avatar = avatar;
     }
 
     @Override
     public String toString() {
-        return "User{" + "userID=" + userID + ", roleID=" + roleID + ", email=" + email + ", passwordHash=" + passwordHash + ", googleID=" + googleID + ", fullName=" + fullName + ", createdAt=" + createdAt + ", isActive=" + isActive + ", isLocked=" + isLocked + ", birthDate=" + birthDate + ", phoneNumber=" + phoneNumber + ", japaneseLevel=" + japaneseLevel + ", address=" + address + ", country=" + country + ", avatar=" + avatar + ", gender=" + gender + '}';
+        return "User{" + "userID=" + userID + ", roleID=" + roleID + ", email=" + email + ", passwordHash=" + passwordHash + ", googleID=" + googleID + ", fullName=" + fullName + ", createdAt=" + createdAt + ", isActive=" + isActive + ", isLocked=" + isLocked + ", birthDate=" + birthDate + ", phoneNumber=" + phoneNumber + ", japaneseLevel=" + japaneseLevel + ", address=" + address + ", country=" + country + ", avatar=" + java.util.Arrays.toString(avatar) + ", gender=" + gender + '}';
     }
 
   
@@ -241,12 +241,18 @@ public class User {
     }
 
     public int getAge() {
-    if (birthDate == null) return -1;
+        if (birthDate == null) {
+            return -1;
+        }
 
-    LocalDate birth = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    LocalDate today = LocalDate.now();
-
-    return Period.between(birth, today).getYears();
-}
+        LocalDate birth;
+        if (birthDate instanceof java.sql.Date) {
+            birth = ((java.sql.Date) birthDate).toLocalDate();
+        } else {
+            birth = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        LocalDate today = LocalDate.now();
+        return Period.between(birth, today).getYears();
+    }
 }
 

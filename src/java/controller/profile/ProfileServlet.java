@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import model.User;
 
 @WebServlet("/profile")
@@ -75,7 +74,7 @@ public class ProfileServlet extends HttpServlet {
             user.setJapaneseLevel(request.getParameter("japaneseLevel"));
             user.setAddress(request.getParameter("address"));
             user.setCountry(request.getParameter("country"));
-            user.setAvatar(request.getParameter("avatar"));
+            user.setAvatar(null); // Bỏ qua hoặc set null nếu không dùng link ngoài
 
             // Xử lý ngày sinh (nếu có)
             String birthDateStr = request.getParameter("birthDate");

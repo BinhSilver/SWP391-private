@@ -35,12 +35,14 @@ public class CreatePaymentServlet extends HttpServlet {
             long orderCode = System.currentTimeMillis();
 
             // Create payment data with all required fields
+            String contextPath = request.getContextPath();
+            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath;
             PaymentData paymentData = PaymentData.builder()
                 .orderCode(orderCode)
                 .amount(amount)
                 .description(description)
-                .returnUrl(Config.returnUrl)
-                .cancelUrl("http://localhost:8080/TestMerge/CancelPayment") //TODO: change to the correct url
+                .returnUrl(baseUrl + "/ReturnFromPayOS")
+                .cancelUrl(baseUrl + "/CancelPayment")
                 .signature(Config.checksumKey)
                 .items(null)
                 .build();

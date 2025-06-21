@@ -5,7 +5,7 @@
 <div class="form-box login">
     <form action="${pageContext.request.contextPath}/login" method="post">
         <input type="hidden" name="action" value="signin">
-        <h1>Login</h1>
+        <h1>Đăng nhập</h1>
         <div class="input-box">
             <input type="email"id="email" name="email" placeholder="Email" value="${not empty email ? email : ''}"
                    required>
@@ -19,17 +19,17 @@
 
         <div class="box-box">
             <div class="checkbox-group">
-                <label for="rememberMe">Remember me</label>
+                <label for="rememberMe">Lưu tài khoản</label>
                 <input type="checkbox" id="rememberMe" name="rememberMe" ${"on".equals(rememberMe) ? "checked"
                                                                             : "" } />
             </div>
             <div class="forgot-link">
-                <a href="#">Forgot Password?</a>
+                <a href="#">Quên mật khẩu?</a>
             </div>
         </div>
 
-        <button type="submit" class="btn">Login</button>
-        <p>or login with social platforms</p>
+        <button type="submit" class="btn">Đăng nhập</button>
+        <p>hoặc đăng nhập với ứng dụng khác</p>
         <div class="social-icons">
             <a href="${pageContext.request.contextPath}/login-google"><i class='bx bxl-google'></i></a>
             <a href="#"><i class='bx bxl-facebook'></i></a>
