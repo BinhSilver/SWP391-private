@@ -94,3 +94,33 @@ body, input, button {
 #butt {
     display: flex;
 }
+#butt {
+    display: flex;
+    padding: 10px;
+    align-items: center; /* ✅ canh giữa theo chiều dọc */
+    gap: 6px;            /* ✅ khoảng cách giữa ô nhập và nút */
+    box-sizing: border-box;
+}
+
+#userInput {
+    flex: 1; /* ✅ giúp input chiếm toàn bộ chiều rộng còn lại */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#buttonChat {
+    padding: 10px 16px;
+    background-color: #f488ad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    height: auto;       /* ✅ KHÔNG ép chiều cao */
+    white-space: nowrap;
+}
+
+#buttonChat:hover {
+    background-color: #e76b95;
+}
