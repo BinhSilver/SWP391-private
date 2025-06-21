@@ -22,7 +22,7 @@ public class CoursesDAO {
                 c.setTitle(rs.getString("title"));
                 c.setDescription(rs.getString("description"));
                 c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested")); // ✅ Mới thêm
+                c.setSuggested(rs.getBoolean("isSuggested"));
                 list.add(c);
             }
         } catch (Exception e) {
