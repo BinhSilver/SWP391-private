@@ -8,7 +8,7 @@ body, input, button {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #f488ad; /* Màu mới */
+    background-color: #f488ad;
     color: white;
     padding: 12px 20px;
     border-radius: 25px;
@@ -17,9 +17,8 @@ body, input, button {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     z-index: 9999;
 }
-
 #chatButton:hover {
-    background-color: #e76b95; /* hover màu đậm hơn */
+    background-color: #e76b95;
 }
 
 /* Khung chat */
@@ -32,14 +31,26 @@ body, input, button {
     background: white;
     border-radius: 10px;
     border: 1px solid #ccc;
-    display: none;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     z-index: 9999;
+
+    /* ✅ Sửa lỗi ẩn/hiện */
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Hiện chat */
+#chatContainer.show {
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Header chat */
 #chatHeader {
-    background-color: #f488ad; /* Màu mới */
+    background-color: #f488ad;
     color: white;
     padding: 10px;
     text-align: center;
@@ -49,7 +60,6 @@ body, input, button {
     border-top-right-radius: 10px;
     position: relative;
 }
-
 #chatHeader button {
     position: absolute;
     right: 10px;
@@ -61,55 +71,29 @@ body, input, button {
     cursor: pointer;
 }
 
+/* Khung nội dung chat */
 #chatBox {
     padding: 10px;
-    height: 300px;
+    flex: 1;
     overflow-y: auto;
     background-color: #f9f9f9;
 }
 
-#userInput {
-    width: 80%;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin: 10px;
-}
-
-#buttonChat {
-    padding: 6px 10px;
-    cursor: pointer;
-    background-color: #f488ad; /* Màu mới */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    height: 50px;
-    margin-top: 4px;
-}
-
-#buttonChat:hover {
-    background-color: #e76b95;
-}
-
-#butt {
-    display: flex;
-}
+/* Ô nhập và nút gửi */
 #butt {
     display: flex;
     padding: 10px;
-    align-items: center; /* ✅ canh giữa theo chiều dọc */
-    gap: 6px;            /* ✅ khoảng cách giữa ô nhập và nút */
+    align-items: center;
+    gap: 6px;
     box-sizing: border-box;
 }
-
 #userInput {
-    flex: 1; /* ✅ giúp input chiếm toàn bộ chiều rộng còn lại */
+    flex: 1;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
 }
-
 #buttonChat {
     padding: 10px 16px;
     background-color: #f488ad;
@@ -117,10 +101,49 @@ body, input, button {
     border: none;
     border-radius: 5px;
     font-size: 14px;
-    height: auto;       /* ✅ KHÔNG ép chiều cao */
     white-space: nowrap;
+    height: auto;
 }
-
 #buttonChat:hover {
     background-color: #e76b95;
+}
+
+/* Gợi ý mẫu */
+#suggestBox {
+    padding: 5px 10px;
+    text-align: center;
+}
+#suggestBox button {
+    padding: 6px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+}
+#suggestBox button:hover {
+    background-color: #ffe3ed;
+    color: #d94c82;
+}
+
+/* Tin nhắn bọc viền */
+.userMessage, .aiMessage {
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 12px;
+    max-width: 90%;
+    clear: both;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.userMessage {
+    background-color: #fcd5e5;
+    float: right;
+    color: #333;
+}
+.aiMessage {
+    background-color: #f6f6f6;
+    float: left;
+    color: #333;
 }

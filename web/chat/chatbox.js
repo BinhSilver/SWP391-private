@@ -1,7 +1,19 @@
 function toggleChat() {
-    let chatContainer = document.getElementById("chatContainer");
-    chatContainer.style.display = (chatContainer.style.display === "none" || chatContainer.style.display === "") ? "block" : "none";
+    const chat = document.getElementById("chatContainer");
+    const isVisible = chat.style.visibility === "visible";
+
+    if (!isVisible) {
+        chat.style.visibility = "visible";
+        chat.style.opacity = "1";
+        setTimeout(() => {
+            document.getElementById("userInput").focus();
+        }, 100);
+    } else {
+        chat.style.visibility = "hidden";
+        chat.style.opacity = "0";
+    }
 }
+
 
 async function sendMessage() {
     let userInput = document.getElementById("userInput").value.trim();
