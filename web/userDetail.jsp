@@ -39,7 +39,7 @@
                         <div class="flex items-center mb-6">
                             <img src="${pageContext.request.contextPath}/avatar?userId=${user.userID}" 
                                  alt="Avatar" class="rounded-full mr-4 w-24 h-24 object-cover"
-                                 onerror="this.src='https://via.placeholder.com/100';">
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/100';">
                             <div>
                                 <h3 class="text-xl font-semibold">${user.fullName}</h3>
                                 <p class="text-gray-600">${user.email}</p>

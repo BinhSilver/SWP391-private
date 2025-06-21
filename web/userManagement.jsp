@@ -76,8 +76,9 @@
                             <c:forEach var="user" items="${users}">
                                 <tr class="border-t">
                                     <td class="p-2">
-                                        <img src="${user.avatar != null ? user.avatar : 'https://via.placeholder.com/60'}" 
-                                             alt="Avatar" class="rounded-full mr-2 inline-block">
+                                        <img src="${pageContext.request.contextPath}/avatar?userId=${user.userID}" 
+                                             alt="Avatar" class="rounded-full h-12 w-12 object-cover"
+                                             onerror="this.onerror=null; this.src='https://via.placeholder.com/60';">
                                     </td>
                                     <td class="p-2">${user.fullName}</td>
                                     <td class="p-2">${user.email}</td>

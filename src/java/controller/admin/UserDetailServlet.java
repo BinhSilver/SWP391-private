@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.User;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Base64;
 
 @WebServlet("/userDetail")
 public class UserDetailServlet extends HttpServlet {

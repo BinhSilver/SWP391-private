@@ -189,9 +189,11 @@
                                     statusLabel = 'Suspended';
                                 }
 
+                                const avatarUrl = '<%= request.getContextPath() %>/avatar?userId=' + user.userID;
+
                                 userDiv.innerHTML =
                                         '<div class="flex items-center space-x-2">' +
-                                        '<img src="' + (user.avatar ? '<%= request.getContextPath()%>/' + user.avatar : 'https://via.placeholder.com/40') + '" alt="Avatar" class="w-10 h-10 rounded-full">' +
+                                        '<img src="' + avatarUrl + '" alt="Avatar" class="w-10 h-10 rounded-full" onerror="this.onerror=null; this.src=\'https://via.placeholder.com/40\';">' +
                                         '<div>' +
                                         '<p class="font-medium text-sm">' + (user.fullName || 'Không rõ') + '</p>' +
                                         '<p class="text-xs text-gray-500">' + (user.email || 'Không có email') + '</p>' +
