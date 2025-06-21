@@ -69,33 +69,3 @@
         </div>
     </div>
 </nav>
-
-<button id="chatbot-fab" title="Chatbot">
-    <i class="fa fa-comment"></i>
-</button>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-#chatbot-fab {
-    position: fixed;
-    bottom: 32px;
-    right: 32px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    font-size: 1.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 9999;
-    transition: background 0.2s;
-}
-#chatbot-fab:hover {
-    background: #1d4ed8;
-}
-</style>
