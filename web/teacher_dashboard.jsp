@@ -55,7 +55,7 @@
                     <!-- Hiển thị danh sách khóa học -->
                     <c:forEach var="course" items="${courses}">
                         <div class="course-item">
-                            <div onclick="window.location.href = '<c:url value='/Courses/ChiTietKhoaHoc.jsp'/>?id=${course.courseID}'" style="cursor: pointer;">
+                            <div onclick="window.location.href = '<c:url value='/CourseDetailServlet'/>?id=${course.courseID}'" style="cursor: pointer;">
                                 <h4>${course.title}
                                     <span style="color: #28a745;">
                                         <c:choose>

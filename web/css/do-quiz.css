@@ -1,0 +1,178 @@
+/* File: css/do-quiz.css - Updated with Wasabii Theme */
+
+/* ====== Tổng thể ====== */
+body {
+    background-color: #f5f7fa;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+    color: #212529;
+}
+
+.page-wrapper {
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+h3 {
+    font-weight: 700;
+    color: #e94f64;
+    margin-bottom: 1.5rem;
+}
+
+/* ====== Card Quiz ====== */
+.card {
+    border-left: 4px solid #0d6efd;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-body p.fw-bold {
+    font-size: 1.1rem;
+    color: #0d6efd;
+}
+
+/* ====== Quiz Answer Radio ====== */
+.form-check {
+    margin-bottom: 0.75rem;
+}
+
+.form-check-label strong {
+    margin-right: 8px;
+}
+
+/* ====== Nút làm bài / quay lại ====== */
+button[type="submit"], .btn-secondary, .back-button {
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+}
+
+button[type="submit"] {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.3);
+}
+
+.btn-secondary, .back-button {
+    background-color: #e94f64 !important;
+    color: #fff;
+}
+
+.btn-secondary:hover, .back-button:hover {
+    background-color: #d43f56 !important;
+}
+
+/* ====== Accordion ====== */
+.accordion-button {
+    font-weight: 600;
+    font-size: 1.1rem;
+    background-color: #e9f5ff;
+    color: #0d6efd;
+    border: none;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.accordion-body {
+    background-color: #ffffff;
+    padding: 1rem 1.25rem;
+}
+
+/* ====== Tài liệu học ====== */
+.material-group-title {
+    font-weight: bold;
+    font-size: 1.05rem;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #212529;
+    padding: 8px 12px;
+    background-color: #eef4f8;
+    border-left: 4px solid #0d6efd;
+    border-radius: 4px;
+}
+
+.material-item {
+    padding-left: 1rem;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #212529;
+}
+
+.material-item a {
+    font-size: 0.85rem;
+    padding: 3px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    border: 1px solid #198754;
+    color: #198754;
+    background-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.material-item a:hover {
+    background-color: #198754;
+    color: white;
+}
+
+.material-item .icon {
+    margin-right: 6px;
+    font-size: 1.1rem;
+}
+
+/* ====== Quiz Preview ====== */
+.quiz-question {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.quiz-answer-list,
+.quiz-answer-list li,
+ul {
+    padding-left: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.quiz-answer-list li {
+    margin-bottom: 5px;
+}
+
+.quiz-answer-list .correct,
+li strong {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* ====== Section Titles ====== */
+h4.text-dark {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+/* ====== Thông báo trống ====== */
+.empty-message {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
