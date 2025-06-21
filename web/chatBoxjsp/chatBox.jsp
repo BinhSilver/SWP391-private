@@ -22,6 +22,11 @@
 <input type="text" id="userInput" placeholder="Nhập câu hỏi..." style="width:400px;" />
 <button onclick="sendMessage()">Gửi</button>
 
+<button id="chatbot-fab"><i class="fa fa-comment"></i></button>
+<div id="chatbot-box" style="display:none; position:fixed; bottom:100px; right:32px; z-index:10000;">
+    <%@ include file="/chatBoxjsp/chatBox.jsp" %>
+</div>
+
 <script src="chat/chatbox.js"></script>
 </body>
 </html>

@@ -40,3 +40,12 @@ Câu hỏi: ${userInput}
 
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+document.getElementById('chatbot-fab').onclick = function() {
+    var box = document.getElementById('chatbot-box');
+    if (box.style.display === 'none' || box.style.display === '') {
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+    }
+};
