@@ -22,7 +22,7 @@ public class CoursesDAO {
                 c.setTitle(rs.getString("title"));
                 c.setDescription(rs.getString("description"));
                 c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested"));
+                c.setSuggested(rs.getBoolean("isSuggested")); // ✅ Mới thêm
                 list.add(c);
             }
         } catch (Exception e) {
@@ -37,8 +37,9 @@ public class CoursesDAO {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested()); // ✅
+            stmt.setBoolean(4, c.isSuggested()); 
             stmt.executeUpdate();
+            System.out.println("abc");
         }
     }
 
@@ -143,17 +144,22 @@ public class CoursesDAO {
         return null;
     }
 
-    public int addAndReturnID(Course c) throws SQLException {
-        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested) OUTPUT INSERTED.CourseID VALUES (?, ?, ?, ?)";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, c.getTitle());
-            stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested());
+    public int addAndReturnID(Course course) throws SQLException {
+        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, GETDATE())";
 
-            ResultSet rs = stmt.executeQuery();
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, course.getTitle());
+            ps.setString(2, course.getDescription());
+            ps.setBoolean(3, course.getHidden());    
+            ps.setBoolean(4, course.isSuggested());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1);
+                return rs.getInt(1); // Trả về CourseID vừa tạo
             }
         }
         return -1;

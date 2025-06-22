@@ -4,7 +4,6 @@
  */
 package Dao;
 
-
 import DB.JDBCConnection;
 import model.Answer;
 
@@ -16,14 +15,14 @@ public class AnswerDAO {
 
     // Thêm đáp án cho 1 câu hỏi
     public static boolean insertAnswer(Answer answer) {
-        String sql = "INSERT INTO Answers (QuestionID, AnswerText, AnswerNumber) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Answers (QuestionID, AnswerText, AnswerNumber, IsCorrect) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, answer.getQuestionId());
             stmt.setString(2, answer.getAnswerText());
             stmt.setInt(3, answer.getAnswerNumber());
+            stmt.setInt(4, answer.getIsCorrect()); // ✅ thêm dòng này
             stmt.executeUpdate();
             return true;
 
@@ -38,8 +37,7 @@ public class AnswerDAO {
         List<Answer> list = new ArrayList<>();
         String sql = "SELECT * FROM Answers WHERE QuestionID = ? ORDER BY AnswerNumber";
 
-        try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, questionId);
             ResultSet rs = stmt.executeQuery();
@@ -50,6 +48,7 @@ public class AnswerDAO {
                 answer.setQuestionId(rs.getInt("QuestionID"));
                 answer.setAnswerText(rs.getString("AnswerText"));
                 answer.setAnswerNumber(rs.getInt("AnswerNumber"));
+                answer.setIsCorrect(rs.getInt("IsCorrect")); // ✅ đọc thêm trường isCorrect
                 list.add(answer);
             }
 
@@ -64,8 +63,7 @@ public class AnswerDAO {
     public static boolean deleteAnswersByQuestionId(int questionId) {
         String sql = "DELETE FROM Answers WHERE QuestionID = ?";
 
-        try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, questionId);
             stmt.executeUpdate();
