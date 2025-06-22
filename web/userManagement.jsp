@@ -10,13 +10,14 @@
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
+        <title>Quản lý người dùng</title>
     </head>
     <body class="bg-gray-100">
 
         <%@ include file="admin/navofadmin.jsp" %>
 
         <div class="container mx-auto p-6">
-            <h2 class="text-2xl font-bold mb-4">User Management</h2>
+            <h2 class="text-2xl font-bold mb-4">Quản lý người dùng</h2>
 
             <c:if test="${not empty sessionScope.message}">
                 <p class="text-green-600 mb-4">${sessionScope.message}</p>
@@ -29,33 +30,35 @@
             <div class="bg-white p-4 rounded-lg shadow mb-4 flex justify-between items-center">
                 <form action="${pageContext.request.contextPath}/userManagement" method="get" class="flex space-x-4">
                     <div>
-                        <input type="text" name="search" value="${searchTerm}" placeholder="Search by name or email..."
+                        <input type="text" name="search" value="${searchTerm}" placeholder="Tìm kiếm theo tên hoặc email..."
                                class="border p-2 rounded">
                     </div>
                     <div>
                         <select name="role" class="border p-2 rounded">
-                            <option value="All Roles" ${selectedRole == 'All Roles' ? 'selected' : ''}>All Roles</option>
-                            <option value="1" ${selectedRole == '1' ? 'selected' : ''}>Free</option>
+                            <option value="All Roles" ${selectedRole == 'All Roles' ? 'selected' : ''}>Tất cả vai trò</option>
+                            <option value="1" ${selectedRole == '1' ? 'selected' : ''}>Miễn phí</option>
                             <option value="2" ${selectedRole == '2' ? 'selected' : ''}>Premium</option>
-                            <option value="3" ${selectedRole == '3' ? 'selected' : ''}>Teacher</option>
-                            <option value="4" ${selectedRole == '4' ? 'selected' : ''}>Admin</option>
+                            <option value="3" ${selectedRole == '3' ? 'selected' : ''}>Giáo viên</option>
+                            <option value="4" ${selectedRole == '4' ? 'selected' : ''}>Quản trị viên</option>
                         </select>
                     </div>
                     <div>
                         <select name="status" class="border p-2 rounded">
-                            <option value="All Status" ${selectedStatus == 'All Status' ? 'selected' : ''}>All Status</option>
-                            <option value="Active" ${selectedStatus == 'Active' ? 'selected' : ''}>Active</option>
-                            <option value="Inactive" ${selectedStatus == 'Inactive' ? 'selected' : ''}>Inactive</option>
-                            <option value="Suspended" ${selectedStatus == 'Suspended' ? 'selected' : ''}>Suspended</option>
+                            <option value="All Status" ${selectedStatus == 'All Status' ? 'selected' : ''}>Tất cả trạng thái</option>
+                            <option value="Active" ${selectedStatus == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                            <option value="Inactive" ${selectedStatus == 'Inactive' ? 'selected' : ''}>Không hoạt động</option>
+                            <option value="Suspended" ${selectedStatus == 'Suspended' ? 'selected' : ''}>Bị đình chỉ</option>
                         </select>
                     </div>
-                    <button type="submit" class="bg-blue-600 text-white p-2 rounded">Filter</button>
+                    <button type="submit" class="bg-blue-600 text-white p-2 rounded">Lọc</button>
                     <button type="button" onclick="window.location.href = '${pageContext.request.contextPath}/userManagement'"
-                            class="bg-gray-200 p-2 rounded">Clear</button>
+                            class="bg-gray-200 p-2 rounded">Xóa bộ lọc</button>
+                            
                 </form>
+                   <a href="userstatistic.jsp" class="bg-green-600 text-white p-2 rounded hover:bg-green-700 transition Sta">Thống kê</a>       
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-4">Users List</h3>
+                <h3 class="text-lg font-semibold mb-4">Danh sách người dùng</h3>
                 <c:if test="${empty users}">
                     <p class="text-gray-600 mb-4">Không tìm thấy người dùng nào phù hợp với bộ lọc.</p>
                 </c:if>
@@ -63,13 +66,13 @@
                     <table class="w-full text-left">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="p-2">Avatar</th>
-                                <th class="p-2">Full Name</th>
+                                <th class="p-2">Ảnh đại diện</th>
+                                <th class="p-2">Họ và tên</th>
                                 <th class="p-2">Email</th>
-                                <th class="p-2">Phone Number</th>
-                                <th class="p-2">Role</th>
-                                <th class="p-2">Status</th>
-                                <th class="p-2">Actions</th>
+                                <th class="p-2">Số điện thoại</th>
+                                <th class="p-2">Vai trò</th>
+                                <th class="p-2">Trạng thái</th>
+                                <th class="p-2">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,7 +80,7 @@
                                 <tr class="border-t">
                                     <td class="p-2">
                                         <img src="${user.avatar != null ? user.avatar : 'https://via.placeholder.com/60'}" 
-                                             alt="Avatar" class="rounded-full mr-2 inline-block">
+                                             alt="Ảnh đại diện" class="rounded-full mr-2 inline-block">
                                     </td>
                                     <td class="p-2">${user.fullName}</td>
                                     <td class="p-2">${user.email}</td>
@@ -88,21 +91,21 @@
                                                 user.roleID == 3 ? 'bg-blue-100 text-blue-800' : 
                                                 user.roleID == 4 ? 'bg-purple-100 text-purple-800' : 
                                                 'bg-gray-100 text-gray-800'}">
-                                                  ${user.roleID == 1 ? 'Free' : 
+                                                  ${user.roleID == 1 ? 'Miễn phí' : 
                                                     user.roleID == 2 ? 'Premium' : 
-                                                    user.roleID == 3 ? 'Teacher' : 'Admin'}
+                                                    user.roleID == 3 ? 'Giáo viên' : 'Quản trị viên'}
                                               </span>
                                         </td>
                                         <td class="p-2">
                                             <span class="px-2 py-1 rounded ${user.isActive && !user.isLocked ? 'bg-green-100 text-green-800' : 
                                                                              !user.isActive ? 'bg-red-100 text-red-800' : 
                                                                              'bg-orange-100 text-orange-800'}">
-                                                      ${user.isActive && !user.isLocked ? 'Active' : !user.isActive ? 'Inactive' : 'Suspended'}
+                                                      ${user.isActive && !user.isLocked ? 'Hoạt động' : !user.isActive ? 'Không hoạt động' : 'Bị đình chỉ'}
                                                   </span>
                                             </td>
                                             <td class="p-2">
                                                 <a href="${pageContext.request.contextPath}/userDetail?userId=${user.userID}" 
-                                                   class="view-details-btn mr-2">View Details</a>
+                                                   class="view-details-btn mr-2">Xem chi tiết</a>
                                                 <form action="${pageContext.request.contextPath}/userManagement" method="post" style="display:inline;">
                                                     <input type="hidden" name="userId" value="${user.userID}">
                                                     <c:choose>
@@ -111,7 +114,7 @@
                                                             <button type="submit" 
                                                                     onclick="return confirm('Bạn có chắc chắn muốn kích hoạt người dùng này?')"
                                                                     class="text-green-600">
-                                                                Active
+                                                                Mở
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>
@@ -119,7 +122,7 @@
                                                             <button type="submit" 
                                                                     onclick="return confirm('Bạn có chắc chắn muốn khóa người dùng này?')"
                                                                     class="text-red-600">
-                                                                Block
+                                                                Khóa
                                                             </button>
                                                         </c:otherwise>
                                                     </c:choose>

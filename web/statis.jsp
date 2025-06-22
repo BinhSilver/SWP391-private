@@ -9,11 +9,11 @@
     }
 %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Wasabii Statistics</title>
+        <title>Thống kê Wasabii</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="css/statiscss.css">
@@ -26,14 +26,14 @@
     </head>
     <body>
         <%@ include file="admin/navofadmin.jsp" %>
-        <!-- Sidebar -->
+        <!-- Thanh bên -->
         <div class="flex min-h-screen">
-            <!-- Main Dashboard -->
+            <!-- Bảng điều khiển chính -->
             <main class="flex-1 p-6 space-y-6">
-                <!-- Cards -->
+                <!-- Thẻ thông tin -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="bg-white p-4 rounded-lg shadow">
-                        <div class="text-sm text-gray-500">Tổng người dùng</div>
+                        <div class="text-sm text-gray-500">Tổng số người dùng</div>
                         <div class="text-2xl font-bold" id="totalUsers">Đang tải...</div>
                         <div class="text-green-500 text-sm" id="userGrowthRate">Đang tải...</div>
                     </div>
@@ -43,17 +43,17 @@
                         <div class="text-green-500 text-sm" id="premiumGrowthRate">Đang tải...</div>
                     </div>
                     <div class="bg-white p-4 rounded-lg shadow">
-                        <div class="text-sm text-gray-500">Tổng khóa học</div>
+                        <div class="text-sm text-gray-500">Tổng số khóa học</div>
                         <div class="text-2xl font-bold" id="totalCourses">Đang tải...</div>
                         <div class="text-green-500 text-sm" id="courseGrowthRate">Đang tải...</div>
                     </div>
                 </div>
 
                 <script>
-                    // Fetch data for cards
+                    // Lấy dữ liệu cho các thẻ
                     function fetchCardData() {
                         const url = '<%= request.getContextPath()%>/UserStatsServlet';
-                        console.log('Fetching card data from:' + url);
+                        console.log('Đang lấy dữ liệu thẻ từ: ' + url);
                         fetch(url)
                                 .then(response => {
                                     if (!response.ok) {
@@ -62,7 +62,7 @@
                                     return response.json();
                                 })
                                 .then(data => {
-                                    console.log('Dữ liệu thẻ nhận được:' + JSON.stringify(data));
+                                    console.log('Dữ liệu thẻ nhận được: ' + JSON.stringify(data));
                                     document.getElementById('totalUsers').textContent = data.totalUsers ? data.totalUsers.toLocaleString() : '0';
                                     document.getElementById('userGrowthRate').textContent =
                                             data.userGrowthRate !== undefined ? (data.userGrowthRate >= 0 ? '+' : '') + data.userGrowthRate.toFixed(1) + '% so với tháng trước' : 'N/A';
@@ -74,7 +74,7 @@
                                             data.courseGrowthRate !== undefined ? (data.courseGrowthRate >= 0 ? '+' : '') + data.courseGrowthRate.toFixed(1) + '% so với tháng trước' : 'N/A';
                                 })
                                 .catch(error => {
-                                    console.error('Lỗi khi lấy dữ liệu thẻ:' + error);
+                                    console.error('Lỗi khi lấy dữ liệu thẻ: ' + error);
                                     document.getElementById('totalUsers').textContent = 'Lỗi';
                                     document.getElementById('userGrowthRate').textContent = 'Lỗi';
                                     document.getElementById('currentMonthPremium').textContent = 'Lỗi';
@@ -89,43 +89,43 @@
                     };
                 </script>
 
-                <!-- Charts and Users -->
+                <!-- Biểu đồ và người dùng -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Charts (8/12) -->
+                    <!-- Biểu đồ (8/12) -->
                     <div class="lg:col-span-8 space-y-6">
-                        <!-- Course Enrollments Chart -->
+                        <!-- Biểu đồ đăng ký khóa học -->
                         <div class="bg-white p-4 rounded-lg shadow">
                             <div class="flex justify-between items-center mb-2">
-                                <h2 class="text-lg font-semibold">Course Enrollments</h2>
+                                <h2 class="text-lg font-semibold">Đăng ký khóa học</h2>
                                 <div>
-                                    <button id="enrollmentMonthBtn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Month</button>
-                                    <button id="enrollmentYearBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Year</button>
+                                    <button id="enrollmentMonthBtn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Tháng</button>
+                                    <button id="enrollmentYearBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Năm</button>
                                 </div>
                             </div>
                             <canvas id="enrollmentChart" height="150"></canvas>
                         </div>
 
-                        <!-- User Registrations Chart -->
+                        <!-- Biểu đồ đăng ký người dùng -->
                         <div class="bg-white p-4 rounded-lg shadow">
                             <div class="flex justify-between items-center mb-2">
-                                <h2 class="text-lg font-semibold">User Registrations</h2>
+                                <h2 class="text-lg font-semibold">Đăng ký người dùng</h2>
                                 <div>
-                                    <button id="registrationMonthBtn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Month</button>
-                                    <button id="registrationYearBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Year</button>
+                                    <button id="registrationMonthBtn" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Tháng</button>
+                                    <button id="registrationYearBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Năm</button>
                                 </div>
                             </div>
                             <canvas id="registrationChart" height="150"></canvas>
                         </div>
                     </div>
 
-                    <!-- Recent Users (4/12) -->
+                    <!-- Người dùng gần đây (4/12) -->
                     <div class="lg:col-span-4 bg-white p-4 rounded-lg shadow">
                         <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-lg font-semibold">Recent Users</h2>
-                            <input type="text" id="searchUser" placeholder="Search users..." class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-1/2" />
+                            <h2 class="text-lg font-semibold">Người dùng gần đây</h2>
+                            <input type="text" id="searchUser" placeholder="Tìm kiếm người dùng..." class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-1/2" />
                         </div>
                         <div id="userList" class="space-y-4 overflow-y-auto" style="height: calc(100% - 60px);">
-                            <!-- User list will be populated here -->
+                            <!-- Danh sách người dùng sẽ được hiển thị ở đây -->
                         </div>
                     </div>
 
@@ -137,10 +137,10 @@
                                     throw new Error('Lỗi HTTP: ' + response.status);
                                 }
                                 const users = await response.json();
-                                console.log('Dữ liệu người dùng:', users);
+                                console.log('Dữ liệu người dùng: ', users);
                                 return users.slice(0, 10);
                             } catch (error) {
-                                console.error('Lỗi khi lấy người dùng:', error);
+                                console.error('Lỗi khi lấy người dùng: ', error);
                                 return [];
                             }
                         }
@@ -171,27 +171,27 @@
                                     roleLabel = 'Premium';
                                 } else if (user.roleID == 3) {
                                     roleClass = 'bg-blue-100 text-blue-800';
-                                    roleLabel = 'Teacher';
+                                    roleLabel = 'Giáo viên';
                                 } else {
                                     roleClass = 'bg-gray-100 text-gray-800';
-                                    roleLabel = 'Free';
+                                    roleLabel = 'Miễn phí';
                                 }
 
                                 let statusClass, statusLabel;
                                 if (user.isActive && !user.isLocked) {
                                     statusClass = 'bg-green-100 text-green-800';
-                                    statusLabel = 'Active';
+                                    statusLabel = 'Hoạt động';
                                 } else if (!user.isActive) {
                                     statusClass = 'bg-red-100 text-red-800';
-                                    statusLabel = 'Inactive';
+                                    statusLabel = 'Không hoạt động';
                                 } else {
                                     statusClass = 'bg-orange-100 text-orange-800';
-                                    statusLabel = 'Suspended';
+                                    statusLabel = 'Bị đình chỉ';
                                 }
 
                                 userDiv.innerHTML =
                                         '<div class="flex items-center space-x-2">' +
-                                        '<img src="' + (user.avatar ? '<%= request.getContextPath()%>/' + user.avatar : 'https://via.placeholder.com/40') + '" alt="Avatar" class="w-10 h-10 rounded-full">' +
+                                        '<img src="' + (user.avatar ? '<%= request.getContextPath()%>/' + user.avatar : 'https://via.placeholder.com/40') + '" alt="Ảnh đại diện" class="w-10 h-10 rounded-full">' +
                                         '<div>' +
                                         '<p class="font-medium text-sm">' + (user.fullName || 'Không rõ') + '</p>' +
                                         '<p class="text-xs text-gray-500">' + (user.email || 'Không có email') + '</p>' +
@@ -204,13 +204,13 @@
                                                 '<form action="<%= request.getContextPath()%>/userManagement" method="post" style="display:inline;">' +
                                                 '<input type="hidden" name="userId" value="' + user.userID + '">' +
                                                 '<input type="hidden" name="action" value="block">' +
-                                                '<button type="submit" onclick="return confirm(\'Bạn có chắc chắn muốn khóa người dùng này?\')" class="text-red-600 text-xs">Block</button>' +
+                                                '<button type="submit" onclick="return confirm(\'Bạn có chắc chắn muốn khóa người dùng này?\')" class="text-red-600 text-xs">Khóa</button>' +
                                                 '</form>'
                                                 : user.isLocked ?
                                                 '<form action="<%= request.getContextPath()%>/userManagement" method="post" style="display:inline;">' +
                                                 '<input type="hidden" name="userId" value="' + user.userID + '">' +
                                                 '<input type="hidden" name="action" value="active">' +
-                                                '<button type="submit" onclick="return confirm(\'Bạn có chắc chắn muốn kích hoạt người dùng này?\')" class="text-green-600 text-xs">Active</button>' +
+                                                '<button type="submit" onclick="return confirm(\'Bạn có chắc chắn muốn kích hoạt người dùng này?\')" class="text-green-600 text-xs">Kích hoạt</button>' +
                                                 '</form>'
                                                 : ''
                                                 ) +
@@ -243,7 +243,7 @@
                         data: {
                             labels: [],
                             datasets: [{
-                                    label: 'Course Enrollments',
+                                    label: 'Đăng ký khóa học',
                                     data: [],
                                     backgroundColor: 'rgba(75, 192, 192, 0.5)',
                                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -252,8 +252,8 @@
                         },
                         options: {
                             scales: {
-                                y: {beginAtZero: true, title: {display: true, text: 'Number of Enrollments'}},
-                                x: {title: {display: true, text: 'Time Period'}}
+                                y: {beginAtZero: true, title: {display: true, text: 'Số lượng đăng ký'}},
+                                x: {title: {display: true, text: 'Thời gian'}}
                             }
                         }
                     });
@@ -263,7 +263,7 @@
                         data: {
                             labels: [],
                             datasets: [{
-                                    label: 'User Registrations',
+                                    label: 'Đăng ký người dùng',
                                     data: [],
                                     backgroundColor: 'rgba(153, 102, 255, 0.5)',
                                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -272,8 +272,8 @@
                         },
                         options: {
                             scales: {
-                                y: {beginAtZero: true, title: {display: true, text: 'Number of Registrations'}},
-                                x: {title: {display: true, text: 'Time Period'}}
+                                y: {beginAtZero: true, title: {display: true, text: 'Số lượng đăng ký'}},
+                                x: {title: {display: true, text: 'Thời gian'}}
                             }
                         }
                     });
@@ -289,10 +289,10 @@
                             }
                             const response = await fetch(contextPath + '/' + url);
                             if (!response.ok) {
-                                throw new Error('API error: ' + response.status + ' ' + response.statusText);
+                                throw new Error('Lỗi API: ' + response.status + ' ' + response.statusText);
                             }
                             const data = await response.json();
-                            console.log(chartType + ' Data:' + JSON.stringify(data));
+                            console.log('Dữ liệu ' + chartType + ': ' + JSON.stringify(data));
                             let chart;
                             if (chartType === 'enrollment') {
                                 chart = enrollmentChart;
@@ -303,8 +303,8 @@
                             chart.data.datasets[0].data = data.map(item => item.count);
                             chart.update();
                         } catch (error) {
-                            console.error('Error fetching ' + chartType + ' data:' + error.message);
-                            alert('Không thể tải dữ liệu ' + chartType + '. Vui lòng kiểm tra console.');
+                            console.error('Lỗi khi lấy dữ liệu ' + chartType + ': ' + error.message);
+                            alert('Không thể tải dữ liệu ' + (chartType === 'enrollment' ? 'đăng ký khóa học' : 'đăng ký người dùng') + '. Vui lòng kiểm tra console.');
                         }
                     }
 

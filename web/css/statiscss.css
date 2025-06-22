@@ -292,3 +292,10 @@ body {
 .save-btn:hover {
   background-color: #0056b3;
 }
+.email-text {
+    max-width: 200px; /* Giới hạn chiều rộng email */
+    overflow: hidden; /* Ẩn phần vượt quá */
+    text-overflow: ellipsis; /* Thêm dấu ... */
+    white-space: nowrap; /* Ngăn xuống dòng */
+    display: inline-block; /* Đảm bảo hiển thị đúng */
+}
