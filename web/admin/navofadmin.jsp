@@ -88,7 +88,7 @@
                     <a href="userManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
                     <a href="courseManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
                     <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
-                    <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Báo cáo</span></a>
+                    <a href="BulkEmailAdmin.jsp" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Gửi Mail</span></a>
        
                 </div>
             </div>

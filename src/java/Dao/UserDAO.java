@@ -315,6 +315,33 @@ public class UserDAO {
         }
         return jsonArray;
     }
+        public List<User> getUsersByRoles(List<String> roleNames) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.* FROM [dbo].[Users] u JOIN [dbo].[Roles] r ON u.RoleID = r.RoleID WHERE r.RoleName IN (";
+        // Build placeholders for role names
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < roleNames.size(); i++) {
+            placeholders.append("?");
+            if (i < roleNames.size() - 1) {
+                placeholders.append(",");
+            }
+        }
+        sql += placeholders.toString() + ")";
+
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Set role names as parameters
+            for (int i = 0; i < roleNames.size(); i++) {
+                stmt.setString(i + 1, roleNames.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(extractUserFromResultSet(rs));
+                }
+            }
+        }
+        return users;
+    }
     public static void main(String[] args) throws SQLException {
         UserDAO dao = new UserDAO();
         List<User> users = dao.getAllUsers();
