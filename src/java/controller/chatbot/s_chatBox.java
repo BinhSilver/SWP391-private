@@ -10,14 +10,29 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 
 @WebServlet(name = "s_chatBox", urlPatterns = {"/aiGe"})
 public class s_chatBox extends HttpServlet {
-
-    private static final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String API_KEY = "Bearer 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"; // ← Thay key thật
+private static String API_URL;
+    private static String API_KEY;
     private static final CoursesDAO coursesDAO = new CoursesDAO();
 
+ @Override
+    public void init() throws ServletException {
+        // Đọc file config.properties từ thư mục controller/chatbot
+        try (InputStream input = getClass().getResourceAsStream("config.properties")) {
+            Properties prop = new Properties();
+            if (input == null) {
+                throw new ServletException("Không tìm thấy file config.properties trong thư mục controller/chatbot");
+            }
+            prop.load(input);
+            API_URL = prop.getProperty("openrouter.api.url");
+            API_KEY = prop.getProperty("openrouter.api.key");
+        } catch (IOException ex) {
+            throw new ServletException("Lỗi khi đọc file config.properties", ex);
+        }
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
