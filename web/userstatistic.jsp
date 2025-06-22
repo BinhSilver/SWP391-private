@@ -9,41 +9,55 @@
     }
 %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Statistics Dashboard</title>
+        <title>Bảng điều khiển thống kê người dùng</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-          <link rel="stylesheet" href="css/usermanagecss.css">
+        <link rel="stylesheet" href="css/usermanagecss.css">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
+        <style>
+            .chart-box {
+                width: 750px; /* 550px + 200px */
+                max-width: 750px; /* Ngăn chặn tràn chiều rộng */
+                height: 500px; /* Tăng 100px từ 400px */
+                display: flex;
+                flex-direction: column;
+            }
+            .chart-box canvas {
+                height: 400px !important; /* Tăng 100px từ 300px */
+                width: 100% !important; /* Đảm bảo canvas không vượt quá container */
+            }
+        </style>
     </head>
     <body class="bg-gray-100">
-        <div class="container mx-auto p-6">
-          
-           <%@ include file="admin/navofadmin.jsp" %>
-       
+        <%@ include file="admin/navofadmin.jsp" %>
+        <div class="container mx-auto p-6 max-w-7xl"> <!-- Giới hạn chiều rộng tối đa -->
 
-            <!-- Bar Chart: User Registrations -->
-            <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-semibold">Registrations by Period</h2>
-                    <select id="timePeriod" class="border p-2 rounded">
-                        <option value="month" selected>Month</option>
-                        <option value="year">Year</option>
-                    </select>
+            <!-- Container cho các biểu đồ -->
+            <div class="flex justify-center items-start gap-5 mt-6">
+                <!-- Bar Chart: Đăng ký theo thời kỳ -->
+                <div class="bg-white shadow-lg rounded-lg p-6 chart-box">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold">Đăng ký theo thời kỳ</h2>
+                        <select id="timePeriod" class="border p-2 rounded">
+                            <option value="month" selected>Tháng</option>
+                            <option value="year">Năm</option>
+                        </select>
+                    </div>
+                    <canvas id="registrationChart"></canvas>
                 </div>
-                <canvas id="registrationChart" height="200"></canvas>
-            </div>
 
-            <!-- Pie Chart: User Role Distribution -->
-            <div class="bg-white shadow-lg rounded-lg p-6">
-                <h2 class="text-lg font-semibold mb-6 text-center">User Role Distribution</h2>
-                <canvas id="userRoleChart" style="min-height: 300px;"></canvas>
+                <!-- Pie Chart: Phân bố vai trò người dùng -->
+                <div class="bg-white shadow-lg rounded-lg p-6 chart-box">
+                    <h2 class="text-lg font-semibold mb-6 text-center">Phân bố vai trò người dùng</h2>
+                    <canvas id="userRoleChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -51,14 +65,14 @@
             // Register Chart.js Data Labels plugin
             Chart.register(ChartDataLabels);
 
-            // Bar Chart: User Registrations
+            // Bar Chart: Đăng ký người dùng
             const registrationCtx = document.getElementById('registrationChart').getContext('2d');
             const registrationChart = new Chart(registrationCtx, {
                 type: 'bar',
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Users',
+                        label: 'Người dùng',
                         data: [],
                         backgroundColor: 'rgba(153, 102, 255, 0.5)',
                         borderColor: 'rgba(153, 102, 255, 1)',
@@ -66,9 +80,11 @@
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Number of Registrations' } },
-                        x: { title: { display: true, text: 'Time Period' } }
+                        y: { beginAtZero: true, title: { display: true, text: 'Số lượng đăng ký' } },
+                        x: { title: { display: true, text: 'Thời kỳ' } }
                     }
                 }
             });
@@ -77,37 +93,37 @@
                 const validPeriod = period || 'month';
                 const url = '<%= request.getContextPath()%>/api/userstats?period=' + validPeriod + '&t=' + Date.now();
                 try {
-                    console.log('Fetching user stats for period:', validPeriod);
+                    console.log('Đang lấy dữ liệu thống kê người dùng cho thời kỳ:', validPeriod);
                     const response = await fetch(url, { cache: 'no-store' });
                     if (!response.ok) {
-                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                        throw new Error(`Lỗi API: ${response.status} ${response.statusText}`);
                     }
                     const data = await response.json();
-                    console.log('Raw user stats data:', data);
+                    console.log('Dữ liệu thống kê người dùng thô:', data);
 
                     if (!Array.isArray(data)) {
-                        throw new Error('User stats data is not an array');
+                        throw new Error('Dữ liệu thống kê người dùng không phải là mảng');
                     }
 
-                    const labels = data.map(item => item.period || 'Unknown');
+                    const labels = data.map(item => item.period || 'Không xác định');
                     const counts = data.map(item => item.count >= 0 ? item.count : 0);
-                    console.log('Registration chart labels:', labels);
-                    console.log('Registration chart counts:', counts);
+                    console.log('Nhãn biểu đồ đăng ký:', labels);
+                    console.log('Số liệu biểu đồ đăng ký:', counts);
 
                     registrationChart.data.labels = labels;
                     registrationChart.data.datasets[0].data = counts;
                     registrationChart.update();
-                    console.log('Registration chart updated');
+                    console.log('Biểu đồ đăng ký đã được cập nhật');
                 } catch (error) {
-                    console.error('Error fetching user stats:', error.message);
-                    alert('Failed to load registration chart data. Check console for details.');
-                    registrationChart.data.labels = ['Error'];
+                    console.error('Lỗi khi lấy dữ liệu thống kê người dùng:', error.message);
+                    alert('Không thể tải dữ liệu biểu đồ đăng ký. Vui lòng kiểm tra console.');
+                    registrationChart.data.labels = ['Lỗi'];
                     registrationChart.data.datasets[0].data = [0];
                     registrationChart.update();
                 }
             }
 
-            // Pie Chart: User Role Distribution
+            // Pie Chart: Phân bố vai trò người dùng
             const roleCtx = document.getElementById('userRoleChart').getContext('2d');
             const userRoleChart = new Chart(roleCtx, {
                 type: 'pie',
@@ -122,6 +138,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { position: 'bottom' },
                         tooltip: {
@@ -132,7 +149,7 @@
                                     const data = context.chart.data.datasets[0].data;
                                     const total = data.reduce((sum, val) => sum + (val >= 0 ? val : 0), 0);
                                     const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return `${label}: ${value} users (${percent}%)`;
+                                    return `${label}: ${value} người dùng (${percent}%)`;
                                 }
                             }
                         },
@@ -142,7 +159,7 @@
                                 const data = context.chart.data.datasets[0].data;
                                 const total = data.reduce((sum, val) => sum + (val >= 0 ? val : 0), 0);
                                 const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                console.log(`Role chart label - Value: ${value}, Total: ${total}, Percent: ${percent}`);
+                                console.log(`Nhãn biểu đồ vai trò - Giá trị: ${value}, Tổng: ${total}, Phần trăm: ${percent}`);
                                 return total > 0 ? `${value} (${percent}%)` : `0 (0%)`;
                             },
                             font: { weight: 'bold', size: 12 },
@@ -156,49 +173,49 @@
             async function loadChartData() {
                 const url = '<%= request.getContextPath()%>/api/userrolestats?t=' + Date.now();
                 try {
-                    console.log('Fetching user role stats');
+                    console.log('Đang lấy dữ liệu thống kê vai trò người dùng');
                     const response = await fetch(url, { cache: 'no-store' });
                     if (!response.ok) {
-                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                        throw new Error(`Lỗi API: ${response.status} ${response.statusText}`);
                     }
                     const data = await response.json();
-                    console.log('Raw user role stats data:', data);
+                    console.log('Dữ liệu thống kê vai trò người dùng thô:', data);
 
                     if (!Array.isArray(data)) {
-                        throw new Error('User role stats data is not an array');
+                        throw new Error('Dữ liệu thống kê vai trò người dùng không phải là mảng');
                     }
 
                     const validData = data.filter(item => item.count >= 0 && typeof item.count === 'number');
-                    const labels = validData.map(item => item.role || 'Unknown');
+                    const labels = validData.map(item => item.role || 'Không xác định');
                     const counts = validData.map(item => item.count || 0);
-                    console.log('Role chart labels:', labels);
-                    console.log('Role chart counts:', counts);
+                    console.log('Nhãn biểu đồ vai trò:', labels);
+                    console.log('Số liệu biểu đồ vai trò:', counts);
 
                     userRoleChart.data.labels = labels;
                     userRoleChart.data.datasets[0].data = counts;
                     userRoleChart.update();
-                    console.log('Role chart updated');
+                    console.log('Biểu đồ vai trò đã được cập nhật');
                 } catch (error) {
-                    console.error('Error fetching user role stats:', error);
-                    alert('Failed to load role chart data. Check console for details.');
-                    userRoleChart.data.labels = ['Error'];
+                    console.error('Lỗi khi lấy dữ liệu thống kê vai trò:', error);
+                    alert('Không thể tải dữ liệu biểu đồ vai trò. Vui lòng kiểm tra console.');
+                    userRoleChart.data.labels = ['Lỗi'];
                     userRoleChart.data.datasets[0].data = [0];
                     userRoleChart.update();
                 }
             }
 
-            // Initialize both charts
+            // Khởi tạo cả hai biểu đồ
             document.addEventListener('DOMContentLoaded', () => {
                 fetchChartData('month');
                 loadChartData();
             });
 
-            // Update bar chart on period change
+            // Cập nhật biểu đồ cột khi thay đổi thời kỳ
             document.getElementById('timePeriod').addEventListener('change', function () {
                 fetchChartData(this.value);
             });
         </script>
-             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
         <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
