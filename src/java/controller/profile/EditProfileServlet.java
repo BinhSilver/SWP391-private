@@ -8,9 +8,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
 import Dao.UserDAO;
+import jakarta.servlet.annotation.MultipartConfig;
 
 @WebServlet("/editprofile")
+@MultipartConfig
 public class EditProfileServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        User currentUser = (User) session.getAttribute("authUser");
+        session.setAttribute("authUser", currentUser);
+        req.getRequestDispatcher("/Profile/profile-edit.jsp").forward(req, resp);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,7 +44,6 @@ public class EditProfileServlet extends HttpServlet {
             String japaneseLevel = request.getParameter("japaneseLevel");
             String address = request.getParameter("address");
             String country = request.getParameter("country");
-            String avatar = request.getParameter("avatar");
 
             // Parse ngày sinh
             Date birthDate = null;
@@ -49,7 +59,12 @@ public class EditProfileServlet extends HttpServlet {
             currentUser.setJapaneseLevel(japaneseLevel);
             currentUser.setAddress(address);
             currentUser.setCountry(country);
-            currentUser.setAvatar(avatar);
+
+            Part filePart = request.getPart("avatar");
+            if (filePart != null && filePart.getSize() > 0) {
+                byte[] avatarBytes = filePart.getInputStream().readAllBytes();
+                currentUser.setAvatar(avatarBytes);
+            }
 
             UserDAO dao = new UserDAO();
             boolean success = dao.updateProfile(currentUser);
@@ -57,7 +72,8 @@ public class EditProfileServlet extends HttpServlet {
             if (success) {
                 session.setAttribute("authUser", currentUser); // Cập nhật session
                 // Điều hướng về trang xem hồ sơ (profile-view.jsp)
-                response.sendRedirect(request.getContextPath() + "/Profile/profile-view.jsp");
+                request.getRequestDispatcher("/Profile/profile-view.jsp").forward(request, response);
+
             } else {
                 // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");

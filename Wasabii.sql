@@ -1,4 +1,4 @@
-﻿CREATE DATABASE Wasabii;
+CREATE DATABASE Wasabii;
 GO
 USE Wasabii;
 GO
@@ -72,8 +72,9 @@ CREATE TABLE UserPremium (
 CREATE TABLE Courses (
     CourseID INT PRIMARY KEY IDENTITY,
     Title NVARCHAR(255),
-    Description NVARCHAR(MAX),
+    Description NVARCHAR(MAX),   
     IsHidden BIT DEFAULT 0,
+    IsSuggested BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
 
@@ -104,15 +105,18 @@ CREATE TABLE CourseRatings (
 
 -- 9. Lesson Materials
 CREATE TABLE LessonMaterials (
-    MaterialID INT PRIMARY KEY IDENTITY,
-    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
-    MaterialType NVARCHAR(20),
-    FileType NVARCHAR(20),
+    MaterialID INT PRIMARY KEY IDENTITY(1,1),
+    LessonID INT NOT NULL,
+    MaterialType NVARCHAR(50) NOT NULL,   -- 'Từ vựng' | 'Kanji' | 'Ngữ pháp'
+    FileType NVARCHAR(50) NOT NULL,       -- 'PDF' | 'Video'
     Title NVARCHAR(255),
-    FilePath NVARCHAR(500),
+    FilePath NVARCHAR(MAX),
     IsHidden BIT DEFAULT 0,
-    CreatedAt DATETIME DEFAULT GETDATE()
-);
+    CreatedAt DATETIME DEFAULT GETDATE(),
+	);
+
+
+
 
 -- 10. Vocabulary, Tags, VocabularyTags
 CREATE TABLE Vocabulary (
@@ -302,11 +306,6 @@ VALUES
     (N'Gói Tháng', 25000, 1, N'Sử dụng Premium trong 1 tháng'),
     (N'Gói Năm', 250000, 12, N'Sử dụng Premium trong 12 tháng');
 
-INSERT INTO Courses (Title, Description, IsHidden)
-VALUES
-    (N'Tiếng Nhật Sơ Cấp N5', N'Khóa học dành cho người mới bắt đầu, giúp bạn xây dựng nền tảng tiếng Nhật.', 0),
-    (N'Tiếng Nhật Trung Cấp N4', N'Khóa học nâng cao dành cho những ai đã có kiến thức cơ bản.', 0);
-
 
 
 
@@ -333,3 +332,102 @@ BEGIN
     INNER JOIN inserted i ON u.UserID = i.UserID
     WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
 END;
+
+
+--thêm user này vô để coi được khóa học nha
+INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', 'img/nam.jpg', N'Nữ');
+
+
+--Thêm mấy bảng này nha
+CREATE TABLE LessonAccess (
+    AccessID INT IDENTITY PRIMARY KEY,
+    UserID INT NOT NULL,
+    LessonID INT NOT NULL,
+    AccessedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_LessonAccess_User FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    CONSTRAINT FK_LessonAccess_Lesson FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID),
+    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)  -- tránh trùng lặp
+);
+
+
+CREATE TABLE LessonVocabulary (
+    LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
+    VocabID INT NOT NULL FOREIGN KEY REFERENCES Vocabulary(VocabID),
+    PRIMARY KEY (LessonID, VocabID)
+);
+
+ALTER TABLE Answers
+ADD AnswerNumber INT CHECK (AnswerNumber BETWEEN 1 AND 4);
+
+ALTER TABLE Lessons
+ADD Description NVARCHAR(1000);
+
+ALTER TABLE LessonMaterials
+ADD CONSTRAINT FK_LessonMaterials_Lessons
+FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID);
+
+--Xóa dữ liệu khóa học cũ rồi thêm mới như ở dưới nha
+
+DELETE FROM Answers;
+DELETE FROM Questions;
+DELETE FROM Quizzes;
+
+DELETE FROM GrammarPoints;
+DELETE FROM Kanji;
+DELETE FROM Vocabulary;
+
+DELETE FROM LessonMaterials;
+
+-- Sau khi các bảng trên đã xóa, mới xóa Lesson và Course
+DELETE FROM Lessons;
+DELETE FROM Courses;
+
+
+
+
+-- 1. Tạo khóa học mới
+INSERT INTO Courses (Title, Description, IsHidden, IsSuggested)
+VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1);
+
+DECLARE @CourseID INT = SCOPE_IDENTITY();
+-- 2. Thêm các bài học
+INSERT INTO Lessons (CourseID, Title) VALUES
+(@CourseID, N'Bài 1: Giới thiệu bản thân'),
+(@CourseID, N'Bài 2: Hỏi thăm sức khỏe'),
+(@CourseID, N'Bài 3: Hỏi đường đi');
+
+
+-- Lấy ID từng bài học
+DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 1: Giới thiệu bản thân');
+DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 2: Hỏi thăm sức khỏe');
+DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 3: Hỏi đường đi');
+
+-- Bài 1
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+VALUES 
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/lesson1_vocab.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Kanji', N'PDF', N'Kanji Bài 1', N'files/lesson1_kanji.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/lesson1_grammar.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/lesson1_grammar.mp4');
+
+-- Bài 2
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+VALUES 
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/lesson2_vocab.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Kanji', N'PDF', N'Kanji Bài 2', N'files/lesson2_kanji.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/lesson2_grammar.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/lesson2_grammar.mp4');
+
+-- Bài 3
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+VALUES 
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/lesson3_vocab.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Kanji', N'PDF', N'Kanji Bài 3', N'files/lesson3_kanji.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/lesson3_grammar.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
+
+
+
+
+

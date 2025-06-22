@@ -14,7 +14,7 @@ public class QuizService {
     }
 
     public static List<QuizQuestion> loadQuestions(int lessonId) {
-        return QuizDAO.getQuestionsByLessonId(lessonId);
+        return QuizDAO.getQuestionsWithAnswersByLessonId(lessonId);
     }
 
     public static boolean deleteQuiz(int lessonId) {
@@ -27,15 +27,14 @@ public class QuizService {
 
     public static boolean updateQuestions(int lessonId, List<QuizQuestion> questions) {
         boolean deleted = deleteQuiz(lessonId);
-        if (!deleted) return false;
+        if (!deleted) {
+            return false;
+        }
         return saveQuestions(lessonId, questions);
     }
 
     public static List<QuizQuestion> loadQuizWithAnswers(int lessonId) {
-        List<QuizQuestion> questions = QuizDAO.getQuestionsByLessonId(lessonId);
-        for (QuizQuestion q : questions) {
-            q.setAnswers(QuizDAO.getAnswersByQuestionId(q.getId()));
-        }
-        return questions;
+        return QuizDAO.getQuestionsWithAnswersByLessonId(lessonId);
     }
+
 }

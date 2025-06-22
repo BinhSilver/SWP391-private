@@ -12,19 +12,20 @@
 <html>
     <head>
         <title>Edit Profile</title>
-          <link rel="stylesheet" href="${pageContext.request.contextPath}/Profile/profile.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/Profile/profile.css">
         <script src="js/suggest-address.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </head>
     <body>
         <div class="container">
-            <form action="${pageContext.request.contextPath}/Profile/profile-view.jsp" method="post" class="edit-form">
+            <form action="editprofile" method="post" class="edit-form" enctype="multipart/form-data">
                 <h2>Edit Profile</h2>
                 <% if (request.getAttribute("error") != null) {%>
                 <p style="color: red;"><%= request.getAttribute("error")%></p>
                 <% }%>
                 <input type="hidden" name="userID" value="<%= user.getUserID()%>" />
 
+                
                 <div class="form-grid">
                     <div class="form-group">
                         <label><i class="fa-solid fa-envelope"></i> Email</label>
@@ -63,11 +64,11 @@
                         <input type="text" name="country" value="<%= user.getCountry() != null ? user.getCountry() : ""%>" />
                     </div>
 
-                   <div class="form-group full-width">
-    <label><i class="fa-solid fa-image"></i> Avatar URL</label>
-    <input type="url" name="avatar" value="<%= user.getAvatar() != null ? user.getAvatar() : ""%>" placeholder="https://example.com/avatar.jpg" />
-</div>
-
+                    <div class="form-group full-width">
+                        <label><i class="fa-solid fa-image"></i> Ảnh đại diện</label>
+                        <input type="file" name="avatar" accept="image/*" />
+                    </div>
+                    
                     <div class="form-group full-width">
                         <label><i class="fa-solid fa-location-dot"></i> Address</label>
                         <input type="text" id="address" name="address" list="address-options"
@@ -76,10 +77,10 @@
                     </div>
                 </div>
 
- <div class="form-actions">
-    <button type="submit" class="btn primary">Save Changes</button>
-    <button type="button" class="btn secondary" onclick="window.location.href='profile-view.jsp'">Cancel</button>
-</div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Save Changes</button>
+                    <button type="button" class="btn secondary" onclick="window.location.href = 'profile'">Cancel</button>
+                </div>
             </form>
         </div>
     </body>

@@ -1,0 +1,55 @@
+/* Table styles */
+table td {
+    vertical-align: middle;
+    padding: 8px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table td img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* View Details button */
+.view-details-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #e6f3ff; /* bg-blue-100 */
+    color: #2563eb; /* text-blue-600 */
+    text-decoration: none; /* Bỏ gạch chân */
+    border-radius: 6px; /* rounded-md */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500;
+    transition: all 0.2s ease; /* Hiệu ứng mượt */
+}
+
+.view-details-btn:hover {
+    background-color: #bfdbfe; /* bg-blue-200 */
+    color: #1e40af; /* text-blue-700 */
+    transform: translateY(-1px); /* Hiệu ứng nhấc nhẹ khi hover */
+}
+
+/* Ensure table responsiveness */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th {
+    padding: 8px;
+    vertical-align: middle;
+}
+
+/* Additional styles to prevent conflicts */
+.container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px;
+}

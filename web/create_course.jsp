@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" />
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>" />
         <link rel="stylesheet" href="<c:url value='/css/create_course.css'/>" />
+
     </head>
 
     <body>
@@ -38,15 +39,20 @@
                         <textarea class="form-control" id="courseDescription" name="courseDescription" rows="3"></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="courseThumbnail" class="form-label">Ảnh đại diện</label>
-                        <input type="file" class="form-control" id="courseThumbnail" name="courseThumbnail" accept="image/*" />
-                    </div>
+
 
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
                     </div>
+                    <c:if test="${sessionScope.authUser != null && sessionScope.authUser.roleID == 4}">
+
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="isSuggested" name="isSuggested" />
+                            <label class="form-check-label" for="isSuggested">Đánh dấu là khóa học nổi bật</label>
+                        </div>
+                    </c:if>
+
                 </div>
 
                 <!-- LESSONS -->
@@ -216,7 +222,6 @@
         </template>
 
 
-        <%@ include file="Home/footer.jsp" %>
 
         <!-- MODAL QUIZ -->
         <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
@@ -243,6 +248,8 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="<c:url value='/js/create_course.js'/>"></script>
+        
+        <%@ include file="Home/footer.jsp" %>
 
     </body>
 </html>
