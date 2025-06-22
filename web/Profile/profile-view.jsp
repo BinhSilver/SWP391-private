@@ -12,9 +12,9 @@
     if (avatar != null && avatar.length > 0) {
         base64 = java.util.Base64.getEncoder().encodeToString(avatar);
     }
-    String defaultAvatar = "assets/avartar/nam.jpg";
+    String defaultAvatar = "assets/avatar/nam.jpg";
     if ("Nữ".equalsIgnoreCase(user.getGender())) {
-        defaultAvatar = "assets/avartar/nu.jpg";
+        defaultAvatar = "assets/avatar/nu.jpg";
     }
 %>
 <!DOCTYPE html>

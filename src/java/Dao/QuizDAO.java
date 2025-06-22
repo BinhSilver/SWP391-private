@@ -10,10 +10,11 @@ import java.util.List;
 
 public class QuizDAO {
 
+    // ✅ Lưu quiz + câu hỏi + đáp án mới (xóa trước nếu đã tồn tại)
     public static boolean saveQuestions(int lessonId, List<QuizQuestion> questions) {
         String insertQuizSql = "INSERT INTO Quizzes (LessonID, Title) OUTPUT INSERTED.QuizID VALUES (?, ?)";
-        String insertQuestionSql = "INSERT INTO Questions (QuizID, QuestionText, CorrectAnswer, TimeLimit) OUTPUT INSERTED.QuestionID VALUES (?, ?, ?, ?)";
-        String insertAnswerSql = "INSERT INTO Answers (QuestionID, AnswerText, AnswerNumber) VALUES (?, ?, ?)";
+        String insertQuestionSql = "INSERT INTO Questions (QuizID, QuestionText, TimeLimit) OUTPUT INSERTED.QuestionID VALUES (?, ?, ?)";
+        String insertAnswerSql = "INSERT INTO Answers (QuestionID, AnswerText, IsCorrect, AnswerNumber) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = JDBCConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -25,8 +26,7 @@ public class QuizDAO {
                 PreparedStatement qStmt = conn.prepareStatement(insertQuestionSql);
                 qStmt.setInt(1, quizId);
                 qStmt.setString(2, question.getQuestion());
-                qStmt.setInt(3, question.getCorrectAnswer());
-                qStmt.setInt(4, question.getTimeLimit());
+                qStmt.setInt(3, question.getTimeLimit());
                 ResultSet qRs = qStmt.executeQuery();
                 if (!qRs.next()) {
                     throw new SQLException("Insert question failed");
@@ -37,7 +37,8 @@ public class QuizDAO {
                     PreparedStatement aStmt = conn.prepareStatement(insertAnswerSql);
                     aStmt.setInt(1, questionId);
                     aStmt.setString(2, answer.getAnswerText());
-                    aStmt.setInt(3, answer.getAnswerNumber());
+                    aStmt.setInt(3, answer.getIsCorrect());
+                    aStmt.setInt(4, answer.getAnswerNumber());
                     aStmt.executeUpdate();
                 }
             }
@@ -50,13 +51,13 @@ public class QuizDAO {
         }
     }
 
+    // ✅ Lấy danh sách câu hỏi đơn giản (không có đáp án)
     public static List<QuizQuestion> getQuestionsByLessonId(int lessonId) {
         List<QuizQuestion> list = new ArrayList<>();
         String questionSql = "SELECT q.QuestionID, q.QuestionText, q.CorrectAnswer, q.TimeLimit FROM Questions q JOIN Quizzes z ON q.QuizID = z.QuizID WHERE z.LessonID = ?";
         String answerSql = "SELECT AnswerText, AnswerNumber FROM Answers WHERE QuestionID = ?";
 
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement qStmt = conn.prepareStatement(questionSql)) {
-
             qStmt.setInt(1, lessonId);
             ResultSet qRs = qStmt.executeQuery();
 
@@ -87,52 +88,38 @@ public class QuizDAO {
         return list;
     }
 
-    public static List<Answer> getAnswersByQuestionId(int questionId) {
-        List<Answer> answers = new ArrayList<>();
-        String sql = "SELECT AnswerID, QuestionID, AnswerText, AnswerNumber FROM Answers WHERE QuestionID = ?";
-
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, questionId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Answer answer = new Answer();
-                answer.setId(rs.getInt("AnswerID"));
-                answer.setQuestionId(rs.getInt("QuestionID"));
-                answer.setAnswerText(rs.getString("AnswerText"));
-                answer.setAnswerNumber(rs.getInt("AnswerNumber"));
-                answers.add(answer);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return answers;
-    }
-
+    // ✅ Lấy danh sách câu hỏi + đáp án đầy đủ
     public static List<QuizQuestion> getQuestionsWithAnswersByLessonId(int lessonId) {
         List<QuizQuestion> questions = new ArrayList<>();
-        String questionSql = "SELECT q.QuestionID, q.QuestionText, q.CorrectAnswer, q.TimeLimit "
-                + "FROM Questions q JOIN Quizzes z ON q.QuizID = z.QuizID WHERE z.LessonID = ?";
+        String questionSql = "SELECT q.QuestionID, q.QuestionText, q.TimeLimit FROM Questions q JOIN Quizzes z ON q.QuizID = z.QuizID WHERE z.LessonID = ?";
 
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement qStmt = conn.prepareStatement(questionSql)) {
-
             qStmt.setInt(1, lessonId);
             ResultSet qRs = qStmt.executeQuery();
 
             while (qRs.next()) {
                 int questionId = qRs.getInt("QuestionID");
-
-                QuizQuestion question = new QuizQuestion();
-                question.setId(questionId);
-                question.setQuestion(qRs.getString("QuestionText"));
-                question.setCorrectAnswer(qRs.getInt("CorrectAnswer"));
-                question.setTimeLimit(qRs.getInt("TimeLimit"));
+                String questionText = qRs.getString("QuestionText");
+                int timeLimit = qRs.getInt("TimeLimit");
 
                 List<Answer> answers = getAnswersByQuestionId(questionId);
-                question.setAnswers(answers);
+
+                int correctAnswerNumber = -1;
+                for (Answer a : answers) {
+                    if (a.getIsCorrect() == 1) {
+                        correctAnswerNumber = a.getAnswerNumber();
+                        break;
+                    }
+                }
+
+                QuizQuestion question = new QuizQuestion(
+                        questionId,
+                        0,
+                        questionText,
+                        correctAnswerNumber,
+                        timeLimit,
+                        answers
+                );
 
                 questions.add(question);
             }
@@ -144,6 +131,33 @@ public class QuizDAO {
         return questions;
     }
 
+    // ✅ Lấy danh sách đáp án theo câu hỏi
+    public static List<Answer> getAnswersByQuestionId(int questionId) {
+        List<Answer> answers = new ArrayList<>();
+        String sql = "SELECT AnswerID, QuestionID, AnswerText, AnswerNumber, IsCorrect FROM Answers WHERE QuestionID = ?";
+
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, questionId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Answer answer = new Answer();
+                answer.setId(rs.getInt("AnswerID"));
+                answer.setQuestionId(rs.getInt("QuestionID"));
+                answer.setAnswerText(rs.getString("AnswerText"));
+                answer.setAnswerNumber(rs.getInt("AnswerNumber"));
+                answer.setIsCorrect(rs.getInt("IsCorrect"));
+                answers.add(answer);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return answers;
+    }
+
+    // ✅ Xóa toàn bộ câu hỏi/đáp án và quiz theo lessonId
     public static boolean deleteQuestionsByLessonId(int lessonId) {
         String getQuizIdSql = "SELECT QuizID FROM Quizzes WHERE LessonID = ?";
         String deleteAnswersSql = "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)";
@@ -181,6 +195,7 @@ public class QuizDAO {
         }
     }
 
+    // ✅ Tạo mới hoặc lấy QuizID hiện tại theo Lesson
     private static int getOrCreateQuizId(Connection conn, int lessonId) throws SQLException {
         String selectSql = "SELECT QuizID FROM Quizzes WHERE LessonID = ?";
         String insertSql = "INSERT INTO Quizzes (LessonID, Title) OUTPUT INSERTED.QuizID VALUES (?, ?)";
@@ -202,6 +217,7 @@ public class QuizDAO {
         return insertRs.getInt(1);
     }
 
+    // ✅ Xóa toàn bộ câu hỏi và đáp án cho quiz (nội bộ)
     private static void deleteQuestionsAndAnswers(Connection conn, int quizId) throws SQLException {
         String deleteAnswers = "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)";
         String deleteQuestions = "DELETE FROM Questions WHERE QuizID = ?";
@@ -214,5 +230,4 @@ public class QuizDAO {
         delQuestions.setInt(1, quizId);
         delQuestions.executeUpdate();
     }
-    
 }

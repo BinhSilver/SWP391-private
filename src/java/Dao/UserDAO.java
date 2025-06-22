@@ -292,6 +292,7 @@ public class UserDAO {
             user.setAddress(rs.getString("Address"));
             user.setCountry(rs.getString("Country"));
             user.setAvatar(rs.getBytes("Avatar"));
+            user.setGender(rs.getString("Gender"));
         } catch (SQLException | NullPointerException ignored) {}
         return user;
     }

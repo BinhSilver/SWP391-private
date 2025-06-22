@@ -57,4 +57,24 @@ public class LessonsDAO {
         return list;
     }
 
+    // ✅ Bổ sung để sử dụng trong StudyLessonServlet
+    public static Lesson getLessonById(int lessonId) {
+        String sql = "SELECT * FROM Lessons WHERE LessonID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lessonId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Lesson(
+                        rs.getInt("LessonID"),
+                        rs.getInt("CourseID"),
+                        rs.getString("Title"),
+                        rs.getBoolean("IsHidden")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

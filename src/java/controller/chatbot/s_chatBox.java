@@ -44,7 +44,7 @@ private static String API_URL;
             requestData.append(line);
         }
 
-        JsonObject requestJson = JsonParser.parseString(requestData.toString()).getAsJsonObject();
+        JsonObject requestJson = new JsonParser().parse(requestData.toString()).getAsJsonObject();
         String userMessage = requestJson.has("message") ? requestJson.get("message").getAsString() : "";
 
         if (userMessage.trim().isEmpty()) {
@@ -103,9 +103,9 @@ private static String API_URL;
 
         String aiResponseText = "Vui lòng hỏi liên quan đến khóa học hoặc tiếng Nhật.";
         try {
-            JsonObject json = JsonParser.parseString(responseStr.toString()).getAsJsonObject();
+            JsonObject json = new JsonParser().parse(responseStr.toString()).getAsJsonObject();
             JsonArray choices = json.getAsJsonArray("choices");
-            if (choices != null && !choices.isEmpty()) {
+            if (choices != null && choices.size() > 0) {
                 JsonObject msg = choices.get(0).getAsJsonObject().getAsJsonObject("message");
                 aiResponseText = msg.get("content").getAsString();
             }

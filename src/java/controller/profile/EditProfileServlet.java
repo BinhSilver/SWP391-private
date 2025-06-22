@@ -9,7 +9,6 @@ import java.util.Date;
 import model.User;
 import Dao.UserDAO;
 import jakarta.servlet.annotation.MultipartConfig;
-import java.io.InputStream;
 
 @WebServlet("/editprofile")
 @MultipartConfig
@@ -45,7 +44,6 @@ public class EditProfileServlet extends HttpServlet {
             String japaneseLevel = request.getParameter("japaneseLevel");
             String address = request.getParameter("address");
             String country = request.getParameter("country");
-            String avatar = request.getParameter("avatar");
 
             // Parse ngày sinh
             Date birthDate = null;
