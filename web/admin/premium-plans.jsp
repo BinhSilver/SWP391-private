@@ -7,9 +7,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- CSS & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
 </head>
 <body>
-    <jsp:include page="navofadmin.jsp" />
+    <%@ include file="navofadmin.jsp" %>
     <div class="container mt-5">
         <h2>Premium Plan Management</h2>
         <a href="${pageContext.request.contextPath}/admin/premium-plans?action=add" class="btn btn-primary mb-3">Add New Plan</a>
