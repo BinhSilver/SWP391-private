@@ -1,13 +1,16 @@
 package controller.payment;
 
+import Dao.PremiumPlanDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import model.PremiumPlan;
 import vn.payos.type.PaymentData;
 import vn.payos.type.CheckoutResponseData;
+
+import java.io.IOException;
 
 /**
  * Servlet xử lý khi người dùng gửi yêu cầu tạo thanh toán
@@ -15,21 +18,23 @@ import vn.payos.type.CheckoutResponseData;
 @WebServlet(name = "CreatePaymentServlet", urlPatterns = {"/CreatePayment"})
 public class CreatePaymentServlet extends HttpServlet {
 
+    private final PremiumPlanDAO premiumPlanDAO = new PremiumPlanDAO();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String plan = request.getParameter("plan");
-            int amount;
-            String description;
-            
-            if ("month".equals(plan)) {
-                amount = 25000;
-                description = "Gói Premium Hàng Tháng";
-            } else {
-                amount = 250000;
-                description = "Gói Premium Hàng Năm";
+            int planId = Integer.parseInt(request.getParameter("planId"));
+            PremiumPlan plan = premiumPlanDAO.getPremiumPlanByID(planId);
+
+            if (plan == null) {
+                request.setAttribute("errorMessage", "Gói thanh toán không hợp lệ.");
+                request.getRequestDispatcher("/PaymentJSP/Payment.jsp").forward(request, response);
+                return;
             }
+
+            int amount = (int) plan.getPrice();
+            String description = plan.getPlanName();
 
             // Create unique order code
             long orderCode = System.currentTimeMillis();
@@ -64,6 +69,9 @@ public class CreatePaymentServlet extends HttpServlet {
             // Forward to QR display page
             request.getRequestDispatcher("/PaymentJSP/PaymentQR.jsp").forward(request, response);
             
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Gói thanh toán không hợp lệ.");
+            request.getRequestDispatcher("/PaymentJSP/Payment.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/PaymentJSP/PaymentCancel.jsp");

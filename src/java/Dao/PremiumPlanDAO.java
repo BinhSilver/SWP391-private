@@ -16,7 +16,7 @@ public class PremiumPlanDAO {
 
     public List<PremiumPlan> getAllPremiumPlans() {
         List<PremiumPlan> list = new ArrayList<>();
-        String query = "SELECT * FROM PremiumPlans WHERE IsDeleted = 0";
+        String query = "SELECT * FROM PremiumPlans";
         try {
             conn = new JDBCConnection().getConnection();
             ps = conn.prepareStatement(query);
@@ -37,7 +37,7 @@ public class PremiumPlanDAO {
     }
 
     public boolean addPremiumPlan(String planName, double price, int durationInMonths, String description) {
-        String query = "INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description, IsDeleted) VALUES (?, ?, ?, ?, 0)";
+        String query = "INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description) VALUES (?, ?, ?, ?)";
         try {
             conn = new JDBCConnection().getConnection();
             ps = conn.prepareStatement(query);
@@ -70,7 +70,7 @@ public class PremiumPlanDAO {
     }
 
     public boolean deletePremiumPlan(int planID) {
-        String query = "UPDATE PremiumPlans SET IsDeleted = 1 WHERE PlanID=?";
+        String query = "DELETE FROM PremiumPlans WHERE PlanID=?";
         try {
             conn = new JDBCConnection().getConnection();
             ps = conn.prepareStatement(query);
@@ -83,7 +83,7 @@ public class PremiumPlanDAO {
     }
 
     public PremiumPlan getPremiumPlanByID(int planID) {
-        String query = "SELECT * FROM PremiumPlans WHERE PlanID=? AND IsDeleted = 0";
+        String query = "SELECT * FROM PremiumPlans WHERE PlanID=?";
         try {
             conn = new JDBCConnection().getConnection();
             ps = conn.prepareStatement(query);

@@ -37,7 +37,7 @@ public class CoursesDAO {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested()); 
+            stmt.setBoolean(4, c.isSuggested());
             stmt.executeUpdate();
             System.out.println("abc");
         }
@@ -152,7 +152,7 @@ public class CoursesDAO {
 
             ps.setString(1, course.getTitle());
             ps.setString(2, course.getDescription());
-            ps.setBoolean(3, course.getHidden());    
+            ps.setBoolean(3, course.getHidden());
             ps.setBoolean(4, course.isSuggested());
 
             ps.executeUpdate();
@@ -164,5 +164,52 @@ public class CoursesDAO {
         }
         return -1;
     }
+
+    // Thêm các phương thức mới
+    public int getTotalEnrollments() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Enrollment]";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Total");
+            }
+        }
+        return 0;
+    }
+
+    public int getEnrollmentsByMonthAndYear(int month, int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Enrollment] WHERE MONTH(EnrolledAt) = ? AND YEAR(EnrolledAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
+    public int getHiddenCoursesCount() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE IsHidden = 1";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
+    public int getCoursesByYear(int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE YEAR(CreatedAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, year);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
 
 }
