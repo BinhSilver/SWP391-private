@@ -412,3 +412,6 @@ VALUES
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/lesson3_grammar.pdf'),
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
 
+
+
+

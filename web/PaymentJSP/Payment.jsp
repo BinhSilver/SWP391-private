@@ -1,43 +1,39 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <title>Nâng Cấp Premium</title>
-  <link rel="stylesheet" href="../css/payment.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/payment.css">
 </head>
 <body>
   <div class="container">
     <h2>Nâng Cấp Tài Khoản Premium</h2>
 
+    <c:if test="${not empty errorMessage}">
+        <p style="color: red;">${errorMessage}</p>
+    </c:if>
+
     <form id="planForm" action="${pageContext.request.contextPath}/CreatePayment" method="Post">
       <div class="plans">
-        <!-- Gói tháng -->
-        <div class="plan" data-value="month">
-          <h3>Gói Hàng Tháng</h3>
-          <div class="price">25.000₫ /tháng</div>
-          <ul>
-            <li>Truy cập đầy đủ tính năng</li>
-            <li>Hỗ trợ ưu tiên</li>
-            <li>Không giới hạn</li>
-          </ul>
-          <input type="radio" name="plan" value="month" hidden>
-        </div>
-
-        <!-- Gói năm -->
-        <div class="plan" data-value="year">
-          <h3>Gói Hàng Năm <span class="badge">Phổ biến</span></h3>
-          <div class="price">
-            <span class="original-price">300.000₫</span>
-            <span style="color:#10b981;">250.000₫</span> /năm
-          </div>
-          <ul>
-            <li>Tiết kiệm 2 tháng</li>
-            <li>Hỗ trợ ưu tiên</li>
-            <li>Không giới hạn</li>
-          </ul>
-          <input type="radio" name="plan" value="year" hidden>
-        </div>
+        <c:forEach var="plan" items="${premiumPlans}">
+            <div class="plan" data-value="${plan.planID}">
+              <h3>${plan.planName}</h3>
+              <div class="price">
+                  <fmt:setLocale value="vi_VN"/>
+                  <fmt:formatNumber value="${plan.price}" type="currency" currencySymbol="₫"/> / ${plan.durationInMonths} tháng
+              </div>
+              <ul>
+                <li>${plan.description}</li>
+                <li>Hỗ trợ ưu tiên</li>
+                <li>Không giới hạn</li>
+              </ul>
+              <input type="radio" name="planId" value="${plan.planID}" hidden>
+            </div>
+        </c:forEach>
       </div>
       <button class="next-btn" type="submit">Tiếp Theo</button>
     </form>
@@ -45,16 +41,13 @@
 
   <script>
     const plans = document.querySelectorAll('.plan');
-    const radios = document.querySelectorAll('input[name="plan"]');
+    const radios = document.querySelectorAll('input[name="planId"]');
     const form = document.getElementById('planForm');
 
     plans.forEach(plan => {
       plan.addEventListener('click', () => {
-        // Bỏ chọn các ô khác
         plans.forEach(p => p.classList.remove('selected'));
-        // Đánh dấu được chọn
         plan.classList.add('selected');
-        // Gán value tương ứng
         const input = plan.querySelector('input[type="radio"]');
         if (input) input.checked = true;
       });
