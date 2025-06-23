@@ -84,6 +84,7 @@
             <!-- Navigation Links -->
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
+
                     <a class="nav-link px-2" href="<c:url value='/HomeServlet'/>">Trang Chủ</a>             
                     <a href="<c:url value='/userManagement'/>" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
                     <a href="<c:url value='/courseManagement'/>" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
