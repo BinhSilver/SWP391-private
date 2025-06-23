@@ -84,11 +84,12 @@
             <!-- Navigation Links -->
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
-                    <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>             
-                    <a href="userManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
-                    <a href="courseManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
-                    <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
-                    <a href="BulkEmailAdmin.jsp" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Gửi Mail</span></a>
+
+                    <a class="nav-link px-2" href="<c:url value='/HomeServlet'/>">Trang Chủ</a>             
+                    <a href="<c:url value='/userManagement'/>" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
+                    <a href="<c:url value='/courseManagement'/>" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
+                    <a href="<c:url value='/admin/premium-plans'/>" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
+                    <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Báo cáo</span></a>
        
                 </div>
             </div>
@@ -106,8 +107,8 @@
             <div class="col-2 d-flex justify-content-end align-items-center gap-2">
                 <c:choose>
                     <c:when test="${empty authUser}">
-                        <a href="<c:url value='login' />" class="btn-wasabii">Đăng Nhập</a>
-                        <a href="<c:url value='register' />" class="btn-wasabii">Đăng Ký</a>
+                        <a href="<c:url value='/login' />" class="btn-wasabii">Đăng Nhập</a>
+                        <a href="<c:url value='/register' />" class="btn-wasabii">Đăng Ký</a>
                     </c:when>
                     <c:otherwise>
                         <div class="dropdown">
@@ -117,16 +118,16 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<c:url value='profile'/>">Profile</a>
+                                    <a class="dropdown-item" href="<c:url value='/profile'/>">Profile</a>
                                 </li>
                                 <c:if test="${authUser.roleID == 3}">
                                     <li>
-                                        <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
+                                        <a class="dropdown-item" href="<c:url value='/teacher_dashboard'/>">Dashboard</a>
                                     </li>
                                 </c:if>
                                 <c:if test="${authUser.roleID == 4}">
                                     <li>
-                                        <a class="dropdown-item" href="<c:url value='statis.jsp'/>">Admin</a>
+                                        <a class="dropdown-item" href="<c:url value='/statis.jsp'/>">Admin</a>
                                     </li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>
