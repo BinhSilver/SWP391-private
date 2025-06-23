@@ -97,7 +97,7 @@
                                         </span>
                                     </td>
                                     <td class="p-2">
-                                        <a href="${pageContext.request.contextPath}/courseDetail?courseId=${course.courseID}" 
+                                        <a href="${pageContext.request.contextPath}/course-detail?courseId=${course.courseID}" 
                                            class="view-details-btn mr-2">Xem chi tiết</a>
                                         <form action="${pageContext.request.contextPath}/courseManagement" method="post" style="display:inline;">
                                             <input type="hidden" name="courseId" value="${course.courseID}">

@@ -1,15 +1,13 @@
 package controller.chart;
 
-
-
 import Dao.UserDAO;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,7 +22,10 @@ public class UserRoleStatsServlet extends HttpServlet {
 
         UserDAO userDAO = new UserDAO();
         try {
-            String json = new Gson().toJson(userDAO.getUserCountByRole());
+            JsonArray userRoleStats = userDAO.getUserCountByRole();
+            System.out.println("Dữ liệu từ UserDAO.getUserCountByRole: " + userRoleStats);
+            String json = new Gson().toJson(userRoleStats);
+            System.out.println("JSON phản hồi: " + json);
             PrintWriter out = response.getWriter();
             out.print(json);
             out.flush();
