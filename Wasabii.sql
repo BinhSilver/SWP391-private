@@ -1,4 +1,4 @@
-CREATE DATABASE Wasabii;
+﻿CREATE DATABASE Wasabii;
 GO
 USE Wasabii;
 GO
@@ -35,7 +35,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar NVARCHAR(255),
+    Avatar VARBINARY(MAX),
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
@@ -317,26 +317,11 @@ VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùn
 -- Đảm bảo các khóa học cũ đều có CreatedAt (nếu migrate data)
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
 
-GO
-CREATE TRIGGER TR_Users_SetAvatarOnGender
-ON Users
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    UPDATE Users
-    SET Avatar = CASE
-                    WHEN i.Gender = N'Nữ' THEN 'img/nu.jpg'
-                    ELSE 'img/nam.jpg'
-                END
-    FROM Users u
-    INNER JOIN inserted i ON u.UserID = i.UserID
-    WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
-END;
 
 
 --thêm user này vô để coi được khóa học nha
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', 'img/nam.jpg', N'Nữ');
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ');
 
 
 --Thêm mấy bảng này nha
@@ -426,8 +411,4 @@ VALUES
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Kanji', N'PDF', N'Kanji Bài 3', N'files/lesson3_kanji.pdf'),
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/lesson3_grammar.pdf'),
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
-
-
-
-
 
