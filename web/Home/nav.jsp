@@ -88,7 +88,7 @@
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="<c:url value='/PaymentJSP/Payment.jsp'/>">Premium</a>
+                    <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
                     <a class="nav-link px-2" href="#">FlashCard</a>
                 </div>
             </div>

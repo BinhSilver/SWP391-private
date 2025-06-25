@@ -20,6 +20,14 @@ public class ReturnFromPayOS extends HttpServlet {
             // Payment successful
             request.getSession().setAttribute("paymentSuccess", true);
             request.getSession().setAttribute("paymentMessage", "Thanh toán thành công!");
+
+            // Cập nhật roleID cho user thành premium (2)
+            model.User user = (model.User) request.getSession().getAttribute("authUser");
+            if (user != null && user.getRoleID() != 2) {
+                user.setRoleID(2);
+                new service.UserService().updateUser(user);
+                request.getSession().setAttribute("authUser", user); // cập nhật lại session
+            }
         } else {
             // Payment failed or cancelled
             request.getSession().setAttribute("paymentSuccess", false);
