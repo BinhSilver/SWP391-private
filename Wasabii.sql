@@ -36,7 +36,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar NVARCHAR(255),
+    Avatar VARBINARY(MAX),
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
