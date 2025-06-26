@@ -314,30 +314,9 @@ INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, P
 VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
        (4, 'admin@gmail.com', '123456789', NULL, N'Quản Trị Viên', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nữ');
 
-
--- Đảm bảo các khóa học cũ đều có CreatedAt (nếu migrate data)
-UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
-
-GO
-CREATE TRIGGER TR_Users_SetAvatarOnGender
-ON Users
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    UPDATE Users
-    SET Avatar = CASE
-                    WHEN i.Gender = N'Nữ' THEN 'img/nu.jpg'
-                    ELSE 'img/nam.jpg'
-                END
-    FROM Users u
-    INNER JOIN inserted i ON u.UserID = i.UserID
-    WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
-END;
-
-
 --thêm user này vô để coi được khóa học nha
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', 'img/nam.jpg', N'Nữ');
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ');
 
 
 --Thêm mấy bảng này nha
