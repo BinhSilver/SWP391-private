@@ -58,7 +58,7 @@ public class LessonMaterialsDAO {
                 String title = rs.getString("Title");
 
                 // Phân loại thông minh
-                String displayType = classifyMaterialType(rawType, fileType, title);
+                String displayType = classifyMaterialType(rawType, fileType);
 
                 LessonMaterial material = new LessonMaterial(
                         rs.getInt("MaterialID"),
@@ -94,7 +94,7 @@ public class LessonMaterialsDAO {
                 String title = rs.getString("Title");
 
                 // Phân loại thông minh
-                String displayType = classifyMaterialType(rawType, fileType, title);
+                String displayType = classifyMaterialType(rawType, fileType);
 
                 LessonMaterial material = new LessonMaterial(
                         rs.getInt("MaterialID"),
@@ -115,8 +115,8 @@ public class LessonMaterialsDAO {
     }
 
     // ✅ Phân loại thông minh (từ tên và định dạng file)
-    private String classifyMaterialType(String rawType, String fileType, String title) {
-        String titleLower = title.toLowerCase();
+    private String classifyMaterialType(String rawType, String fileType) {
+        String titleLower = rawType.toLowerCase();
 
         if ("PDF".equalsIgnoreCase(fileType)) {
             if (titleLower.contains("từ vựng")) {

@@ -14,7 +14,6 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" />
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>" />
         <link rel="stylesheet" href="<c:url value='/css/create_course.css'/>" />
-
     </head>
 
     <body>
@@ -39,20 +38,16 @@
                         <textarea class="form-control" id="courseDescription" name="courseDescription" rows="3"></textarea>
                     </div>
 
-
-
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
                     </div>
                     <c:if test="${sessionScope.authUser != null && sessionScope.authUser.roleID == 4}">
-
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" id="isSuggested" name="isSuggested" />
                             <label class="form-check-label" for="isSuggested">Đánh dấu là khóa học nổi bật</label>
                         </div>
                     </c:if>
-
                 </div>
 
                 <!-- LESSONS -->
@@ -70,7 +65,7 @@
 
                     <div class="col-md-9">
                         <div class="tab-content" id="lessonTabContent">
-                            <div class="tab-pane fade show active" id="lesson-0" role="tabpanel">
+                            <div class="tab-pane fade show active" id="lesson-0" role="tabpanel" data-lesson-index="0">
                                 <div class="lesson-block course-card border p-3 rounded mb-3" data-lesson-index="0">
                                     <h6 class="fw-semibold mb-3">Lesson 1</h6>
                                     <div class="mb-2">
@@ -83,17 +78,13 @@
                                     </div>
                                     <!-- Vocab -->
                                     <div class="mb-2">
-                                        <label class="form-label">Video Từ Vựng</label>
-                                        <input type="file" class="form-control" name="lessons[0][vocabVideo][]" accept="video/*" multiple />
-                                    </div>
-                                    <div class="mb-2">
                                         <label class="form-label">Tài Liệu Từ Vựng</label>
                                         <input type="file" class="form-control" name="lessons[0][vocabDoc][]" accept="application/pdf" multiple />
                                     </div>
                                     <!-- Grammar -->
                                     <div class="mb-2">
                                         <label class="form-label">Video Ngữ Pháp</label>
-                                        <input type="file" class="form-control" name="lessons[0][grammarVideo][]" accept="video/*" multiple />
+                                        <input type="file" class="form-control" name="lessons[{{index}}][grammarVideo][]" accept="video/*" multiplFe />
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Tài Liệu Ngữ Pháp</label>
@@ -101,14 +92,9 @@
                                     </div>
                                     <!-- Kanji -->
                                     <div class="mb-2">
-                                        <label class="form-label">Video Kanji</label>
-                                        <input type="file" class="form-control" name="lessons[0][kanjiVideo][]" accept="video/*" multiple />
-                                    </div>
-                                    <div class="mb-2">
                                         <label class="form-label">Tài Liệu Kanji</label>
                                         <input type="file" class="form-control" name="lessons[0][kanjiDoc][]" accept="application/pdf" multiple />
                                     </div>
-
                                     <div class="d-flex gap-2 mt-2">
                                         <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
                                         <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal">Tạo Quiz</button>
@@ -176,7 +162,7 @@
             </div>
         </template>
         <template id="lessonTemplate">
-            <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel">
+            <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
                 <div class="lesson-block course-card border p-3 rounded mb-3" data-lesson-index="{{index}}">
                     <h6 class="fw-semibold mb-3">Lesson {{indexLabel}}</h6>
                     <div class="mb-2">
@@ -221,8 +207,6 @@
             </div>
         </template>
 
-
-
         <!-- MODAL QUIZ -->
         <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -248,8 +232,6 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="<c:url value='/js/create_course.js'/>"></script>
-        
         <%@ include file="Home/footer.jsp" %>
-
     </body>
 </html>

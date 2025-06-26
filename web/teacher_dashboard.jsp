@@ -13,12 +13,13 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/teacher_dashboard.css'/>">
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     </head>
     <body>
         <%@ include file="../Home/nav.jsp" %>
 
         <div class="page-wrapper">
-
             <div class="dashboard-wrapper">
                 <!-- Sidebar -->
                 <div class="sidebar">
@@ -54,7 +55,7 @@
 
                     <!-- Hiển thị danh sách khóa học -->
                     <c:forEach var="course" items="${courses}">
-                        <div class="course-item">
+                        <div class="course-item" id="course-${course.courseID}">
                             <div onclick="window.location.href = '<c:url value='/CourseDetailServlet'/>?id=${course.courseID}'" style="cursor: pointer;">
                                 <h4>${course.title}
                                     <span style="color: #28a745;">
@@ -72,15 +73,11 @@
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
 
-                                <!-- Form xóa an toàn qua POST -->
-                                <form action="<c:url value='/DeleteCourseServlet'/>" method="post" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                    <input type="hidden" name="courseId" value="${course.courseID}" />
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
+                                <!-- Nút Delete xử lý bằng JS -->
+                                <button onclick="deleteCourse(${course.courseID})" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
                             </div>
-
                         </div>
                     </c:forEach>
                 </div>
@@ -89,7 +86,64 @@
         </div>
         <%@ include file="../Home/footer.jsp" %>
 
+        <script>
+            function deleteCourse(courseId) {
+                Swal.fire({
+                    title: 'Bạn có chắc chắn?',
+                    text: "Hành động này sẽ xóa khóa học vĩnh viễn!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('<c:url value="/DeleteCourseServlet" />', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'courseId=' + encodeURIComponent(courseId)
+                        })
+                                .then(response => {
+                                    if (response.ok) {
+                                        // Hiệu ứng ẩn dòng đã xóa
+                                        const courseDiv = document.getElementById("course-" + courseId);
+                                        if (courseDiv) {
+                                            courseDiv.classList.add("fade-out");
+                                            setTimeout(() => courseDiv.remove(), 500);
+                                        }
+
+                                        Swal.fire(
+                                                'Đã xóa!',
+                                                'Khóa học đã được xóa thành công.',
+                                                'success'
+                                                );
+                                    } else {
+                                        Swal.fire(
+                                                'Lỗi!',
+                                                'Không thể xóa khóa học. Vui lòng thử lại.',
+                                                'error'
+                                                );
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Lỗi:", error);
+                                    Swal.fire(
+                                            'Lỗi!',
+                                            'Đã xảy ra lỗi trong quá trình gửi yêu cầu.',
+                                            'error'
+                                            );
+                                });
+                    }
+                });
+            }
+        </script>
+
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     </body>
 </html>

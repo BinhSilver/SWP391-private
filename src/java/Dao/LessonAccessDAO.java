@@ -43,4 +43,25 @@ public class LessonAccessDAO extends JDBCConnection {
         }
         return result;
     }
+
+    // Kiểm tra xem user đã từng truy cập bài học nào trong một khóa học chưa
+    public boolean hasUserAccessedCourse(int userId, int courseId) {
+        String sql = """
+            SELECT TOP 1 la.LessonID
+            FROM LessonAccess la
+            JOIN Lessons l ON la.LessonID = l.LessonID
+            WHERE la.UserID = ? AND l.CourseID = ?
+        """;
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, courseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // có ít nhất 1 bản ghi là đã từng truy cập
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
