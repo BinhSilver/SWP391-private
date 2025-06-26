@@ -1,10 +1,9 @@
-/* File: css/study.css - Đồng bộ nav/footer với indexstyle.css, phần còn lại thiết kế riêng */
-
 /* ===== Tổng thể ===== */
 body {
     background-color: #f5f7fa;
     font-family: 'JetBrains Mono', monospace;
-    color: #212529;
+    color: #333;
+    z-index: 1;
     line-height: 1.6;
 }
 
@@ -12,25 +11,26 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    z-index: 1;
 }
 
 /* ===== Sidebar ===== */
 .lesson-sidebar {
     width: 250px;
     background-color: #ffffff;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid #e94f64;
     padding: 20px;
     position: fixed;
-    top: 80px; /* Để không đè lên navbar */
+    top: 80px;
     left: 0;
     height: auto;
-    max-height: calc(100vh - 80px - 60px); /* trừ thêm chiều cao footer approx */
+    max-height: calc(100vh - 80px - 60px);
     overflow-y: auto;
-    z-index: 1000;
+    transition: transform 0.3s ease;
 }
 
 .lesson-sidebar h5 {
-    color: #0d6efd;
+    color: #e94f64;
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -39,6 +39,7 @@ body {
 .lesson-sidebar ul {
     list-style: none;
     padding-left: 0;
+    margin-bottom: 0;
 }
 
 .lesson-sidebar li {
@@ -51,43 +52,74 @@ body {
     padding: 8px 12px;
     display: block;
     border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .lesson-sidebar a:hover,
 .lesson-sidebar a.active {
-    background-color: #e9f5ff;
-    color: #0d6efd;
+    background-color: #fef0f2;
+    color: #e94f64;
 }
 
-/* ===== Main Layout Wrapper ===== */
+/* ===== Sidebar Toggle ===== */
+.sidebar-toggle-btn {
+    position: absolute;
+    top: 20px;
+    left: -15px ;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: #e94f64;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 1100;
+    transition: transform 0.3s ease;
+}
+
+.lesson-sidebar.collapsed {
+    transform: translateX(-100%);
+}
+
+.lesson-content.expanded {
+    margin-left: 0 !important;
+    transition: margin-left 0.3s ease;
+}
+
+/* ===== Main Layout ===== */
 .lesson-main {
     display: flex;
     flex: 1;
-    margin-top: 80px;
-    min-height: calc(100vh - 80px - 60px);
 }
 
-/* ===== Main Content ===== */
 .lesson-content {
     margin-left: 250px;
+    position: relative;
     flex: 1;
     padding: 40px 50px;
     background-color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: margin-left 0.3s ease;
+    z-index: 1;
+
 }
 
 .lesson-content h2 {
-    color: #0d6efd;
+    color: #e94f64;
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1rem;
 }
 
-/* ===== Tabs for Sections ===== */
+.lesson-content p {
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+/* ===== Tabs ===== */
 .lesson-tabs {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid #e94f64;
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
@@ -113,36 +145,85 @@ body {
     border-radius: 4px 4px 0 0;
 }
 
-.tab-pane {
-    padding-top: 1rem;
+.lesson-tabs .nav-link.active {
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(233, 79, 100, 0.25);
 }
 
-.lesson-content .section-title {
+/* ===== Tab Pane Transition ===== */
+.tab-pane {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+.tab-pane.active.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== Section Title ===== */
+.section-title {
     margin-top: 2rem;
     margin-bottom: 1rem;
     font-size: 1.3rem;
     font-weight: 600;
-    color: #212529;
-    border-left: 4px solid #0d6efd;
+    color: #e94f64;
+    border-left: 4px solid #e94f64;
     padding-left: 12px;
-}
-
-.lesson-content p {
-    margin-bottom: 1rem;
 }
 
 /* ===== File Viewer ===== */
 .file-viewer {
     margin-top: 1rem;
     margin-bottom: 2rem;
+    position: relative;
 }
 
 .file-viewer iframe,
 .file-viewer video {
     width: 100%;
-    max-height: 500px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    height: 400px;
+    border: 2px solid #e94f64;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(233, 79, 100, 0.1);
+    object-fit: contain;
+}
+
+/* ===== Fullscreen Mode ===== */
+.fullscreen-toggle {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: #e94f64;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.fullscreen-toggle:hover {
+    transform: scale(1.2);
+}
+
+.file-viewer.fullscreen {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    background: #000;
+    z-index: 2000;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.file-viewer.fullscreen iframe,
+.file-viewer.fullscreen video {
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
 /* ===== Quiz Section ===== */
@@ -180,7 +261,6 @@ body {
     .lesson-main {
         flex-direction: column;
         margin-top: 0;
-        min-height: auto;
     }
 
     .lesson-content {
@@ -192,5 +272,15 @@ body {
     .lesson-tabs {
         flex-direction: column;
         gap: 0.5rem;
+    }
+
+    .file-viewer iframe,
+    .file-viewer video {
+        height: 300px;
+    }
+
+    .sidebar-toggle-btn {
+        top: -5px;
+        right: 10px;
     }
 }

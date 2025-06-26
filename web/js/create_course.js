@@ -2,9 +2,7 @@
 let lessonCount = 1;
 let questionCount = 1;
 let quizData = [];
-let activeQuizLessonIndex = null; // lesson index đang tạo quiz
-
-
+let activeQuizLessonIndex = null;
 
 // --- DOM ELEMENT REFERENCES ---
 const addLessonBtn = document.getElementById("addLessonBtn");
@@ -32,15 +30,20 @@ function updateLessonIndices() {
         navLink.textContent = `Lesson ${newIndex + 1}`;
 
         pane.id = `lesson-${newIndex}`;
-        pane.dataset.lessonIndex = newIndex;
+        pane.dataset.lessonIndex = newIndex; // cập nhật lại index cho pane
 
+        // Cập nhật cho lesson-block bên trong
+        const lessonBlock = pane.querySelector('.lesson-block');
+        if (lessonBlock) {
+            lessonBlock.dataset.lessonIndex = newIndex;
+            const h6Title = lessonBlock.querySelector('h6');
+            if (h6Title) h6Title.textContent = `Lesson ${newIndex + 1}`;
+        }
+
+        // Update all fields name
         pane.querySelectorAll('[name^="lessons["]').forEach(input => {
             input.name = input.name.replace(/lessons\[\d+\]/, `lessons[${newIndex}]`);
         });
-
-        const h6Title = pane.querySelector('h6');
-        if (h6Title)
-            h6Title.textContent = `Lesson ${newIndex + 1}`;
     });
 
     lessonCount = allLessonTabs.length;
@@ -77,7 +80,7 @@ function updateQuizQuestionIndices() {
     questionCount = allQuestionBlocks.length;
 }
 
-/// --- EVENT LISTENER: ADD NEW LESSON ---
+// --- EVENT LISTENER: ADD NEW LESSON ---
 addLessonBtn.addEventListener("click", () => {
     const index = lessonCount;
     const tabId = `tab-${index}`;
@@ -143,7 +146,6 @@ document.addEventListener("click", function (e) {
         }
     }
 });
-
 
 // --- EVENT LISTENER: SAVE LESSON ---
 document.addEventListener("click", (e) => {

@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import model.User;
 
 import java.sql.*;
-
 import java.util.*;
 import java.io.InputStream;
 

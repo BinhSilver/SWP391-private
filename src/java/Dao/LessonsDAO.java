@@ -77,4 +77,23 @@ public class LessonsDAO {
         }
         return null;
     }
+    
+    public int addAndReturnID(Lesson lesson) throws SQLException {
+        String sql = "INSERT INTO Lessons (CourseID, Title, IsHidden) VALUES (?, ?, ?)";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setInt(1, lesson.getCourseID());
+            stmt.setString(2, lesson.getTitle());
+            stmt.setBoolean(3, lesson.isIsHidden());
+
+            stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // Trả về LessonID vừa tạo
+            }
+        }
+        throw new SQLException("Insert Lesson failed, no ID obtained.");
+    }
 }

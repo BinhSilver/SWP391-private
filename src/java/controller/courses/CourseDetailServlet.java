@@ -40,7 +40,7 @@ public class CourseDetailServlet extends HttpServlet {
         LessonsDAO lessonDAO = new LessonsDAO();
         LessonMaterialsDAO materialDAO = new LessonMaterialsDAO();
         QuizDAO quizDAO = new QuizDAO();
-        LessonAccessDAO accessDAO = new LessonAccessDAO();  // NEW
+        LessonAccessDAO accessDAO = new LessonAccessDAO();
 
         // 3. Lấy thông tin khóa học
         Course course = courseDAO.getCourseByID(courseID);
@@ -70,10 +70,13 @@ public class CourseDetailServlet extends HttpServlet {
 
         // 8. Lấy danh sách bài học đã "vào học" từ DB (persistent)
         Set<Integer> accessedLessons = new HashSet<>();
+        boolean hasAccessedCourse = false;
         if (currentUser != null) {
             accessedLessons = accessDAO.getAccessedLessons(currentUser.getUserID());
+            hasAccessedCourse = accessDAO.hasUserAccessedCourse(currentUser.getUserID(), courseID);
         }
         request.setAttribute("accessedLessons", accessedLessons);
+        request.setAttribute("hasAccessedCourse", hasAccessedCourse);
 
         // 9. Đẩy dữ liệu về trang JSP
         request.setAttribute("course", course);

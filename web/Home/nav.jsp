@@ -88,7 +88,7 @@
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="<c:url value='/PaymentJSP/Payment.jsp'/>">Premium</a>
+                    <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
                     <a class="nav-link px-2" href="#">FlashCard</a>
                 </div>
             </div>
@@ -119,14 +119,10 @@
                                 <li>
                                     <a class="dropdown-item" href="<c:url value='profile'/>">Profile</a>
                                 </li>
-                                <c:if test="${authUser.roleID == 3}">
+                                <!-- Gộp quyền Teacher/Admin chung 1 Dashboard -->
+                                <c:if test="${authUser.roleID == 3 || authUser.roleID == 4}">
                                     <li>
                                         <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
-                                    </li>
-                                </c:if>
-                                <c:if test="${authUser.roleID == 4}">
-                                    <li>
-                                        <a class="dropdown-item" href="<c:url value='statis.jsp'/>">Admin</a>
                                     </li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>

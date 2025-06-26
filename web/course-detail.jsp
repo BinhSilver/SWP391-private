@@ -10,6 +10,17 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/course-detail.css'/>" />
+        <style>
+            iframe.pdf-frame {
+                width: 100%;
+                height: 1900px;
+                border: none;
+                border-radius: 12px;
+                display: block;
+                background-color: #fff;
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            }
+        </style>
     </head>
     <body>
         <div class="page-wrapper">
@@ -34,19 +45,26 @@
                                 </c:choose>
                             </p>
 
-                            <!-- Nút hành động -->
                             <div class="mt-3">
                                 <c:choose>
                                     <c:when test="${currentUser == null}">
                                         <a href="LoginServlet" class="btn btn-primary">Vào học</a>
                                     </c:when>
                                     <c:otherwise>
-                                        <form action="StudyLessonServlet" method="get" class="d-inline">
-                                            <input type="hidden" name="courseId" value="${course.courseID}" />
-                                            <input type="hidden" name="lessonId" value="${lessons[0].lessonID}" />
-                                            <button type="submit" class="btn btn-success">Vào học</button>
-                                        </form>
-
+                                        <c:if test="${hasAccessedCourse}">
+                                            <form action="StudyLessonServlet" method="get" class="d-inline">
+                                                <input type="hidden" name="courseId" value="${course.courseID}" />
+                                                <input type="hidden" name="lessonId" value="${lessons[0].lessonID}" />
+                                                <button type="submit" class="btn btn-success">Học tiếp</button>
+                                            </form>
+                                        </c:if>
+                                        <c:if test="${!hasAccessedCourse}">
+                                            <form action="StudyLessonServlet" method="get" class="d-inline">
+                                                <input type="hidden" name="courseId" value="${lessons[0].courseID}" />
+                                                <input type="hidden" name="lessonId" value="${lessons[0].lessonID}" />
+                                                <button type="submit" class="btn btn-success">Vào học</button>
+                                            </form>
+                                        </c:if>
                                     </c:otherwise>
                                 </c:choose>
                                 <a href="HomeServlet" class="btn btn-secondary ms-2">← Quay lại</a>
@@ -71,92 +89,11 @@
                                          aria-labelledby="heading-${lesson.lessonID}" data-bs-parent="#accordion-${lesson.lessonID}">
                                         <div class="accordion-body">
                                             <c:choose>
-                                                <c:when test="${not empty accessedLessons && accessedLessons.contains(lesson.lessonID)}">
-                                                    <!-- Nội dung bài học (nếu đã vào học) -->
-                                                    <h6 class="mt-2">📖 Từ vựng:</h6>
-                                                    <c:set var="hasVocab" value="false" />
-                                                    <c:forEach var="material" items="${lessonMaterialsMap[lesson.lessonID]}">
-                                                        <c:if test="${material.materialType eq 'Từ vựng'}">
-                                                            <c:set var="hasVocab" value="true" />
-                                                            <div class="ms-3 mb-2">
-                                                                • 📄 <strong>${material.title}</strong>
-                                                                <c:if test="${not empty material.filePath}">
-                                                                    <a href="${material.filePath}" target="_blank" class="btn btn-sm btn-outline-success ms-2">Xem</a>
-                                                                </c:if>
-                                                            </div>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                    <c:if test="${not hasVocab}">
-                                                        <p class="ms-3 text-muted">Chưa có tài liệu từ vựng.</p>
-                                                    </c:if>
-
+                                                <c:when test="${hasAccessedCourse}">
+                                                    <h6 class="mt-3">📖 Từ vựng:</h6>
                                                     <h6 class="mt-3">🈶 Kanji:</h6>
-                                                    <c:set var="hasKanji" value="false" />
-                                                    <c:forEach var="material" items="${lessonMaterialsMap[lesson.lessonID]}">
-                                                        <c:if test="${material.materialType eq 'Kanji'}">
-                                                            <c:set var="hasKanji" value="true" />
-                                                            <div class="ms-3 mb-2">
-                                                                • 📄 <strong>${material.title}</strong>
-                                                                <c:if test="${not empty material.filePath}">
-                                                                    <a href="${material.filePath}" target="_blank" class="btn btn-sm btn-outline-success ms-2">Xem</a>
-                                                                </c:if>
-                                                            </div>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                    <c:if test="${not hasKanji}">
-                                                        <p class="ms-3 text-muted">Chưa có tài liệu kanji.</p>
-                                                    </c:if>
-
                                                     <h6 class="mt-3">🧠 Ngữ pháp:</h6>
-                                                    <c:set var="hasGrammar" value="false" />
-                                                    <c:forEach var="material" items="${lessonMaterialsMap[lesson.lessonID]}">
-                                                        <c:if test="${material.materialType eq 'Ngữ pháp'}">
-                                                            <c:set var="hasGrammar" value="true" />
-                                                            <div class="ms-3 mb-2">
-                                                                • <c:choose>
-                                                                    <c:when test="${material.fileType eq 'PDF'}">📄</c:when>
-                                                                    <c:when test="${material.fileType eq 'Video'}">🎬</c:when>
-                                                                    <c:otherwise>📁</c:otherwise>
-                                                                </c:choose>
-                                                                <strong>${material.title}</strong>
-                                                                <c:if test="${not empty material.filePath}">
-                                                                    <a href="${material.filePath}" target="_blank" class="btn btn-sm btn-outline-success ms-2">Xem</a>
-                                                                </c:if>
-                                                            </div>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                    <c:if test="${not hasGrammar}">
-                                                        <p class="ms-3 text-muted">Chưa có tài liệu ngữ pháp.</p>
-                                                    </c:if>
-
                                                     <h6 class="mt-3">📝 Quiz:</h6>
-                                                    <p class="text-muted ms-2">Số câu hỏi: ${fn:length(quizMap[lesson.lessonID])}</p>
-                                                    <c:if test="${not empty quizMap[lesson.lessonID]}">
-                                                        <a href="doQuiz?lessonId=${lesson.lessonID}" class="btn btn-sm btn-primary mb-3">Làm Quiz</a>
-                                                    </c:if>
-
-                                                    <c:forEach var="question" items="${quizMap[lesson.lessonID]}">
-                                                        <div class="ms-3">
-                                                            <p><strong>❓ ${question.question}</strong></p>
-                                                            <% String[] labels = {"A", "B", "C", "D"};
-                                                        pageContext.setAttribute("labels", labels);%>
-                                                            <ul>
-                                                                <c:forEach var="answer" items="${question.answers}">
-                                                                    <c:set var="label" value="${labels[answer.answerNumber - 1]}" />
-                                                                    <li>
-                                                                        <c:choose>
-                                                                            <c:when test="${answer.answerNumber == question.correctAnswer}">
-                                                                                ✅ <strong>${label}. ${answer.answerText}</strong>
-                                                                            </c:when>
-                                                                            <c:otherwise>
-                                                                                ${label}. ${answer.answerText}
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                    </li>
-                                                                </c:forEach>
-                                                            </ul>
-                                                        </div>
-                                                    </c:forEach>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <p class="text-muted">⚠ Bạn cần bấm nút "Vào học" để xem nội dung bài học này.</p>
