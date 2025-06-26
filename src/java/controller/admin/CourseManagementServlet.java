@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import model.Course;
 import java.sql.*;
+
 @WebServlet("/courseManagement")
 public class CourseManagementServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -65,7 +66,7 @@ public class CourseManagementServlet extends HttpServlet {
             request.getRequestDispatcher("/admincourse.jsp").forward(request, response);
         } catch (SQLException e) {
             e.printStackTrace();
-            request.getSession().setAttribute("error", "Lỗi khi tải danh sách khóa học.");
+            request.getSession().setAttribute("error", "Lỗi khi tải danh sách khóa học: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/courseManagement");
         }
     }
@@ -74,7 +75,14 @@ public class CourseManagementServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        int courseId = Integer.parseInt(request.getParameter("courseId"));
+        int courseId;
+        try {
+            courseId = Integer.parseInt(request.getParameter("courseId"));
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("error", "ID khóa học không hợp lệ.");
+            response.sendRedirect(request.getContextPath() + "/courseManagement");
+            return;
+        }
 
         try {
             Course course = coursesDAO.getCourseByID(courseId);
@@ -87,13 +95,23 @@ public class CourseManagementServlet extends HttpServlet {
                     course.setHidden(false);
                     coursesDAO.update(course);
                     request.getSession().setAttribute("message", "Khóa học đã được hiển thị thành công.");
+                } else if ("suggest".equals(action)) {
+                    course.setSuggested(true);
+                    coursesDAO.update(course);
+                    request.getSession().setAttribute("message", "Khóa học đã được gợi ý thành công.");
+                } else if ("unsuggest".equals(action)) {
+                    course.setSuggested(false);
+                    coursesDAO.update(course);
+                    request.getSession().setAttribute("message", "Khóa học đã được bỏ gợi ý thành công.");
+                } else {
+                    request.getSession().setAttribute("error", "Hành động không hợp lệ.");
                 }
             } else {
-                request.getSession().setAttribute("error", "Không tìm thấy khóa học.");
+                request.getSession().setAttribute("error", "Không tìm thấy khóa học với ID: " + courseId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.getSession().setAttribute("error", "Lỗi khi cập nhật trạng thái khóa học.");
+            request.getSession().setAttribute("error", "Lỗi khi cập nhật trạng thái khóa học: " + e.getMessage());
         }
 
         response.sendRedirect(request.getContextPath() + "/courseManagement");
@@ -128,11 +146,11 @@ public class CourseManagementServlet extends HttpServlet {
         String sql = "SELECT CourseID, AVG(CAST(Rating AS FLOAT)) as AvgRating " +
                      "FROM [dbo].[CourseRatings] WHERE CourseID = ? GROUP BY CourseID";
 
-        try (java.sql.Connection conn = DB.JDBCConnection.getConnection();
-             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DB.JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (Course course : courses) {
                 stmt.setInt(1, course.getCourseID());
-                java.sql.ResultSet rs = stmt.executeQuery();
+                ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     ratings.put(course.getCourseID(), Math.round(rs.getDouble("AvgRating") * 10.0) / 10.0);
                 }

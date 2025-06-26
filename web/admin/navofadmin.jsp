@@ -84,12 +84,13 @@
             <!-- Navigation Links -->
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
-                    <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>             
+
+                    <a href="${pageContext.request.contextPath}/HomeServlet" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Trang Chủ</span></a>
                     <a href="${pageContext.request.contextPath}/userManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
                     <a href="${pageContext.request.contextPath}/courseManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
                     <a href="${pageContext.request.contextPath}/admin/premium-plans" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
                     <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Báo cáo</span></a>
-       
+
                 </div>
             </div>
 
