@@ -28,7 +28,7 @@ async function sendMessage() {
     };
 
     try {
-        let response = await fetch("/t/aiGe", {
+        let response = await fetch("/SWP_HUY/aiGe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(requestData)

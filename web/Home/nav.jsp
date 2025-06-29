@@ -119,10 +119,14 @@
                                 <li>
                                     <a class="dropdown-item" href="<c:url value='profile'/>">Profile</a>
                                 </li>
-                                <!-- Gộp quyền Teacher/Admin chung 1 Dashboard -->
-                                <c:if test="${authUser.roleID == 3 || authUser.roleID == 4}">
+                                <c:if test="${authUser.roleID == 3}">
                                     <li>
                                         <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
+                                    </li>
+                                </c:if>
+                                <c:if test="${authUser.roleID == 4}">
+                                    <li>
+                                        <a class="dropdown-item" href="<c:url value='statis.jsp'/>">Admin</a>
                                     </li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>

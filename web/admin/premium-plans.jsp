@@ -18,6 +18,7 @@
     <div class="container mt-5">
         <h2>Premium Plan Management</h2>
         <a href="${pageContext.request.contextPath}/admin/premium-plans?action=add" class="btn btn-primary mb-3">Add New Plan</a>
+      <a href="${pageContext.request.contextPath}/revenue_stats.jsp" class="btn btn-primary mb-3">Thống kê</a>   
         <table class="table table-bordered">
             <thead>
                 <tr>
