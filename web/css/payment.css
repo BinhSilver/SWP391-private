@@ -31,8 +31,8 @@ body {
     flex: 1 1 50%;
     padding: 20px;
     border-radius: 10px;
-    border: 2px solid #d1fae5;
-    background-color: #ecfdf5;
+    border: 2px solid #f9cfd7;
+    background-color: #fbe6ea;
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -43,11 +43,11 @@ body {
   .plan h3 {
     font-size: 20px;
     margin-bottom: 10px;
-    color: #065f46;
+    color: #e94f64;
   }
   
   .plan .badge {
-    background-color: #10b981;
+    background-color: #e94f64;
     color: white;
     font-size: 12px;
     padding: 3px 8px;
@@ -83,19 +83,19 @@ body {
     margin-top: 15px;
     padding: 10px;
     border-radius: 6px;
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: #fbe6ea;
+    color: #e94f64;
     font-weight: bold;
   }
   
   .plan.selected {
-    background-color: #bbf7d0;
-    border-color: #22c55e;
+    background-color: #f9cfd7;
+    border-color: #e94f64;
   }
   
   .plan.selected::after {
     content: "Chọn gói này";
-    background-color: #22c55e;
+    background-color: #e94f64;
     color: white;
   }
   
@@ -105,7 +105,7 @@ body {
     margin: 30px auto 0;
     padding: 12px 30px;
     font-size: 16px;
-    background-color: #16a34a;
+    background-color: #e94f64;
     color: white;
     border: none;
     border-radius: 8px;
@@ -114,7 +114,7 @@ body {
   }
   
   .next-btn:hover {
-    background-color: #15803d;
+    background-color: #e94f64;
   }
   
   /* Responsive fallback nếu cần */
