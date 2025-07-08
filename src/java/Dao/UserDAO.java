@@ -338,6 +338,20 @@ public class UserDAO {
         return users;
     }
 
+    public List<User> searchUsersByFullName(String keyword) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM [dbo].[Users] WHERE dbo.RemoveDiacritics(FullName) LIKE '%' + dbo.RemoveDiacritics(?) + '%' AND IsActive = 1";
+
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, keyword); 
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        }
+        return users;
+    }
+
     public static void main(String[] args) throws SQLException {
         UserDAO dao = new UserDAO();
         List<User> users = dao.getAllUsers();

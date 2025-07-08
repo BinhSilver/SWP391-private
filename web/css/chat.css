@@ -1,0 +1,243 @@
+/* Container */
+.chat-container {
+  display: flex;
+  height: calc(100vh - 75px); /* Giảm chiều cao để chừa chỗ cho navbar (60px là chiều cao mặc định của navbar) */
+
+}
+
+/* Navbar Styles */
+.navbar {
+  position: fixed; /* Cố định trên đầu trang */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Đảm bảo navbar nằm trên các phần khác */
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm bóng để nổi bật */
+}
+
+/* Sidebar */
+.chat-sidebar {
+  width: 300px;
+  background: #f8f9fa;
+  padding: 10px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.chat-sidebar input#searchUser {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #FA9DC8;
+  border-radius: 25px;
+  font-size: 14px;
+  outline: none;
+  background: #ffffff;
+  box-shadow: 0 2px 5px rgba(250, 157, 200, 0.2);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.chat-sidebar input#searchUser:focus {
+  border-color: #E67BA9;
+  box-shadow: 0 4px 10px rgba(250, 157, 200, 0.3);
+}
+
+.chat-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+.chat-sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+}
+
+.chat-sidebar li:hover {
+  background: #e9ecef;
+}
+
+/* Hiển thị trạng thái online (ví dụ: chấm xanh) */
+.chat-sidebar li::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #28a745;
+  margin-right: 5px;
+}
+
+/* Main Chat */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 10px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chat Input */
+.chat-input-wrap {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-wrap input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chat-input-wrap button {
+  padding: 8px 16px;
+  background: #FA9DC8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-input-wrap button:hover {
+  background: #f488ad;
+}
+
+/* Message Styles */
+.chat-msg {
+  display: flex;
+  align-items: flex-start;
+  margin: 10px 0;
+  flex-direction: row;
+}
+
+.chat-msg.me {
+  flex-direction: row-reverse;
+}
+
+.chat-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.chat-msg.me .chat-msg-avatar {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.chat-msg-content {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+/* Sender message (yourself) */
+.me .chat-msg-content {
+  background-color: #FA9DC8;
+  color: white;
+  align-self: flex-end;
+}
+
+/* Receiver message (others) */
+.chat-msg:not(.me) .chat-msg-content {
+  background-color: #fff;
+  color: black;
+  border: 1px solid #ddd;
+  align-self: flex-start;
+}
+
+.chat-msg-sender {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.chat-msg-timestamp {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: #fff;
+  min-width: 100px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 4px;
+  right: 0;
+}
+
+.dropdown-content button {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-content button:hover {
+  background-color: #FA9DC8;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chat-sidebar {
+    width: 100%;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    transition: height 0.3s;
+  }
+
+  .chat-sidebar.active {
+    height: 40vh;
+    padding: 10px;
+  }
+
+  .chat-container {
+    flex-direction: column;
+    height: calc(100vh - 60px);
+  }
+
+  .chat-main {
+    width: 100%;
+    height: calc(100% - 60px);
+  }
+}
