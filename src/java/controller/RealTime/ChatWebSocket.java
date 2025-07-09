@@ -1,4 +1,5 @@
 package controller.RealTime;
+
 import Dao.UserDAO;
 import Dao.ConversationDAO;
 import Dao.MessageDAO;
@@ -62,7 +63,7 @@ public class ChatWebSocket {
 
             switch (type) {
                 case "message":
-                    int toUserId = ((Double) json.get("toUserId")).intValue(); // Chuyển từ Double sang int
+                    int toUserId = ((Double) json.get("toUserId")).intValue();
                     String content = (String) json.get("content");
 
                     if (new BlockDAO().isBlocked(fromUserId, toUserId)) {
@@ -146,6 +147,28 @@ public class ChatWebSocket {
                 case "read":
                     int senderId = ((Double) json.get("fromUserId")).intValue();
                     new MessageDAO().markMessagesAsRead(senderId, fromUserId);
+                    break;
+
+                case "callInvite":
+                    int toUserIdCall = ((Double) json.get("toUserId")).intValue();
+                    String roomUrl = (String) json.get("roomUrl");
+                    String token = (String) json.get("token");
+                    Map<String, Object> inviteData = new HashMap<>();
+                    inviteData.put("type", "callInvite");
+                    inviteData.put("fromUserId", fromUserId);
+                    inviteData.put("fromUsername", fromUsername);
+                    inviteData.put("toUserId", toUserIdCall);
+                    inviteData.put("roomUrl", roomUrl); // Thêm roomUrl từ Daily.co
+                    inviteData.put("token", token);    // Thêm token từ Daily.co
+                    sendTo(toUserIdCall, inviteData);
+                    break;
+
+                case "callRejected":
+                    int toUserIdReject = ((Double) json.get("toUserId")).intValue();
+                    Map<String, Object> rejectData = new HashMap<>();
+                    rejectData.put("type", "callRejected");
+                    rejectData.put("fromUserId", fromUserId);
+                    sendTo(toUserIdReject, rejectData);
                     break;
             }
         } catch (Exception e) {

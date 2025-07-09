@@ -122,6 +122,9 @@
                                  <li>
                                     <a class="dropdown-item" href="<c:url value='chatrealtime.jsp'/>">chat</a>
                                 </li>
+                              <li>
+                                    <a class="dropdown-item" href="<c:url value='videocall.jsp'/>">Video Call</a>
+                                </li>
                                 <c:if test="${authUser.roleID == 3}">
                                     <li>
                                         <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>

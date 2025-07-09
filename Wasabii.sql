@@ -1,8 +1,9 @@
-Ôªø
-ÔªøCREATE DATABASE Wasabii;
-GO
-USE Wasabii;
-GO
+
+-- trong phiÍn b?n n‡y Huy ? thay ?i thÍm m?t h‡m ? format kÌ t? ghÈp v‡ d?u v?i b?ng liÍn quan ?n chat messenger conversation 
+CREATE DATABASE Wasabiii
+GO;
+USE Wasabiii;
+GO;
 
 -- 1. Roles
 CREATE TABLE Roles (
@@ -37,7 +38,7 @@ CREATE TABLE Users (
     Address NVARCHAR(255),
     Country NVARCHAR(100),
     Avatar VARBINARY(MAX),
-    Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Kh√°c'
+    Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Kh·c'
 );
 
 -- 4. Payments
@@ -108,7 +109,7 @@ CREATE TABLE CourseRatings (
 CREATE TABLE LessonMaterials (
     MaterialID INT PRIMARY KEY IDENTITY(1,1),
     LessonID INT NOT NULL,
-    MaterialType NVARCHAR(50) NOT NULL,   -- 'T·ª´ v·ª±ng' | 'Kanji' | 'Ng·ªØ ph√°p'
+    MaterialType NVARCHAR(50) NOT NULL,   -- 'T? v?ng' | 'Kanji' | 'Ng? ph·p'
     FileType NVARCHAR(50) NOT NULL,       -- 'PDF' | 'Video'
     Title NVARCHAR(255),
     FilePath NVARCHAR(MAX),
@@ -249,12 +250,38 @@ CREATE TABLE FeedbackVotes (
 );
 
 -- 18. Chat & Video Call
-CREATE TABLE Chats (
-    ChatID INT PRIMARY KEY IDENTITY,
-    SenderID INT FOREIGN KEY REFERENCES Users(UserID),
-    ReceiverID INT FOREIGN KEY REFERENCES Users(UserID),
-    Message NVARCHAR(MAX),
-    SentAt DATETIME DEFAULT GETDATE()
+-- B?ng Conversations
+CREATE TABLE Conversations (
+    ConversationID INT PRIMARY KEY IDENTITY(1,1),
+    User1ID INT NOT NULL,
+    User2ID INT NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (User1ID) REFERENCES Users(UserID),
+    FOREIGN KEY (User2ID) REFERENCES Users(UserID)
+);
+
+-- B?ng Messages
+CREATE TABLE Messages (
+    MessageID INT PRIMARY KEY IDENTITY(1,1),
+    ConversationID INT NOT NULL,
+    SenderID INT NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    Type NVARCHAR(50) NOT NULL, -- Ch? h? tr? 'text' trong phiÍn b?n n‡y
+    IsRead BIT DEFAULT 0,
+    IsRecall BIT DEFAULT 0,
+    SentAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (ConversationID) REFERENCES Conversations(ConversationID),
+    FOREIGN KEY (SenderID) REFERENCES Users(UserID)
+);
+
+-- B?ng Blocks
+CREATE TABLE Blocks (
+    BlockerID INT NOT NULL,
+    BlockedID INT NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (BlockerID, BlockedID),
+    FOREIGN KEY (BlockerID) REFERENCES Users(UserID),
+    FOREIGN KEY (BlockedID) REFERENCES Users(UserID)
 );
 
 CREATE TABLE VideoCalls (
@@ -280,7 +307,7 @@ CREATE TABLE Rooms (
     RoomID INT PRIMARY KEY IDENTITY(1,1),
     HostUserID INT NOT NULL,
     LanguageLevel NVARCHAR(50) NOT NULL,
-    GenderPreference NVARCHAR(20) NOT NULL DEFAULT N'Kh√¥ng y√™u c·∫ßu',
+    GenderPreference NVARCHAR(20) NOT NULL DEFAULT N'KhÙng yÍu c?u',
     MinAge INT CHECK (MinAge >= 0),
     MaxAge INT,
     AllowApproval BIT DEFAULT 0,
@@ -288,7 +315,7 @@ CREATE TABLE Rooms (
     CreatedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Rooms_Host FOREIGN KEY (HostUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
     CONSTRAINT CK_Rooms_GenderPreference CHECK (
-        GenderPreference IN (N'Nam', N'N·ªØ', N'Kh√¥ng y√™u c·∫ßu')
+        GenderPreference IN (N'Nam', N'N?', N'KhÙng yÍu c?u')
     )
 );
 
@@ -304,43 +331,27 @@ CREATE TABLE RoomParticipants (
 -- Seed data
 INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description)
 VALUES 
-    (N'G√≥i Th√°ng', 25000, 1, N'S·ª≠ d·ª•ng Premium trong 1 th√°ng'),
-    (N'G√≥i NƒÉm', 250000, 12, N'S·ª≠ d·ª•ng Premium trong 12 th√°ng');
+    (N'GÛi Th·ng', 25000, 1, N'S? d?ng Premium trong 1 th·ng'),
+    (N'GÛi N„m', 250000, 12, N'S? d?ng Premium trong 12 th·ng');
 
 
 
 
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Ng∆∞·ªùi D√πng', '2000-01-01', '0123456789', N'N5', N'ƒê·ªãa ch·ªâ user', N'Vi·ªát Nam', NULL, N'Nam'),
-       (4, 'admin@gmail.com', '123456789', NULL, N'Qu·∫£n Tr·ªã Vi√™n', '1990-01-01', '0987654321', N'N1', N'ƒê·ªãa ch·ªâ admin', N'Vi·ªát Nam', NULL, N'N·ªØ');
+VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Ng˝?i D˘ng', '2000-01-01', '0123456789', N'N5', N'–?a ch? user', N'Vi?t Nam', NULL, N'Nam'),
+       (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'–?a ch? admin', N'Vi?t Nam', NULL, N'Nam');
 
 
--- ƒê·∫£m b·∫£o c√°c kh√≥a h·ªçc c≈© ƒë·ªÅu c√≥ CreatedAt (n·∫øu migrate data)
+-- –?m b?o c·c khÛa h?c c? ?u cÛ CreatedAt (n?u migrate data)
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
 
 GO
-CREATE TRIGGER TR_Users_SetAvatarOnGender
-ON Users
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    UPDATE Users
-    SET Avatar = CASE
-                    WHEN i.Gender = N'N·ªØ' THEN 'img/nu.jpg'
-                    ELSE 'img/nam.jpg'
-                END
-    FROM Users u
-    INNER JOIN inserted i ON u.UserID = i.UserID
-    WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
-END;
-
-
---th√™m user n√†y v√¥ ƒë·ªÉ coi ƒë∆∞·ª£c kh√≥a h·ªçc nha
+--thÍm user n‡y vÙ ? coi ˝?c khÛa h?c nha
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'ƒê·ªãa ch·ªâ teacher', N'Vi·ªát Nam', 'img/nam.jpg', N'N·ªØ');
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'–?a ch? teacher', N'Vi?t Nam', null, N'N?');
 
 
---Th√™m m·∫•y b·∫£ng n√†y nha
+--ThÍm m?y b?ng n‡y nha
 CREATE TABLE LessonAccess (
     AccessID INT IDENTITY PRIMARY KEY,
     UserID INT NOT NULL,
@@ -348,7 +359,7 @@ CREATE TABLE LessonAccess (
     AccessedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_LessonAccess_User FOREIGN KEY (UserID) REFERENCES Users(UserID),
     CONSTRAINT FK_LessonAccess_Lesson FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID),
-    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)  -- tr√°nh tr√πng l·∫∑p
+    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)  -- tr·nh tr˘ng l?p
 );
 
 
@@ -368,7 +379,7 @@ ALTER TABLE LessonMaterials
 ADD CONSTRAINT FK_LessonMaterials_Lessons
 FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID);
 
---X√≥a d·ªØ li·ªáu kh√≥a h·ªçc c≈© r·ªìi th√™m m·ªõi nh∆∞ ·ªü d∆∞·ªõi nha
+--XÛa d? li?u khÛa h?c c? r?i thÍm m?i nh˝ ? d˝?i nha
 
 DELETE FROM Answers;
 DELETE FROM Questions;
@@ -380,51 +391,228 @@ DELETE FROM Vocabulary;
 
 DELETE FROM LessonMaterials;
 
--- Sau khi c√°c b·∫£ng tr√™n ƒë√£ x√≥a, m·ªõi x√≥a Lesson v√† Course
+-- Sau khi c·c b?ng trÍn ? xÛa, m?i xÛa Lesson v‡ Course
 DELETE FROM Lessons;
 DELETE FROM Courses;
 
 
 
 
--- 1. T·∫°o kh√≥a h·ªçc m·ªõi N5
+-- 1. T?o khÛa h?c m?i N5
 INSERT INTO Courses (Title, Description, IsHidden, IsSuggested)
-VALUES (N'Kh√≥a h·ªçc Giao ti·∫øp N5', N'Kh√≥a h·ªçc ti·∫øng Nh·∫≠t s∆° c·∫•p t·∫≠p trung v√†o giao ti·∫øp c∆° b·∫£n.', 0, 1);
+VALUES (N'KhÛa h?c Giao ti?p N5', N'KhÛa h?c ti?ng Nh?t sı c?p t?p trung v‡o giao ti?p cı b?n.', 0, 1);
 
 DECLARE @CourseID INT = SCOPE_IDENTITY();
--- 2. Th√™m c√°c b√†i h·ªçc
+-- 2. ThÍm c·c b‡i h?c
 INSERT INTO Lessons (CourseID, Title) VALUES
-(@CourseID, N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n'),
-(@CourseID, N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe'),
-(@CourseID, N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi');
+(@CourseID, N'B‡i 1: Gi?i thi?u b?n th‚n'),
+(@CourseID, N'B‡i 2: H?i th„m s?c kh?e'),
+(@CourseID, N'B‡i 3: H?i ˝?ng i');
 
 
--- L·∫•y ID t·ª´ng b√†i h·ªçc
-DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n');
-DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe');
-DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi');
+-- L?y ID t?ng b‡i h?c
+DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B‡i 1: Gi?i thi?u b?n th‚n');
+DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B‡i 2: H?i th„m s?c kh?e');
+DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B‡i 3: H?i ˝?ng i');
 
--- B√†i 1
+-- B‡i 1
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n'), N'T·ª´ v·ª±ng', N'PDF', N'T·ª´ v·ª±ng B√†i 1', N'files/courseN5/vocabN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n'), N'Kanji', N'PDF', N'Kanji B√†i 1', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n'), N'Ng·ªØ ph√°p', N'PDF', N'Ng·ªØ ph√°p B√†i 1', N'files/courseN5/grammarN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 1: Gi·ªõi thi·ªáu b·∫£n th√¢n'), N'Ng·ªØ ph√°p', N'Video', N'Video Ng·ªØ ph√°p B√†i 1', N'files/lesson1_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 1: Gi?i thi?u b?n th‚n'), N'T? v?ng', N'PDF', N'T? v?ng B‡i 1', N'files/courseN5/vocabN5/Lesson1.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 1: Gi?i thi?u b?n th‚n'), N'Kanji', N'PDF', N'Kanji B‡i 1', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 1: Gi?i thi?u b?n th‚n'), N'Ng? ph·p', N'PDF', N'Ng? ph·p B‡i 1', N'files/courseN5/grammarN5/Lesson1.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 1: Gi?i thi?u b?n th‚n'), N'Ng? ph·p', N'Video', N'Video Ng? ph·p B‡i 1', N'files/lesson1_grammar.mp4');
 
--- B√†i 2
+-- B‡i 2
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe'), N'T·ª´ v·ª±ng', N'PDF', N'T·ª´ v·ª±ng B√†i 2', N'files/courseN5/vocabN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe'), N'Kanji', N'PDF', N'Kanji B√†i 2', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe'), N'Ng·ªØ ph√°p', N'PDF', N'Ng·ªØ ph√°p B√†i 2', N'files/courseN5/grammarN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 2: H·ªèi thƒÉm s·ª©c kh·ªèe'), N'Ng·ªØ ph√°p', N'Video', N'Video Ng·ªØ ph√°p B√†i 2', N'files/lesson2_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 2: H?i th„m s?c kh?e'), N'T? v?ng', N'PDF', N'T? v?ng B‡i 2', N'files/courseN5/vocabN5/Lesson2.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 2: H?i th„m s?c kh?e'), N'Kanji', N'PDF', N'Kanji B‡i 2', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 2: H?i th„m s?c kh?e'), N'Ng? ph·p', N'PDF', N'Ng? ph·p B‡i 2', N'files/courseN5/grammarN5/Lesson2.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 2: H?i th„m s?c kh?e'), N'Ng? ph·p', N'Video', N'Video Ng? ph·p B‡i 2', N'files/lesson2_grammar.mp4');
 
--- B√†i 3
+-- B‡i 3
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi'), N'T·ª´ v·ª±ng', N'PDF', N'T·ª´ v·ª±ng B√†i 3', N'files/courseN5/vocabN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi'), N'Kanji', N'PDF', N'Kanji B√†i 3', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi'), N'Ng·ªØ ph√°p', N'PDF', N'Ng·ªØ ph√°p B√†i 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B√†i 3: H·ªèi ƒë∆∞·ªùng ƒëi'), N'Ng·ªØ ph√°p', N'Video', N'Video Ng·ªØ ph√°p B√†i 3', N'files/lesson3_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 3: H?i ˝?ng i'), N'T? v?ng', N'PDF', N'T? v?ng B‡i 3', N'files/courseN5/vocabN5/Lesson3.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 3: H?i ˝?ng i'), N'Kanji', N'PDF', N'Kanji B‡i 3', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 3: H?i ˝?ng i'), N'Ng? ph·p', N'PDF', N'Ng? ph·p B‡i 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'B‡i 3: H?i ˝?ng i'), N'Ng? ph·p', N'Video', N'Video Ng? ph·p B‡i 3', N'files/lesson3_grammar.mp4');
 
+
+-- x? lÌ d?u kÌ t? ghÈp ( o?n n‡y nh? ch?y riÍng h‡m n‡y ) 
+CREATE OR ALTER FUNCTION dbo.RemoveDiacritics(@input NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @result NVARCHAR(MAX) = LOWER(@input);
+
+    -- B? d?u thanh ti?ng Vi?t
+    SET @result = REPLACE(@result, N'·', 'a');
+    SET @result = REPLACE(@result, N'‡', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'„', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'‚', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'', 'd');
+    SET @result = REPLACE(@result, N'È', 'e');
+    SET @result = REPLACE(@result, N'Ë', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'Í', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'Ì', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'Û', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'Ù', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'ı', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'˙', 'u');
+    SET @result = REPLACE(@result, N'˘', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'˝', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+
+    -- T·ch c·c k? t? ghÈp ti?ng Vi?t
+    SET @result = REPLACE(@result, N'kh', 'k h');
+    SET @result = REPLACE(@result, N'gi', 'g i');
+    SET @result = REPLACE(@result, N'ng', 'n g');
+    SET @result = REPLACE(@result, N'nh', 'n h');
+    SET @result = REPLACE(@result, N'ph', 'p h');
+    SET @result = REPLACE(@result, N'th', 't h');
+    SET @result = REPLACE(@result, N'ch', 'c h');
+    SET @result = REPLACE(@result, N'tr', 't r');
+    SET @result = REPLACE(@result, N'gh', 'g h');
+    SET @result = REPLACE(@result, N'qu', 'q u'); -- ThÍm qu
+
+    RETURN @result;
+END;
+-- o?n n‡y th? chayj h?t ph?n d˝?i v? ch?y l? nÛ thi?u declare
+-- 1. ThÍm 50 ng˝?i d˘ng
+DECLARE @StartDate DATETIME = '2025-01-01';
+DECLARE @EndDate DATETIME = '2025-06-22';
+DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
+DECLARE @UserCount INT = 50;
+DECLARE @Counter INT = 1;
+DECLARE @RoleID INT;
+DECLARE @Email NVARCHAR(255);
+DECLARE @FullName NVARCHAR(100);
+DECLARE @CreatedAt DATETIME;
+
+-- T?m l˝u danh s·ch ng˝?i d˘ng ? d˘ng cho Enrollment
+CREATE TABLE #TempUsers (UserID INT, CreatedAt DATETIME);
+
+WHILE @Counter <= @UserCount
+BEGIN
+    -- Ph‚n b? RoleID theo t? l?: Admin (1), Free (4), Premium (3), Teacher (1)
+    SET @RoleID = CASE 
+        WHEN @Counter <= 5 THEN 4 -- 5 Admin
+        WHEN @Counter <= 25 THEN 1 -- 20 Free
+        WHEN @Counter <= 40 THEN 2 -- 15 Premium
+        ELSE 3 -- 5 Teacher
+    END;
+
+    -- T?o email v‡ tÍn gi? l?p
+    SET @Email = 'user' + CAST(@Counter AS NVARCHAR(10)) + '@example.com';
+    SET @FullName = N'Ng˝?i D˘ng ' + CAST(@Counter AS NVARCHAR(10));
+
+    -- TÌnh CreatedAt tr?i ?u t? 01/01/2025 ?n 06/22/2025
+    SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @UserCount, @StartDate);
+
+    -- ThÍm ng˝?i d˘ng
+    INSERT INTO Users (
+        RoleID, Email, PasswordHash, FullName, CreatedAt, 
+        BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Gender
+    )
+    VALUES (
+        @RoleID, 
+        @Email, 
+        'hashed_password', -- Gi? l?p m?t kh?u
+        @FullName, 
+        @CreatedAt,
+        '2000-01-01', -- Ng‡y sinh gi? l?p
+        '0123456789', -- S? i?n tho?i gi? l?p
+        N'N5', 
+        N'–?a ch? gi? l?p', 
+        N'Vi?t Nam', 
+        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'N?' END
+    );
+
+    -- L˝u UserID v‡ CreatedAt v‡o b?ng t?m
+    INSERT INTO #TempUsers (UserID, CreatedAt)
+    VALUES (SCOPE_IDENTITY(), @CreatedAt);
+
+    SET @Counter = @Counter + 1;
+END;
+
+-- 2. ThÍm 30 b?n ghi Enrollment
+DECLARE @EnrollmentCount INT = 30;
+SET @Counter = 1;
+DECLARE @UserID INT;
+DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'KhÛa h?c Giao ti?p N5');
+DECLARE @EnrolledAt DATETIME;
+
+-- Cursor ? l?y ng?u nhiÍn 30 ng˝?i d˘ng t? b?ng t?m
+DECLARE user_cursor CURSOR FOR 
+SELECT TOP 30 UserID, CreatedAt 
+FROM #TempUsers 
+ORDER BY NEWID(); -- Randomize
+
+OPEN user_cursor;
+FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+
+WHILE @Counter <= @EnrollmentCount
+BEGIN
+    -- TÌnh EnrolledAt tr?i ?u t? 01/01/2025 ?n 06/22/2025
+    SET @EnrolledAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @EnrollmentCount, @StartDate);
+
+    -- ThÍm b?n ghi Enrollment
+    INSERT INTO Enrollment (UserID, CourseID, EnrolledAt)
+    VALUES (@UserID, @CourseID, @EnrolledAt);
+
+    FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+    SET @Counter = @Counter + 1;
+END;
+
+CLOSE user_cursor;
+DEALLOCATE user_cursor;
+
+-- XÛa b?ng t?m
+DROP TABLE #TempUsers;
