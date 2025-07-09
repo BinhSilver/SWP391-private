@@ -1,4 +1,3 @@
-﻿
 ﻿CREATE DATABASE Wasabii;
 GO
 USE Wasabii;
@@ -36,7 +35,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar VARBINARY(MAX),
+    Avatar NVARCHAR(MAX),
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
