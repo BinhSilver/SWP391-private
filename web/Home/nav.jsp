@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<style>
     .navbar {
         position: relative;
     }
@@ -88,8 +87,22 @@
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
-                    <a class="nav-link px-2" href="#">FlashCard</a>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">Premium</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">FlashCard</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="#">FlashCard</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
 
