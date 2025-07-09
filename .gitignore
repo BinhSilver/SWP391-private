@@ -8,6 +8,10 @@ nbdist/
 *.orig
 src/DB/db.properties
 
+# Ensure lib directory is not ignored
+!lib/
+!lib/**
+
 # Cache files
 *.class
 *.log
