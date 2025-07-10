@@ -6,75 +6,56 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.PremiumPlan;
-import vn.payos.type.PaymentData;
-import vn.payos.type.CheckoutResponseData;
-
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
+import model.PremiumPlan;
 
-/**
- * Servlet xử lý khi người dùng gửi yêu cầu tạo thanh toán
- */
-@WebServlet(name = "CreatePaymentServlet", urlPatterns = {"/CreatePayment"})
+@WebServlet("/CreatePayment")
 public class CreatePaymentServlet extends HttpServlet {
-
-    private final PremiumPlanDAO premiumPlanDAO = new PremiumPlanDAO();
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // Lấy planId từ request
             int planId = Integer.parseInt(request.getParameter("planId"));
-            PremiumPlan plan = premiumPlanDAO.getPremiumPlanByID(planId);
-
-            if (plan == null) {
-                request.setAttribute("errorMessage", "Gói thanh toán không hợp lệ.");
-                request.getRequestDispatcher("/PaymentJSP/Payment.jsp").forward(request, response);
-                return;
+            
+            // Lưu planId vào session
+            HttpSession session = request.getSession();
+            session.setAttribute("selectedPlanId", planId);
+            
+            // Lấy thông tin plan
+            PremiumPlanDAO planDAO = new PremiumPlanDAO();
+            PremiumPlan plan = planDAO.getPlanById(planId);
+            
+            if (plan != null) {
+                // Tạo URL cho return và cancel
+                String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+                String returnUrl = baseUrl + "/ReturnFromPayOS";
+                String cancelUrl = baseUrl + "/CancelPayment";
+                
+                // Tạo URL thanh toán
+                String paymentUrl = Config.createPaymentLink(
+                    (int)plan.getPrice(),
+                    "Thanh toán gói " + plan.getPlanName(),
+                    returnUrl,
+                    cancelUrl
+                );
+                
+                if (paymentUrl != null) {
+                    response.sendRedirect(paymentUrl);
+                } else {
+                    request.setAttribute("errorMessage", "Không thể tạo link thanh toán");
+                    request.getRequestDispatcher("/PaymentJSP/PaymentCancel.jsp").forward(request, response);
+                }
+            } else {
+                request.setAttribute("errorMessage", "Không tìm thấy gói premium");
+                request.getRequestDispatcher("/PaymentJSP/PaymentCancel.jsp").forward(request, response);
             }
-
-            int amount = (int) plan.getPrice();
-            String description = plan.getPlanName();
-
-            // Create unique order code
-            long orderCode = System.currentTimeMillis();
-
-            // Create payment data with all required fields
-            String contextPath = request.getContextPath();
-            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath;
-            PaymentData paymentData = PaymentData.builder()
-                .orderCode(orderCode)
-                .amount(amount)
-                .description(description)
-                .returnUrl(baseUrl + "/ReturnFromPayOS")
-                .cancelUrl(baseUrl + "/CancelPayment")
-                .signature(Config.checksumKey)
-                .items(null)
-                .build();
-
-            // Create payment with PayOS
-            CheckoutResponseData result = Config.payOS().createPaymentLink(paymentData);
-            
-            // Get the QR code URL and payment URL
-            String qrCode = result.getQrCode();
-            String paymentUrl = result.getCheckoutUrl();
-            
-            // Store in request attributes
-            request.setAttribute("qrCode", qrCode);
-            request.setAttribute("paymentUrl", paymentUrl);
-            request.setAttribute("amount", amount);
-            request.setAttribute("description", description);
-            request.setAttribute("orderCode", String.valueOf(orderCode));
-            
-            // Forward to QR display page
-            request.getRequestDispatcher("/PaymentJSP/PaymentQR.jsp").forward(request, response);
-            
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Gói thanh toán không hợp lệ.");
-            request.getRequestDispatcher("/PaymentJSP/Payment.jsp").forward(request, response);
-        } catch (Exception e) {
+        } catch (NumberFormatException | SQLException e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/PaymentJSP/PaymentCancel.jsp");
+            request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            request.getRequestDispatcher("/PaymentJSP/PaymentCancel.jsp").forward(request, response);
         }
     }
 }

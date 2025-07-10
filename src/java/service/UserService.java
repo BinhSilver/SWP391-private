@@ -64,6 +64,30 @@ public class UserService {
         }
     }
 
+    public void updateUserWithConnection(User user, Connection conn) throws SQLException {
+        String sql = "UPDATE Users SET RoleID = ?, Email = ?, PasswordHash = ?, GoogleID = ?, FullName = ?, "
+                + "BirthDate = ?, PhoneNumber = ?, JapaneseLevel = ?, Address = ?, Country = ?, Avatar = ?, Gender = ? "
+                + "WHERE UserID = ?";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, user.getRoleID());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setString(4, user.getGoogleID());
+            stmt.setString(5, user.getFullName());
+            stmt.setDate(6, user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null);
+            stmt.setString(7, user.getPhoneNumber());
+            stmt.setString(8, user.getJapaneseLevel());
+            stmt.setString(9, user.getAddress());
+            stmt.setString(10, user.getCountry());
+            stmt.setString(11, user.getAvatar());
+            stmt.setString(12, user.getGender());
+            stmt.setInt(13, user.getUserID());
+            
+            stmt.executeUpdate();
+        }
+    }
+
     // Nếu bạn dùng IDENTITY (auto-increment), không cần hàm generateUserId
     // Nhưng nếu vẫn muốn tạo manual ID kiểu chuỗi, bạn có thể giữ nguyên hoặc viết lại phù hợp với kiểu chuỗi
     // Dưới đây là ví dụ nếu userId là int auto-increment thì bỏ hàm này
