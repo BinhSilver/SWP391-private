@@ -123,7 +123,7 @@ window.attachedFile = null;
 // Load chatbot configuration from server
 async function loadChatbotConfig() {
     try {
-        const response = await fetch('/chatbot-config');
+        const response = await fetch('/SWP_HUY/chatbot-config');
         chatbotConfig = await response.json();
         console.log('Chatbot config loaded:', chatbotConfig);
     } catch (error) {
@@ -136,7 +136,7 @@ async function loadChatbotConfig() {
             authToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjI5MDQwMjM5M2MzNTg5Y2QwMjEzMSJ9.8Ze_T_XpEWOI3Mi3pS5XgLHXw92YmqDZIsOJtRILvVw",
             modelName: "gemini-2.5-flash-preview-05-20"
         };
-        // Optionally, you can show a message to the user or log a warning here
+        console.warn('Using fallback chatbot configuration');
     }
 }
 

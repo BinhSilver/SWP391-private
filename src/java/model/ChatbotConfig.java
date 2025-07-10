@@ -8,44 +8,34 @@ public class ChatbotConfig {
     private static final Properties properties = new Properties();
     
     static {
-        try (InputStream input = ChatbotConfig.class.getClassLoader().getResourceAsStream("controller/chatbot/config.properties")) {
+        try (InputStream input = ChatbotConfig.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
-                System.out.println("Không thể tìm thấy file config.properties");
-            } else {
-                properties.load(input);
+                throw new RuntimeException("Cannot find config.properties");
             }
-        } catch (IOException ex) {
-            System.out.println("Lỗi khi đọc file config.properties: " + ex.getMessage());
+            properties.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading config.properties", e);
         }
     }
     
-    public static String get(String key) {
-        return properties.getProperty(key);
-    }
-    
-    public static String get(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
-    }
-    
-    // Chatbot specific getters
     public static String getApiUrl() {
-        return get("chatbot.api.url", "https://ai.ftes.vn/api/ai/rag_agent_template/stream");
+        return properties.getProperty("chatbot.api.url");
     }
     
     public static String getApiKey() {
-        return get("chatbot.api.key", "AIzaSyAH5Su96L-fRZBAzWH46VD5ICXyf9Jpihs");
+        return properties.getProperty("chatbot.api.key");
     }
     
     public static String getBotId() {
-        return get("chatbot.bot.id", "943bf25b42058b8882474ccb");
+        return properties.getProperty("chatbot.bot.id");
     }
     
     public static String getAuthToken() {
-        return get("chatbot.auth.token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjI5MDQwMjM5M2MzNTg5Y2QwMjEzMSJ9.8Ze_T_XpEWOI3Mi3pS5XgLHXw92YmqDZIsOJtRILvVw");
+        return properties.getProperty("chatbot.auth.token");
     }
     
     public static String getModelName() {
-        return get("chatbot.model.name", "gemini-2.5-flash-preview-05-20");
+        return properties.getProperty("chatbot.model.name");
     }
 }
 
