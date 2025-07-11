@@ -1,5 +1,5 @@
 -- Trong phiên bản này Huy đã thay đổi thêm một hàm để format ký tự ghép và dấu với bảng liên quan đến chat messenger conversation 
-CREATE DATABASE Wasabii;
+﻿CREATE DATABASE Wasabii;
 GO
 USE Wasabii;
 GO
