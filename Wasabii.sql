@@ -1,5 +1,5 @@
 -- Trong phiên bản này Huy đã thay đổi thêm một hàm để format ký tự ghép và dấu với bảng liên quan đến chat messenger conversation 
-﻿CREATE DATABASE Wasabii;
+CREATE DATABASE Wasabii;
 GO
 USE Wasabii;
 GO
@@ -336,7 +336,8 @@ VALUES
 
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
 VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
-       (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam');
+       (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam'),
+	   (4, 'Admin@gmail.com', '123456789', NULL, N'TBinh', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam');
 
 -- Đảm bảo các khóa học có đều có CreatedAt (nếu migrate data)
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
@@ -613,3 +614,18 @@ DEALLOCATE user_cursor;
 
 -- Xóa bảng tạm
 DROP TABLE #TempUsers;
+
+
+INSERT INTO [Wasabii_Huy].[dbo].[Vocabulary] 
+([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
+VALUES
+( N'水', N'nước', N'みず (mizu)', N'水を飲みます。', 1, N'/images/vocab/mizu.png'),
+( N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', 1, N'/images/vocab/taberu.png'),
+( N'猫', N'mèo', N'ねこ (neko)', N'猫が好きです。', 1, N'/images/vocab/neko.png'),
+( N'先生', N'giáo viên', N'せんせい (sensei)', N'先生は教室にいます。', 1, N'/images/vocab/sensei.png'),
+( N'行く', N'đi', N'いく (iku)', N'学校へ行きます。', 1, N'/images/vocab/iku.png'),
+( N'見る', N'xem/nhìn', N'みる (miru)', N'映画を見ます。', 2, N'/images/vocab/miru.png'),
+( N'本', N'sách', N'ほん (hon)', N'本を読みます。', 2, N'/images/vocab/hon.png'),
+( N'車', N'xe ô tô', N'くるま (kuruma)', N'車を運転します。', 2, N'/images/vocab/kuruma.png'),
+( N'天気', N'thời tiết', N'てんき (tenki)', N'今日の天気はいいです。', 2, N'/images/vocab/tenki.png'),
+( N'友達', N'bạn bè', N'ともだち (tomodachi)', N'友達と話します。', 2, N'/images/vocab/tomodachi.png');
