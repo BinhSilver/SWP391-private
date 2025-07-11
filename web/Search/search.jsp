@@ -6,21 +6,21 @@
         <h3>Tìm kiếm khóa học</h3>
         <input type="text" class="search-input" id="searchInputCourse" placeholder="Nhập tên khóa học..." onkeyup="searchCourse()">
         <div class="result-box" id="courseResults"></div>
-  
+        <button class="btn-load-more" id="loadMoreCourse" onclick="loadMoreCourse()">Xem thêm</button>
     </div>
 
     <div class="search-section">
         <h3>Tìm kiếm Kanji</h3>
         <input type="text" class="search-input" id="searchInputKanji" placeholder="Nhập Kanji hoặc nghĩa..." onkeyup="searchKanji()">
         <div class="result-box" id="kanjiResults"></div>
-  
+        <button class="btn-load-more" id="loadMoreKanji" onclick="loadMoreKanji()">Xem thêm</button>
     </div>
 
     <div class="search-section">
         <h3>Tìm kiếm từ vựng</h3>
         <input type="text" class="search-input" id="searchInputVocabulary" placeholder="Nhập từ vựng..." onkeyup="searchVocabulary()">
         <div class="result-box" id="vocabularyResults"></div>
-     
+        <button class="btn-load-more" id="loadMoreVocabulary" onclick="loadMoreVocabulary()">Xem thêm</button>
     </div>
 </div>
 

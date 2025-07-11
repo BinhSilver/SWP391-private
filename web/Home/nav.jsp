@@ -118,7 +118,7 @@
                                     var $p = $('<p>').text(courseDesc);
                                     var $a = $('<a>')
                                             .addClass('btn btn-sm btn-wasabii')
-                                            .attr('href', '<c:url value="/courseDetails.jsp"/>?courseID=' + encodeURIComponent(courseId))
+                                            .attr('href', '<c:url value="/course-detail.jsp"/>?courseID=' + encodeURIComponent(courseId))
                                             .text('Xem chi tiết');
 
                                     $li.append($h5).append($p).append($a);

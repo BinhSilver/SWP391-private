@@ -60,19 +60,40 @@
             border-color: #28a745;
             background-color: #f8fff9;
         }
+        .payment-method.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f8f9fa;
+        }
+        .payment-method.disabled:hover {
+            border-color: #e9ecef;
+            transform: none;
+        }
         .payment-method i {
             font-size: 2em;
             margin-bottom: 10px;
             color: #007bff;
         }
+        .payment-method.disabled i {
+            color: #6c757d;
+        }
         .payment-method h3 {
             margin: 10px 0;
             color: #343a40;
+        }
+        .payment-method.disabled h3 {
+            color: #6c757d;
         }
         .payment-method p {
             color: #6c757d;
             font-size: 0.9em;
             margin: 0;
+        }
+        .coming-soon {
+            color: #dc3545;
+            font-size: 0.8em;
+            font-style: italic;
+            margin-top: 5px;
         }
         .buttons {
             display: flex;
@@ -133,6 +154,11 @@
             <div class="description">
                 <%= request.getAttribute("description") %>
             </div>
+            <% if (request.getAttribute("planName") != null) { %>
+                <div style="margin-top: 10px; color: #6c757d; font-size: 14px;">
+                    <i class="fas fa-gem"></i> Gói đã chọn: <strong><%= request.getAttribute("planName") %></strong>
+                </div>
+            <% } %>
         </div>
 
         <div class="payment-methods">
@@ -142,28 +168,31 @@
                 <p>Quét mã QR để thanh toán nhanh chóng qua ứng dụng ngân hàng</p>
             </div>
             
-            <div class="payment-method" onclick="selectPaymentMethod('card')">
+            <div class="payment-method disabled">
                 <i class="fas fa-credit-card"></i>
                 <h3>Thẻ Tín Dụng/Ghi Nợ</h3>
                 <p>Thanh toán an toàn qua cổng thanh toán</p>
+                <div class="coming-soon">Sắp ra mắt</div>
             </div>
             
-            <div class="payment-method" onclick="selectPaymentMethod('ewallet')">
+            <div class="payment-method disabled">
                 <i class="fas fa-wallet"></i>
                 <h3>Ví Điện Tử</h3>
                 <p>MoMo, ZaloPay, VNPay, ...</p>
+                <div class="coming-soon">Sắp ra mắt</div>
             </div>
             
-            <div class="payment-method" onclick="selectPaymentMethod('bank')">
+            <div class="payment-method disabled">
                 <i class="fas fa-university"></i>
                 <h3>Chuyển Khoản Ngân Hàng</h3>
                 <p>Chuyển khoản trực tiếp đến tài khoản của chúng tôi</p>
+                <div class="coming-soon">Sắp ra mắt</div>
             </div>
         </div>
 
         <div class="buttons">
             <button onclick="proceedPayment()" class="btn btn-primary">Tiếp Tục Thanh Toán</button>
-            <a href="javascript:history.back()" class="btn btn-secondary">Quay Lại</a>
+            <a href="${pageContext.request.contextPath}/payment" class="btn btn-secondary">Quay Lại</a>
         </div>
 
         <div class="payment-logos">
@@ -175,12 +204,17 @@
     </div>
 
     <script>
-        let selectedMethod = '';
+        let selectedMethod = 'qr'; // Mặc định chọn QR Code vì chỉ có phương thức này hoạt động
 
         function selectPaymentMethod(method) {
+            if (method !== 'qr') {
+                alert('Phương thức thanh toán này đang được phát triển. Vui lòng sử dụng QR Code.');
+                return;
+            }
+            
             selectedMethod = method;
             // Remove selected class from all methods
-            document.querySelectorAll('.payment-method').forEach(el => {
+            document.querySelectorAll('.payment-method:not(.disabled)').forEach(el => {
                 el.classList.remove('selected');
             });
             // Add selected class to clicked method
@@ -193,25 +227,18 @@
                 return;
             }
 
-            // Redirect based on selected payment method
-            switch(selectedMethod) {
-                case 'qr':
-                    window.location.href = '<%= request.getAttribute("paymentUrl") %>';
-                    break;
-                case 'card':
-                    // Thay thế URL này bằng URL xử lý thanh toán thẻ của bạn
-                    window.location.href = 'CardPayment';
-                    break;
-                case 'ewallet':
-                    // Thay thế URL này bằng URL xử lý thanh toán ví điện tử của bạn
-                    window.location.href = 'EWalletPayment';
-                    break;
-                case 'bank':
-                    // Thay thế URL này bằng URL xử lý chuyển khoản ngân hàng của bạn
-                    window.location.href = 'BankTransfer';
-                    break;
+            // Hiện tại chỉ hỗ trợ QR Code
+            if (selectedMethod === 'qr') {
+                window.location.href = '<%= request.getAttribute("paymentUrl") %>';
+            } else {
+                alert('Phương thức thanh toán này đang được phát triển. Vui lòng sử dụng QR Code.');
             }
         }
+
+        // Tự động chọn QR Code khi trang load
+        window.onload = function() {
+            document.querySelector('.payment-method:not(.disabled)').classList.add('selected');
+        };
     </script>
 </body>
 </html> 
