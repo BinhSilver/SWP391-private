@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchDropdown = document.getElementById('searchDropdown');
-    const contextPath = '/SWP_HUY';
+    const contextPath = '/test';
 
     console.log('DOM ready');
 

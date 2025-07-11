@@ -1,8 +1,8 @@
 package controller.RealTime;
 
 import DB.JDBCConnection;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+// import io.jsonwebtoken.Jwts;
+// import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,13 +46,19 @@ public class DailyTokenServlet extends HttpServlet {
                         String storedPassword = rs.getString("PasswordHash"); // Lấy PasswordHash
                         if (password.equals(storedPassword)) { // So sánh trực tiếp vì password thô
                             int userId = rs.getInt("UserID");
-                            String token = Jwts.builder()
-                                .setSubject(String.valueOf(userId))
-                                .claim("name", username)
-                                .setIssuedAt(new Date())
-                                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24 giờ
-                                .signWith(SignatureAlgorithm.HS256, API_KEY.getBytes())
-                                .compact();
+                            
+                            // TODO: Thêm thư viện JWT vào lib folder để sử dụng token thật
+                            // String token = Jwts.builder()
+                            //     .setSubject(String.valueOf(userId))
+                            //     .claim("name", username)
+                            //     .setIssuedAt(new Date())
+                            //     .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24 giờ
+                            //     .signWith(SignatureAlgorithm.HS256, API_KEY.getBytes())
+                            //     .compact();
+                            
+                            // Tạo token giả lập cho đến khi có thư viện JWT
+                            String token = "dummy_token_user_" + userId + "_" + System.currentTimeMillis();
+                            
                             response.setContentType("text/plain");
                             response.getWriter().write(token);
                         } else {

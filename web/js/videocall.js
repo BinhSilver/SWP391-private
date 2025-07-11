@@ -10,7 +10,7 @@ var password = userPassword || '';
 
 function getDailyToken(username, password, callback) {
     console.log("Requesting token for username: " + username + ", password: " + password);
-    var url = "/SWP_HUY/getDailyToken?username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password);
+            var url = "/test/getDailyToken?username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password);
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {
@@ -100,7 +100,7 @@ function joinRoom() {
 
 function joinMeeting(roomUrl, token) {
     // Chuyển hướng đến meeting.jsp với roomUrl và token làm tham số
-    var meetingUrl = "/SWP_HUY/meeting.jsp?roomUrl=" + encodeURIComponent(roomUrl) + "&token=" + encodeURIComponent(token);
+                    var meetingUrl = "/test/meeting.jsp?roomUrl=" + encodeURIComponent(roomUrl) + "&token=" + encodeURIComponent(token);
     console.log("Redirecting to: ", meetingUrl);
     window.location.href = meetingUrl;
 }

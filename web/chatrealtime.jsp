@@ -19,7 +19,7 @@
     <body>
         <%@ include file="../Home/nav.jsp" %>
         <c:if test="${empty sessionScope.authUser}">
-            <c:redirect url="/SWP_HUY/LoginJSP/LoginIndex.jsp"/>
+            <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>
 
         <section class="chat-container">

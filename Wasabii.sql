@@ -1,8 +1,7 @@
-
--- trong phi�n b?n n�y Huy �? thay �?i th�m m?t h�m �? format k� t? gh�p v� d?u v?i b?ng li�n quan �?n chat messenger conversation 
-CREATE DATABASE Wasabiii
+-- Trong phiên bản này Huy đã thay đổi thêm một hàm để format ký tự ghép và dấu với bảng liên quan đến chat messenger conversation 
+CREATE DATABASE Wasabii_Huy
 GO;
-USE Wasabiii;
+USE Wasabii_Huy;
 GO;
 
 -- 1. Roles
@@ -38,7 +37,7 @@ CREATE TABLE Users (
     Address NVARCHAR(255),
     Country NVARCHAR(100),
     Avatar VARBINARY(MAX),
-    Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Kh�c'
+    Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
 -- 4. Payments
@@ -109,16 +108,13 @@ CREATE TABLE CourseRatings (
 CREATE TABLE LessonMaterials (
     MaterialID INT PRIMARY KEY IDENTITY(1,1),
     LessonID INT NOT NULL,
-    MaterialType NVARCHAR(50) NOT NULL,   -- 'T? v?ng' | 'Kanji' | 'Ng? ph�p'
+    MaterialType NVARCHAR(50) NOT NULL,   -- 'Từ vựng' | 'Kanji' | 'Ngữ pháp'
     FileType NVARCHAR(50) NOT NULL,       -- 'PDF' | 'Video'
     Title NVARCHAR(255),
     FilePath NVARCHAR(MAX),
     IsHidden BIT DEFAULT 0,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-	);
-
-
-
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
 
 -- 10. Vocabulary, Tags, VocabularyTags
 CREATE TABLE Vocabulary (
@@ -254,7 +250,7 @@ CREATE TABLE FeedbackVotes (
 );
 
 -- 18. Chat & Video Call
--- B?ng Conversations
+-- Bảng Conversations
 CREATE TABLE Conversations (
     ConversationID INT PRIMARY KEY IDENTITY(1,1),
     User1ID INT NOT NULL,
@@ -264,13 +260,13 @@ CREATE TABLE Conversations (
     FOREIGN KEY (User2ID) REFERENCES Users(UserID)
 );
 
--- B?ng Messages
+-- Bảng Messages
 CREATE TABLE Messages (
     MessageID INT PRIMARY KEY IDENTITY(1,1),
     ConversationID INT NOT NULL,
     SenderID INT NOT NULL,
     Content NVARCHAR(MAX) NOT NULL,
-    Type NVARCHAR(50) NOT NULL, -- Ch? h? tr? 'text' trong phi�n b?n n�y
+    Type NVARCHAR(50) NOT NULL, -- Chỉ hỗ trợ 'text' trong phiên bản này
     IsRead BIT DEFAULT 0,
     IsRecall BIT DEFAULT 0,
     SentAt DATETIME DEFAULT GETDATE(),
@@ -278,7 +274,7 @@ CREATE TABLE Messages (
     FOREIGN KEY (SenderID) REFERENCES Users(UserID)
 );
 
--- B?ng Blocks
+-- Bảng Blocks
 CREATE TABLE Blocks (
     BlockerID INT NOT NULL,
     BlockedID INT NOT NULL,
@@ -311,7 +307,7 @@ CREATE TABLE Rooms (
     RoomID INT PRIMARY KEY IDENTITY(1,1),
     HostUserID INT NOT NULL,
     LanguageLevel NVARCHAR(50) NOT NULL,
-    GenderPreference NVARCHAR(20) NOT NULL DEFAULT N'Kh�ng y�u c?u',
+    GenderPreference NVARCHAR(20) NOT NULL DEFAULT N'Không yêu cầu',
     MinAge INT CHECK (MinAge >= 0),
     MaxAge INT,
     AllowApproval BIT DEFAULT 0,
@@ -319,7 +315,7 @@ CREATE TABLE Rooms (
     CreatedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Rooms_Host FOREIGN KEY (HostUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
     CONSTRAINT CK_Rooms_GenderPreference CHECK (
-        GenderPreference IN (N'Nam', N'N?', N'Kh�ng y�u c?u')
+        GenderPreference IN (N'Nam', N'Nữ', N'Không yêu cầu')
     )
 );
 
@@ -335,27 +331,22 @@ CREATE TABLE RoomParticipants (
 -- Seed data
 INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description)
 VALUES 
-    (N'G�i Th�ng', 25000, 1, N'S? d?ng Premium trong 1 th�ng'),
-    (N'G�i N�m', 250000, 12, N'S? d?ng Premium trong 12 th�ng');
-
-
-
+    (N'Gói Tháng', 25000, 1, N'Sử dụng Premium trong 1 tháng'),
+    (N'Gói Năm', 250000, 12, N'Sử dụng Premium trong 12 tháng');
 
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Ng�?i D�ng', '2000-01-01', '0123456789', N'N5', N'�?a ch? user', N'Vi?t Nam', NULL, N'Nam'),
-       (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'�?a ch? admin', N'Vi?t Nam', NULL, N'Nam');
+VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
+       (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam');
 
-
--- �?m b?o c�c kh�a h?c c? �?u c� CreatedAt (n?u migrate data)
+-- Đảm bảo các khóa học có đều có CreatedAt (nếu migrate data)
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
 
 GO
---th�m user n�y v� �? coi ��?c kh�a h?c nha
+--thêm user này vì để coi được khóa học nha
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'�?a ch? teacher', N'Vi?t Nam', null, N'N?');
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', null, N'Nữ');
 
-
---Th�m m?y b?ng n�y nha
+--Thêm mấy bảng này nha
 CREATE TABLE LessonAccess (
     AccessID INT IDENTITY PRIMARY KEY,
     UserID INT NOT NULL,
@@ -363,9 +354,8 @@ CREATE TABLE LessonAccess (
     AccessedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_LessonAccess_User FOREIGN KEY (UserID) REFERENCES Users(UserID),
     CONSTRAINT FK_LessonAccess_Lesson FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID),
-    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)  -- tr�nh tr�ng l?p
+    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)  -- tránh trùng lặp
 );
-
 
 CREATE TABLE LessonVocabulary (
     LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
@@ -383,7 +373,7 @@ ALTER TABLE LessonMaterials
 ADD CONSTRAINT FK_LessonMaterials_Lessons
 FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID);
 
---X�a d? li?u kh�a h?c c? r?i th�m m?i nh� ? d�?i nha
+--Xóa dữ liệu khóa học cũ rồi thêm mới nhé ở dưới nha
 
 DELETE FROM Answers;
 DELETE FROM Questions;
@@ -395,126 +385,127 @@ DELETE FROM Vocabulary;
 
 DELETE FROM LessonMaterials;
 
--- Sau khi c�c b?ng tr�n �? x�a, m?i x�a Lesson v� Course
+-- Sau khi các bảng trên đã xóa, mới xóa Lesson và Course
 DELETE FROM Lessons;
 DELETE FROM Courses;
 
-
-
-
--- 1. T?o kh�a h?c m?i N5
+-- 1. Tạo khóa học mới N5
 INSERT INTO Courses (Title, Description, IsHidden, IsSuggested)
-VALUES (N'Kh�a h?c Giao ti?p N5', N'Kh�a h?c ti?ng Nh?t s� c?p t?p trung v�o giao ti?p c� b?n.', 0, 1);
+VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1);
 
 DECLARE @CourseID INT = SCOPE_IDENTITY();
--- 2. Th�m c�c b�i h?c
+-- 2. Thêm các bài học
 INSERT INTO Lessons (CourseID, Title) VALUES
-(@CourseID, N'B�i 1: Gi?i thi?u b?n th�n'),
-(@CourseID, N'B�i 2: H?i th�m s?c kh?e'),
-(@CourseID, N'B�i 3: H?i ��?ng �i');
+(@CourseID, N'Bài 1: Giới thiệu bản thân'),
+(@CourseID, N'Bài 2: Hỏi thăm sức khỏe'),
+(@CourseID, N'Bài 3: Hỏi đường đi');
 
+-- Lấy ID từng bài học
+DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 1: Giới thiệu bản thân');
+DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 2: Hỏi thăm sức khỏe');
+DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 3: Hỏi đường đi');
 
--- L?y ID t?ng b�i h?c
-DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B�i 1: Gi?i thi?u b?n th�n');
-DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B�i 2: H?i th�m s?c kh?e');
-DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'B�i 3: H?i ��?ng �i');
-
--- B�i 1
+-- Bài 1
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 1: Gi?i thi?u b?n th�n'), N'T? v?ng', N'PDF', N'T? v?ng B�i 1', N'files/courseN5/vocabN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 1: Gi?i thi?u b?n th�n'), N'Kanji', N'PDF', N'Kanji B�i 1', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 1: Gi?i thi?u b?n th�n'), N'Ng? ph�p', N'PDF', N'Ng? ph�p B�i 1', N'files/courseN5/grammarN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 1: Gi?i thi?u b?n th�n'), N'Ng? ph�p', N'Video', N'Video Ng? ph�p B�i 1', N'files/lesson1_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/courseN5/vocabN5/Lesson1.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Kanji', N'PDF', N'Kanji Bài 1', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/courseN5/grammarN5/Lesson1.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/lesson1_grammar.mp4');
 
--- B�i 2
+-- Bài 2
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 2: H?i th�m s?c kh?e'), N'T? v?ng', N'PDF', N'T? v?ng B�i 2', N'files/courseN5/vocabN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 2: H?i th�m s?c kh?e'), N'Kanji', N'PDF', N'Kanji B�i 2', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 2: H?i th�m s?c kh?e'), N'Ng? ph�p', N'PDF', N'Ng? ph�p B�i 2', N'files/courseN5/grammarN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 2: H?i th�m s?c kh?e'), N'Ng? ph�p', N'Video', N'Video Ng? ph�p B�i 2', N'files/lesson2_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/courseN5/vocabN5/Lesson2.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Kanji', N'PDF', N'Kanji Bài 2', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/courseN5/grammarN5/Lesson2.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/lesson2_grammar.mp4');
 
--- B�i 3
+-- Bài 3
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 3: H?i ��?ng �i'), N'T? v?ng', N'PDF', N'T? v?ng B�i 3', N'files/courseN5/vocabN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 3: H?i ��?ng �i'), N'Kanji', N'PDF', N'Kanji B�i 3', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 3: H?i ��?ng �i'), N'Ng? ph�p', N'PDF', N'Ng? ph�p B�i 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'B�i 3: H?i ��?ng �i'), N'Ng? ph�p', N'Video', N'Video Ng? ph�p B�i 3', N'files/lesson3_grammar.mp4');
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/courseN5/vocabN5/Lesson3.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Kanji', N'PDF', N'Kanji Bài 3', NULL),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
+((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
 
-
--- x? l� d?u k� t? gh�p ( �o?n n�y nh? ch?y ri�ng h�m n�y ) 
+-- xử lý dấu ký tự ghép ( đoạn này nhớ chạy riêng hàm này ) 
 CREATE OR ALTER FUNCTION dbo.RemoveDiacritics(@input NVARCHAR(MAX))
 RETURNS NVARCHAR(MAX)
 AS
 BEGIN
     DECLARE @result NVARCHAR(MAX) = LOWER(@input);
 
-    -- B? d?u thanh ti?ng Vi?t
-    SET @result = REPLACE(@result, N'�', 'a');
-    SET @result = REPLACE(@result, N'�', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'�', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'�', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'?', 'a');
-    SET @result = REPLACE(@result, N'�', 'd');
-    SET @result = REPLACE(@result, N'�', 'e');
-    SET @result = REPLACE(@result, N'�', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'�', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'?', 'e');
-    SET @result = REPLACE(@result, N'�', 'i');
-    SET @result = REPLACE(@result, N'?', 'i');
-    SET @result = REPLACE(@result, N'?', 'i');
-    SET @result = REPLACE(@result, N'?', 'i');
-    SET @result = REPLACE(@result, N'?', 'i');
-    SET @result = REPLACE(@result, N'�', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'�', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'�', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'?', 'o');
-    SET @result = REPLACE(@result, N'�', 'u');
-    SET @result = REPLACE(@result, N'�', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'�', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
-    SET @result = REPLACE(@result, N'?', 'u');
+    -- Bỏ dấu thanh tiếng Việt
+    SET @result = REPLACE(@result, N'à', 'a');
+    SET @result = REPLACE(@result, N'á', 'a');
+    SET @result = REPLACE(@result, N'ả', 'a');
+    SET @result = REPLACE(@result, N'ã', 'a');
+    SET @result = REPLACE(@result, N'ạ', 'a');
+    SET @result = REPLACE(@result, N'ă', 'a');
+    SET @result = REPLACE(@result, N'ằ', 'a');
+    SET @result = REPLACE(@result, N'ắ', 'a');
+    SET @result = REPLACE(@result, N'ẳ', 'a');
+    SET @result = REPLACE(@result, N'ẵ', 'a');
+    SET @result = REPLACE(@result, N'ặ', 'a');
+    SET @result = REPLACE(@result, N'â', 'a');
+    SET @result = REPLACE(@result, N'ầ', 'a');
+    SET @result = REPLACE(@result, N'ấ', 'a');
+    SET @result = REPLACE(@result, N'ẩ', 'a');
+    SET @result = REPLACE(@result, N'ẫ', 'a');
+    SET @result = REPLACE(@result, N'ậ', 'a');
+    SET @result = REPLACE(@result, N'đ', 'd');
+    SET @result = REPLACE(@result, N'è', 'e');
+    SET @result = REPLACE(@result, N'é', 'e');
+    SET @result = REPLACE(@result, N'ẻ', 'e');
+    SET @result = REPLACE(@result, N'ẽ', 'e');
+    SET @result = REPLACE(@result, N'ẹ', 'e');
+    SET @result = REPLACE(@result, N'ê', 'e');
+    SET @result = REPLACE(@result, N'ề', 'e');
+    SET @result = REPLACE(@result, N'ế', 'e');
+    SET @result = REPLACE(@result, N'ể', 'e');
+    SET @result = REPLACE(@result, N'ễ', 'e');
+    SET @result = REPLACE(@result, N'ệ', 'e');
+    SET @result = REPLACE(@result, N'ì', 'i');
+    SET @result = REPLACE(@result, N'í', 'i');
+    SET @result = REPLACE(@result, N'ỉ', 'i');
+    SET @result = REPLACE(@result, N'ĩ', 'i');
+    SET @result = REPLACE(@result, N'ị', 'i');
+    SET @result = REPLACE(@result, N'ò', 'o');
+    SET @result = REPLACE(@result, N'ó', 'o');
+    SET @result = REPLACE(@result, N'ỏ', 'o');
+    SET @result = REPLACE(@result, N'õ', 'o');
+    SET @result = REPLACE(@result, N'ọ', 'o');
+    SET @result = REPLACE(@result, N'ô', 'o');
+    SET @result = REPLACE(@result, N'ồ', 'o');
+    SET @result = REPLACE(@result, N'ố', 'o');
+    SET @result = REPLACE(@result, N'ổ', 'o');
+    SET @result = REPLACE(@result, N'ỗ', 'o');
+    SET @result = REPLACE(@result, N'ộ', 'o');
+    SET @result = REPLACE(@result, N'ơ', 'o');
+    SET @result = REPLACE(@result, N'ờ', 'o');
+    SET @result = REPLACE(@result, N'ớ', 'o');
+    SET @result = REPLACE(@result, N'ở', 'o');
+    SET @result = REPLACE(@result, N'ỡ', 'o');
+    SET @result = REPLACE(@result, N'ợ', 'o');
+    SET @result = REPLACE(@result, N'ù', 'u');
+    SET @result = REPLACE(@result, N'ú', 'u');
+    SET @result = REPLACE(@result, N'ủ', 'u');
+    SET @result = REPLACE(@result, N'ũ', 'u');
+    SET @result = REPLACE(@result, N'ụ', 'u');
+    SET @result = REPLACE(@result, N'ư', 'u');
+    SET @result = REPLACE(@result, N'ừ', 'u');
+    SET @result = REPLACE(@result, N'ứ', 'u');
+    SET @result = REPLACE(@result, N'ử', 'u');
+    SET @result = REPLACE(@result, N'ữ', 'u');
+    SET @result = REPLACE(@result, N'ự', 'u');
+    SET @result = REPLACE(@result, N'ỳ', 'y');
+    SET @result = REPLACE(@result, N'ý', 'y');
+    SET @result = REPLACE(@result, N'ỷ', 'y');
+    SET @result = REPLACE(@result, N'ỹ', 'y');
+    SET @result = REPLACE(@result, N'ỵ', 'y');
 
-    -- T�ch c�c k? t? gh�p ti?ng Vi?t
+    -- Tách các ký tự ghép tiếng Việt
     SET @result = REPLACE(@result, N'kh', 'k h');
     SET @result = REPLACE(@result, N'gi', 'g i');
     SET @result = REPLACE(@result, N'ng', 'n g');
@@ -524,12 +515,14 @@ BEGIN
     SET @result = REPLACE(@result, N'ch', 'c h');
     SET @result = REPLACE(@result, N'tr', 't r');
     SET @result = REPLACE(@result, N'gh', 'g h');
-    SET @result = REPLACE(@result, N'qu', 'q u'); -- Th�m qu
+    SET @result = REPLACE(@result, N'qu', 'q u'); -- Thêm qu
 
     RETURN @result;
 END;
--- �o?n n�y th? chayj h?t ph?n d�?i v? ch?y l? n� thi?u declare
--- 1. Th�m 50 ng�?i d�ng
+
+GO
+-- Đoạn này thử chạy hết phần dưới về chạy lẻ nó thiếu declare
+-- 1. Thêm 50 người dùng
 DECLARE @StartDate DATETIME = '2025-01-01';
 DECLARE @EndDate DATETIME = '2025-06-22';
 DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
@@ -540,12 +533,12 @@ DECLARE @Email NVARCHAR(255);
 DECLARE @FullName NVARCHAR(100);
 DECLARE @CreatedAt DATETIME;
 
--- T?m l�u danh s�ch ng�?i d�ng �? d�ng cho Enrollment
+-- Tạm lưu danh sách người dùng để dùng cho Enrollment
 CREATE TABLE #TempUsers (UserID INT, CreatedAt DATETIME);
 
 WHILE @Counter <= @UserCount
 BEGIN
-    -- Ph�n b? RoleID theo t? l?: Admin (1), Free (4), Premium (3), Teacher (1)
+    -- Phân bố RoleID theo tỷ lệ: Admin (1), Free (4), Premium (3), Teacher (1)
     SET @RoleID = CASE 
         WHEN @Counter <= 5 THEN 4 -- 5 Admin
         WHEN @Counter <= 25 THEN 1 -- 20 Free
@@ -553,14 +546,14 @@ BEGIN
         ELSE 3 -- 5 Teacher
     END;
 
-    -- T?o email v� t�n gi? l?p
+    -- Tạo email và tên giả lập
     SET @Email = 'user' + CAST(@Counter AS NVARCHAR(10)) + '@example.com';
-    SET @FullName = N'Ng�?i D�ng ' + CAST(@Counter AS NVARCHAR(10));
+    SET @FullName = N'Người Dùng ' + CAST(@Counter AS NVARCHAR(10));
 
-    -- T�nh CreatedAt tr?i �?u t? 01/01/2025 �?n 06/22/2025
+    -- Tính CreatedAt trải đều từ 01/01/2025 đến 06/22/2025
     SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @UserCount, @StartDate);
 
-    -- Th�m ng�?i d�ng
+    -- Thêm người dùng
     INSERT INTO Users (
         RoleID, Email, PasswordHash, FullName, CreatedAt, 
         BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Gender
@@ -568,32 +561,32 @@ BEGIN
     VALUES (
         @RoleID, 
         @Email, 
-        'hashed_password', -- Gi? l?p m?t kh?u
+        'hashed_password', -- Giả lập mật khẩu
         @FullName, 
         @CreatedAt,
-        '2000-01-01', -- Ng�y sinh gi? l?p
-        '0123456789', -- S? �i?n tho?i gi? l?p
+        '2000-01-01', -- Ngày sinh giả lập
+        '0123456789', -- Số điện thoại giả lập
         N'N5', 
-        N'�?a ch? gi? l?p', 
-        N'Vi?t Nam', 
-        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'N?' END
+        N'Địa chỉ giả lập', 
+        N'Việt Nam', 
+        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'Nữ' END
     );
 
-    -- L�u UserID v� CreatedAt v�o b?ng t?m
+    -- Lưu UserID và CreatedAt vào bảng tạm
     INSERT INTO #TempUsers (UserID, CreatedAt)
     VALUES (SCOPE_IDENTITY(), @CreatedAt);
 
     SET @Counter = @Counter + 1;
 END;
 
--- 2. Th�m 30 b?n ghi Enrollment
+-- 2. Thêm 30 bản ghi Enrollment
 DECLARE @EnrollmentCount INT = 30;
 SET @Counter = 1;
 DECLARE @UserID INT;
-DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'Kh�a h?c Giao ti?p N5');
+DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'Khóa học Giao tiếp N5');
 DECLARE @EnrolledAt DATETIME;
 
--- Cursor �? l?y ng?u nhi�n 30 ng�?i d�ng t? b?ng t?m
+-- Cursor để lấy ngẫu nhiên 30 người dùng từ bảng tạm
 DECLARE user_cursor CURSOR FOR 
 SELECT TOP 30 UserID, CreatedAt 
 FROM #TempUsers 
@@ -604,10 +597,10 @@ FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
 
 WHILE @Counter <= @EnrollmentCount
 BEGIN
-    -- T�nh EnrolledAt tr?i �?u t? 01/01/2025 �?n 06/22/2025
+    -- Tính EnrolledAt trải đều từ 01/01/2025 đến 06/22/2025
     SET @EnrolledAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @EnrollmentCount, @StartDate);
 
-    -- Th�m b?n ghi Enrollment
+    -- Thêm bản ghi Enrollment
     INSERT INTO Enrollment (UserID, CourseID, EnrolledAt)
     VALUES (@UserID, @CourseID, @EnrolledAt);
 
@@ -618,5 +611,5 @@ END;
 CLOSE user_cursor;
 DEALLOCATE user_cursor;
 
--- X�a b?ng t?m
+-- Xóa bảng tạm
 DROP TABLE #TempUsers;

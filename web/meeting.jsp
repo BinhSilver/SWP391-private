@@ -41,7 +41,7 @@
     <%@ include file="Home/nav.jsp" %>
 
     <c:if test="${empty param.roomUrl or empty param.token}">
-        <c:redirect url="/SWP_HUY/videocall.jsp"/>
+        <c:redirect url="/test/videocall.jsp"/>
     </c:if>
 
     <c:set var="roomUrl" value="${param.roomUrl}"/>
@@ -49,7 +49,7 @@
         <c:when test="${not fn:contains(roomUrl, 'wasabii.daily.co') or fn:contains(roomUrl, 'dashboard')}">
             <div class="error-message">
                 <p>URL phòng họp không hợp lệ. Vui lòng đảm bảo mã phòng sử dụng domain 'wasabii.daily.co'!</p>
-                <a href="/SWP_HUY/videocall.jsp" class="btn btn-primary">Quay lại</a>
+                <a href="/test/videocall.jsp" class="btn btn-primary">Quay lại</a>
             </div>
         </c:when>
         <c:otherwise>
@@ -95,7 +95,7 @@
 
         window.addEventListener('message', function(event) {
             if (event.data === 'left-meeting') {
-                window.location.href = "/SWP_HUY/videocall.jsp";
+                window.location.href = "/test/videocall.jsp";
             }
         });
     </script>

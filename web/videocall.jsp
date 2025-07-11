@@ -42,7 +42,7 @@
     <body>
         <%@ include file="Home/nav.jsp" %>
         <c:if test="${empty sessionScope.authUser}">
-            <c:redirect url="/SWP_HUY/LoginJSP/LoginIndex.jsp"/>
+            <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>
 
         <div class="video-call-container">
@@ -62,7 +62,7 @@
         if (!userPassword) {
             console.error("Password not found in session. Please ensure login sets it.");
             alert("Không thể tải token do thiếu thông tin xác thực. Vui lòng đăng nhập lại.");
-            window.location.href = "/SWP_HUY/LoginJSP/LoginIndex.jsp";
+            window.location.href = "/test/LoginJSP/LoginIndex.jsp";
         }
         </script>
         <script src="${pageContext.request.contextPath}/js/videocall.js"></script>

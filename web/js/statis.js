@@ -1,5 +1,5 @@
 window.onload = function () {
-    fetch('/SWP_HUY/UserStatsServlet')
+    fetch('/test/UserStatsServlet')
         .then(response => response.json())
         .then(data => {
             document.getElementById('totalUsers').innerText = data.totalUsers.toLocaleString();
