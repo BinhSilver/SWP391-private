@@ -12,13 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
-@WebServlet("/api/revenuestat")
-public class RevenueStatsServlet extends HttpServlet {
+@WebServlet("/api/paymenttrends")
+public class PaymentTrendsServlet extends HttpServlet {
     
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response)
@@ -32,25 +28,12 @@ public class RevenueStatsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        System.out.println("=== RevenueStatsServlet: Processing request ===");
-        
-        // Debug current date/time
-        LocalDate currentDate = LocalDate.now();
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        Date javaDate = new Date();
-        ZoneId zoneId = ZoneId.systemDefault();
-        
-        System.out.println("Server date debugging:");
-        System.out.println("- LocalDate.now(): " + currentDate);
-        System.out.println("- LocalDateTime.now(): " + currentDateTime);
-        System.out.println("- new Date(): " + javaDate);
-        System.out.println("- System timezone: " + zoneId);
-        System.out.println("- System.currentTimeMillis(): " + System.currentTimeMillis());
+        System.out.println("=== PaymentTrendsServlet: Processing request ===");
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // Enable CORS if needed
+        // Enable CORS
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -59,50 +42,49 @@ public class RevenueStatsServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         try {
-            String period = request.getParameter("period");
-            if (period == null) period = "month";
+            System.out.println("PaymentTrendsServlet: Fetching trends data");
             
-            System.out.println("RevenueStatsServlet: Requested period = " + period);
+            JsonObject trendsData = paymentDAO.getPaymentTrendsByMonth();
+            System.out.println("PaymentTrendsServlet: Data from PaymentDAO = " + trendsData);
             
-            JsonObject revenueStats = paymentDAO.getRevenueStatsByPeriod(period);
-            System.out.println("RevenueStatsServlet: Data from PaymentDAO = " + revenueStats);
-            
-            String json = new Gson().toJson(revenueStats);
-            System.out.println("RevenueStatsServlet: JSON response = " + json);
+            String json = new Gson().toJson(trendsData);
+            System.out.println("PaymentTrendsServlet: JSON response = " + json);
             
             out.print(json);
             out.flush();
             
-            System.out.println("RevenueStatsServlet: Response sent successfully");
+            System.out.println("PaymentTrendsServlet: Response sent successfully");
             
         } catch (SQLException e) {
-            System.out.println("RevenueStatsServlet: SQL Error - " + e.getMessage());
+            System.out.println("PaymentTrendsServlet: SQL Error - " + e.getMessage());
             e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             JsonObject errorObj = new JsonObject();
-            errorObj.addProperty("error", "Unable to fetch revenue data: " + e.getMessage());
-            errorObj.addProperty("plans", "[]");
-            errorObj.addProperty("totalRevenue", 0);
-            errorObj.addProperty("purchaserCount", 0);
+            errorObj.addProperty("error", "Unable to fetch trends data: " + e.getMessage());
+            errorObj.addProperty("months", "[]");
+            errorObj.addProperty("revenue", "[]");
+            errorObj.addProperty("transactions", "[]");
+            errorObj.addProperty("successTransactions", "[]");
             
             out.print(new Gson().toJson(errorObj));
             out.flush();
         } catch (Exception e) {
-            System.out.println("RevenueStatsServlet: Unexpected Error - " + e.getMessage());
+            System.out.println("PaymentTrendsServlet: Unexpected Error - " + e.getMessage());
             e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             JsonObject errorObj = new JsonObject();
             errorObj.addProperty("error", "Server error: " + e.getMessage());
-            errorObj.addProperty("plans", "[]");
-            errorObj.addProperty("totalRevenue", 0);
-            errorObj.addProperty("purchaserCount", 0);
+            errorObj.addProperty("months", "[]");
+            errorObj.addProperty("revenue", "[]");
+            errorObj.addProperty("transactions", "[]");
+            errorObj.addProperty("successTransactions", "[]");
             
             out.print(new Gson().toJson(errorObj));
             out.flush();
         } finally {
-            System.out.println("=== RevenueStatsServlet: Request completed ===");
+            System.out.println("=== PaymentTrendsServlet: Request completed ===");
         }
     }
-}
+} 

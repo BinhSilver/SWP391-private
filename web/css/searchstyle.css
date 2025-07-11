@@ -55,16 +55,83 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 .btn-load-more {
     display: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 14px;
     color: #fff;
-    background-color: #007BFF;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .btn-load-more:hover {
-    background-color: #0056b3;
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+}
+
+.btn-load-more:active {
+    transform: translateY(0);
+}
+
+/* Search results styling */
+.search-item {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.search-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.search-item h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.search-item p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.search-item .btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.search-item .btn:hover {
+    transform: translateY(-1px);
+}
+
+.no-results {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+.error-message {
+    text-align: center;
+    color: #dc3545;
+    padding: 20px;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
 }
