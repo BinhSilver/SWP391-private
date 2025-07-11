@@ -32,6 +32,7 @@
                             <a class="nav-link px-2" href="#">FlashCard</a>
                         </c:otherwise>
                     </c:choose>
+                    <a class="nav-link px-2" href="search.jsp">Tra Cứu</a>
                 </div>
             </div>
 
@@ -63,6 +64,9 @@
                                 </li>
                                  <li>
                                     <a class="dropdown-item" href="<c:url value='chatrealtime.jsp'/>">chat</a>
+                                </li>
+                              <li>
+                                    <a class="dropdown-item" href="<c:url value='videocall.jsp'/>">Video Call</a>
                                 </li>
                                 <c:if test="${authUser.roleID == 3}">
                                     <li>

@@ -355,9 +355,9 @@ public class UserDAO {
 
     public static void main(String[] args) throws SQLException {
         UserDAO dao = new UserDAO();
-        List<User> users = dao.getAllUsers();
-        for (User u : users) {
-            System.out.println(u);
-        }
+        User users = dao.getUserById(1);
+     
+            System.out.println(users);
+        
     }
 }

@@ -22,7 +22,7 @@ public class UsersServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("authUser");
         if (user == null) {
-            resp.sendRedirect("/SWP_HUY/LoginJSP/LoginIndex.jsp");
+            resp.sendRedirect("/test/LoginJSP/LoginIndex.jsp");
             return;
         }
 

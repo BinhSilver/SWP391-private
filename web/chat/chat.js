@@ -11,17 +11,19 @@ console.log("Current User ID parsed:", currentUserId);
 
 let currentChatUserId = null;
 let currentChatUserName = null;
-let autoLoadInterval = null;
 
-// Theo dõi tin nhắn đang được chọn
-let selectedMessageId = null;
+const ws = new WebSocket("ws://" + location.host + "/test/chat");
+ws.onopen = function () {
+    console.log("WebSocket connected");
+};
+ws.onclose = function () {
+    console.log("WebSocket closed");
+};
+ws.onerror = function (err) {
+    console.error("WebSocket error", err);
+};
 
-const ws = new WebSocket("ws://" + location.host + "/SWP_HUY/chat");
-ws.onopen = function() { console.log("WebSocket connected"); };
-ws.onclose = function() { console.log("WebSocket closed"); };
-ws.onerror = function(err) { console.error("WebSocket error", err); };
-
-ws.onmessage = function(event) {
+ws.onmessage = function (event) {
     console.log("WebSocket message received:", event.data);
     let msg;
     try {
@@ -31,15 +33,19 @@ ws.onmessage = function(event) {
         console.error("Failed to parse WebSocket message:", e, "Raw data:", event.data);
         return; // Bỏ qua nếu không parse được
     }
-    
+
     if (msg.type === "unread_list") {
         console.log("Processing unread_list with senders:", msg.senders);
-        msg.senders.forEach(function(senderId) { markUserAsUnread(senderId); });
+        msg.senders.forEach(function (senderId) {
+            markUserAsUnread(senderId);
+        });
         return;
     }
     if (msg.type === "block_status") {
-        if ((msg.status === "blocked_by_me" || msg.status === "unblocked_by_me") && currentChatUserId !== msg.blockedId) return;
-        if ((msg.status === "blocked_me" || msg.status === "unblocked_me") && currentChatUserId !== msg.blockerId) return;
+        if ((msg.status === "blocked_by_me" || msg.status === "unblocked_by_me") && currentChatUserId !== msg.blockedId)
+            return;
+        if ((msg.status === "blocked_me" || msg.status === "unblocked_me") && currentChatUserId !== msg.blockerId)
+            return;
 
         const messageInput = document.getElementById("messageInput");
         const sendBtn = document.querySelector(".chat-input-wrap button");
@@ -71,16 +77,16 @@ ws.onmessage = function(event) {
         alert(msg.message);
         return;
     }
-    
+
     console.log("Checking message for current chat:", {
         fromUserId: msg.fromUserId,
         toUserId: msg.toUserId,
         currentChatUserId: currentChatUserId,
         currentUserId: currentUserId
     });
-    
+
     if ((msg.fromUserId === currentChatUserId && msg.toUserId === currentUserId) ||
-        (msg.toUserId === currentChatUserId && msg.fromUserId === currentUserId)) {
+            (msg.toUserId === currentChatUserId && msg.fromUserId === currentUserId)) {
         console.log("Adding message to chat box with sender:", msg.fromUsername || "Unknown");
         addMessageToChatBox(msg);
     }
@@ -92,13 +98,13 @@ ws.onmessage = function(event) {
 };
 
 function selectChatUser(userId, username) {
-    console.log("selectChatUser called with:", { userId, username });
+    console.log("selectChatUser called with:", {userId, username});
     document.querySelector(".chat-main").style.display = "flex";
     currentChatUserId = userId;
     currentChatUserName = username;
     document.getElementById("chatWith").textContent = username;
 
-    document.querySelectorAll("#userList li").forEach(function(item) {
+    document.querySelectorAll("#userList li").forEach(function (item) {
         item.classList.toggle("selected", parseInt(item.dataset.userId) === userId);
     });
 
@@ -117,43 +123,45 @@ function selectChatUser(userId, username) {
         if (currentChatUserId) {
             loadChatHistory(currentChatUserId);
         }
-    }, 3000); // 3000ms = 3 giây
+    }, 3500); // 1000ms = 1 giây
 
-    fetch("/SWP_HUY/checkBlock?user1=" + currentUserId + "&user2=" + userId)
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            const blockBtn = document.getElementById("blockBtn");
-            const unblockBtn = document.getElementById("unblockBtn");
-            const messageInput = document.getElementById("messageInput");
-            const sendBtn = document.querySelector(".chat-input-wrap button");
-            const blockNotice = document.getElementById("blockNotice");
+    fetch("/test/checkBlock?user1=" + currentUserId + "&user2=" + userId)
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (data) {
+                const blockBtn = document.getElementById("blockBtn");
+                const unblockBtn = document.getElementById("unblockBtn");
+                const messageInput = document.getElementById("messageInput");
+                const sendBtn = document.querySelector(".chat-input-wrap button");
+                const blockNotice = document.getElementById("blockNotice");
 
-            if (data.blockedByMe) {
-                blockBtn.style.display = "none";
-                unblockBtn.style.display = "inline-block";
-                messageInput.style.display = "none";
-                sendBtn.style.display = "none";
-                blockNotice.textContent = "Bạn đã chặn người dùng này";
-                blockNotice.style.display = "block";
-            } else if (data.blockedMe) {
-                blockBtn.style.display = "none";
-                unblockBtn.style.display = "none";
-                messageInput.style.display = "none";
-                sendBtn.style.display = "none";
-                blockNotice.textContent = "Bạn đã bị người dùng này chặn";
-                blockNotice.style.display = "block";
-            } else {
-                blockBtn.style.display = "inline-block";
-                unblockBtn.style.display = "none";
-                messageInput.style.display = "block";
-                sendBtn.style.display = "inline-block";
-                blockNotice.style.display = "none";
-            }
-        });
+                if (data.blockedByMe) {
+                    blockBtn.style.display = "none";
+                    unblockBtn.style.display = "inline-block";
+                    messageInput.style.display = "none";
+                    sendBtn.style.display = "none";
+                    blockNotice.textContent = "Bạn đã chặn người dùng này";
+                    blockNotice.style.display = "block";
+                } else if (data.blockedMe) {
+                    blockBtn.style.display = "none";
+                    unblockBtn.style.display = "none";
+                    messageInput.style.display = "none";
+                    sendBtn.style.display = "none";
+                    blockNotice.textContent = "Bạn đã bị người dùng này chặn";
+                    blockNotice.style.display = "block";
+                } else {
+                    blockBtn.style.display = "inline-block";
+                    unblockBtn.style.display = "none";
+                    messageInput.style.display = "block";
+                    sendBtn.style.display = "inline-block";
+                    blockNotice.style.display = "none";
+                }
+            });
 
     const dropdownBtn = document.getElementById("userDropDown");
     const dropdownContent = document.getElementById("userDropDownContent");
-    dropdownBtn.onclick = function(e) {
+    dropdownBtn.onclick = function (e) {
         e.stopPropagation();
         dropdownContent.style.display = dropdownContent.style.display === "flex" ? "none" : "flex";
     };
@@ -166,14 +174,13 @@ function addMessageToChatBox(msg) {
     const messageId = msg.messageId || Date.now(); // Đảm bảo messageId có giá trị
     const content = msg.content || "Nội dung trống";
     const isRecalled = msg.isRecall || msg.type === "recall";
-    const timeText = new Date(msg.sentAt || Date.now()).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    const timeText = new Date(msg.sentAt || Date.now()).toLocaleString("vi-VN", {hour: "2-digit", minute: "2-digit"});
 
-    console.log("Adding message:", { senderName, content, isSentByMe, messageId });
+    console.log("Adding message:", {senderName, content, isSentByMe, messageId});
 
     const wrapper = document.createElement("div");
     wrapper.className = "chat-msg " + (isSentByMe ? "me" : "");
     wrapper.dataset.messageId = messageId;
-    wrapper.onclick = function(e) { showRecallButton(messageId, e); }; // Thêm sự kiện click
 
     // Thêm avatar
     const avatarImg = document.createElement("img");
@@ -207,6 +214,29 @@ function addMessageToChatBox(msg) {
         const p = document.createElement("p");
         p.textContent = content;
         contentBox.appendChild(p);
+
+        if (isSentByMe) {
+            const actions = document.createElement("div");
+            actions.className = "chat-actions";
+            actions.style.display = "none"; // Ẩn mặc định
+            const recallBtn = document.createElement("button");
+            recallBtn.className = "recall-btn"; // New class for styling
+            recallBtn.innerHTML = '<i class="fas fa-undo"></i>'; // Font Awesome undo icon
+            recallBtn.onclick = function () {
+                recallMessage(messageId);
+                actions.style.display = "none"; // Ẩn nút sau khi thu hồi
+            };
+            actions.appendChild(recallBtn);
+            contentBox.appendChild(actions);
+
+            // Thêm sự kiện click để hiển thị nút thu hồi
+            wrapper.addEventListener("click", function (e) {
+                e.stopPropagation(); // Ngăn sự kiện lan ra ngoài
+                const allActions = document.querySelectorAll(".chat-actions");
+                allActions.forEach(a => a.style.display = "none"); // Ẩn tất cả nút khác
+                actions.style.display = "block"; // Hiển thị nút của tin nhắn này
+            });
+        }
     }
 
     // Thêm timestamp
@@ -218,46 +248,20 @@ function addMessageToChatBox(msg) {
     timeSpan.style.alignSelf = "flex-end";
     contentBox.appendChild(timeSpan);
 
-    // Thêm nút thu hồi (ẩn mặc định)
-    if (isSentByMe && !isRecalled) {
-        const actions = document.createElement("div");
-        actions.className = "chat-actions";
-        actions.style.display = "none"; // Ẩn mặc định
-        const recallBtn = document.createElement("button");
-        recallBtn.textContent = "Thu hồi";
-        recallBtn.onclick = function(e) { e.stopPropagation(); recallMessage(messageId); };
-        actions.appendChild(recallBtn);
-        contentBox.appendChild(actions);
-    }
-
     wrapper.appendChild(avatarImg);
     wrapper.appendChild(contentBox);
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function showRecallButton(messageId, event) {
-    event.stopPropagation(); // Ngăn sự kiện lan ra ngoài
-    if (selectedMessageId) {
-        const prevActions = document.querySelector(`.chat-msg[data-message-id="${selectedMessageId}"] .chat-actions`);
-        if (prevActions) prevActions.style.display = "none";
-    }
-
-    const messageElement = document.querySelector(`.chat-msg[data-message-id="${messageId}"]`);
-    const actions = messageElement.querySelector(".chat-actions");
-    if (actions) {
-        actions.style.display = "block";
-        selectedMessageId = messageId;
-    }
-}
-
-// Ẩn nút thu hồi khi click ra ngoài
-document.addEventListener("click", function(e) {
-    if (!e.target.closest(".chat-msg") && selectedMessageId) {
-        const actions = document.querySelector(`.chat-msg[data-message-id="${selectedMessageId}"] .chat-actions`);
-        if (actions) actions.style.display = "none";
-        selectedMessageId = null;
-    }
+// Thêm sự kiện click trên document để ẩn nút khi nhấp ra ngoài
+document.addEventListener("click", function (e) {
+    const allActions = document.querySelectorAll(".chat-actions");
+    allActions.forEach(a => {
+        if (!e.target.closest(".chat-msg")) {
+            a.style.display = "none";
+        }
+    });
 });
 
 function handleRecallMessage(msg) {
@@ -265,17 +269,16 @@ function handleRecallMessage(msg) {
     if (messageElement) {
         const contentBox = messageElement.querySelector(".chat-msg-content");
         contentBox.innerHTML = "<p class='msg-recalled'>Tin nhắn đã bị thu hồi</p>";
-        const actions = messageElement.querySelector(".chat-actions");
-        if (actions) actions.style.display = "none";
-        selectedMessageId = null;
     }
 }
 
 function sendMessage() {
     const input = document.getElementById("messageInput");
     const content = input.value.trim();
-    if (!currentChatUserId) return alert("Vui lòng chọn người dùng để chat");
-    if (!content) return alert("Tin nhắn không được để trống");
+    if (!currentChatUserId)
+        return alert("Vui lòng chọn người dùng để chat");
+    if (!content)
+        return alert("Tin nhắn không được để trống");
 
     const msg = {
         type: "message",
@@ -292,25 +295,26 @@ function sendMessage() {
 }
 
 function loadChatHistory(userId) {
-    fetch("/SWP_HUY/getChatHistory?user1=" + currentUserId + "&user2=" + userId)
-        .then(function(res) {
-            if (!res.ok) throw new Error("Không tải được lịch sử trò chuyện");
-            return res.json();
-        })
-        .then(function(data) {
-            const chatBox = document.getElementById("chatBox");
-            chatBox.innerHTML = "";
-            console.log("Loaded chat history:", data.messages);
-            if (data.messages && Array.isArray(data.messages)) {
-                data.messages.forEach(addMessageToChatBox);
-            } else {
-                console.warn("No valid messages array in chat history:", data);
-            }
-        })
-        .catch(function(err) {
-            console.error(err);
-            document.getElementById("chatBox").innerHTML = "<p style='color: red;'>Không tải được lịch sử trò chuyện.</p>";
-        });
+    fetch("/test/getChatHistory?user1=" + currentUserId + "&user2=" + userId)
+            .then(function (res) {
+                if (!res.ok)
+                    throw new Error("Không tải được lịch sử trò chuyện");
+                return res.json();
+            })
+            .then(function (data) {
+                const chatBox = document.getElementById("chatBox");
+                chatBox.innerHTML = "";
+                console.log("Loaded chat history:", data.messages);
+                if (data.messages && Array.isArray(data.messages)) {
+                    data.messages.forEach(addMessageToChatBox);
+                } else {
+                    console.warn("No valid messages array in chat history:", data);
+                }
+            })
+            .catch(function (err) {
+                console.error(err);
+                document.getElementById("chatBox").innerHTML = "<p style='color: red;'>Không tải được lịch sử trò chuyện.</p>";
+            });
 }
 
 function markUserAsUnread(userId) {
@@ -321,27 +325,31 @@ function markUserAsUnread(userId) {
 }
 
 function markMessagesAsRead(fromUserId) {
-    ws.send(JSON.stringify({ type: "read", fromUserId: fromUserId }));
+    ws.send(JSON.stringify({type: "read", fromUserId: fromUserId}));
     clearUnreadMark(fromUserId);
 }
 
 function clearUnreadMark(userId) {
     const li = document.querySelector("#userList li[data-user-id='" + userId + "']");
-    if (li) li.classList.remove("user-unread");
+    if (li)
+        li.classList.remove("user-unread");
 }
 
 function blockUser() {
-    if (!currentChatUserId) return;
-    ws.send(JSON.stringify({ type: "block", fromUserId: currentUserId, blockedId: currentChatUserId }));
+    if (!currentChatUserId)
+        return;
+    ws.send(JSON.stringify({type: "block", fromUserId: currentUserId, blockedId: currentChatUserId}));
 }
 
 function unblockUser() {
-    if (!currentChatUserId) return;
-    ws.send(JSON.stringify({ type: "unblock", fromUserId: currentUserId, blockedId: currentChatUserId }));
+    if (!currentChatUserId)
+        return;
+    ws.send(JSON.stringify({type: "unblock", fromUserId: currentUserId, blockedId: currentChatUserId}));
 }
 
 function recallMessage(messageId) {
-    if (!currentChatUserId) return alert("Vui lòng chọn người dùng");
+    if (!currentChatUserId)
+        return alert("Vui lòng chọn người dùng");
     if (confirm("Bạn có chắc chắn muốn thu hồi tin nhắn này?")) {
         ws.send(JSON.stringify({
             type: "recall",
@@ -358,52 +366,52 @@ function searchUsers(keyword) {
         return;
     }
 
-    fetch("/SWP_HUY/searchUsers?keyword=" + encodeURIComponent(keyword), {
+            fetch("/test/searchUsers?keyword=" + encodeURIComponent(keyword), {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         }
     })
-    .then(function(response) {
-        if (!response.ok) {
-            throw new Error("HTTP error! Status: " + response.status);
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data.error) {
-            console.error(data.error);
-            document.getElementById("userList").innerHTML = "<li>" + data.error + "</li>";
-            return;
-        }
-        updateUserList(data);
-    })
-    .catch(function(error) {
-        console.error("Lỗi khi tìm kiếm người dùng:", error);
-        document.getElementById("userList").innerHTML = "<li>Lỗi khi tìm kiếm người dùng. Vui lòng thử lại.</li>";
-    });
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("HTTP error! Status: " + response.status);
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.error) {
+                    console.error(data.error);
+                    document.getElementById("userList").innerHTML = "<li>" + data.error + "</li>";
+                    return;
+                }
+                updateUserList(data);
+            })
+            .catch(function (error) {
+                console.error("Lỗi khi tìm kiếm người dùng:", error);
+                document.getElementById("userList").innerHTML = "<li>Lỗi khi tìm kiếm người dùng. Vui lòng thử lại.</li>";
+            });
 }
 
 function fetchInitialUserList() {
-    fetch("/SWP_HUY/chatUsers", {
+    fetch("/test/chatUsers", {
         method: "GET"
     })
-    .then(function(response) {
-        if (!response.ok) {
-            throw new Error("HTTP error! Status: " + response.status);
-        }
-        return response.text();
-    })
-    .then(function(html) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const userList = doc.querySelector("#userList").innerHTML;
-        document.getElementById("userList").innerHTML = userList;
-    })
-    .catch(function(error) {
-        console.error("Lỗi khi tải danh sách người dùng:", error);
-        document.getElementById("userList").innerHTML = "<li>Lỗi khi tải danh sách người dùng. Vui lòng thử lại.</li>";
-    });
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("HTTP error! Status: " + response.status);
+                }
+                return response.text();
+            })
+            .then(function (html) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const userList = doc.querySelector("#userList").innerHTML;
+                document.getElementById("userList").innerHTML = userList;
+            })
+            .catch(function (error) {
+                console.error("Lỗi khi tải danh sách người dùng:", error);
+                document.getElementById("userList").innerHTML = "<li>Lỗi khi tải danh sách người dùng. Vui lòng thử lại.</li>";
+            });
 }
 
 function updateUserList(users) {
@@ -415,23 +423,26 @@ function updateUserList(users) {
         return;
     }
 
-    users.forEach(function(user) {
+    users.forEach(function (user) {
         if (user.userID !== parseInt(currentUserId)) {
             const li = document.createElement("li");
             li.setAttribute("data-user-id", user.userID);
-            li.onclick = function() { selectChatUser(user.userID, user.fullName); };
-            li.innerHTML = "<img src='/SWP_HUY/assets/avatar/nam.jpg' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
-                           "<strong>" + user.fullName + "</strong>";
+            li.onclick = function () {
+                selectChatUser(user.userID, user.fullName);
+            };
+            li.innerHTML = "<img src='/test/assets/avatar/nam.jpg' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
+                    "<strong>" + user.fullName + "</strong>";
             userList.appendChild(li);
         }
     });
 }
 
-document.getElementById("searchUser").addEventListener("input", function(e) {
+document.getElementById("searchUser").addEventListener("input", function (e) {
     searchUsers(e.target.value);
 });
 
-document.addEventListener("click", function(event) {
+document.addEventListener("click", function (e) {
     const dropdown = document.getElementById("userDropDownContent");
-    if (!event.target.closest(".dropdown")) dropdown.style.display = "none";
+    if (!e.target.closest(".dropdown"))
+        dropdown.style.display = "none";
 });

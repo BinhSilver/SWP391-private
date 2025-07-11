@@ -6,25 +6,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SWP_HUY | Chat</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+        <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
         <meta name="current-user-id" content="${sessionScope.authUser.userID}">
         <meta name="current-username" content="${sessionScope.authUser.fullName}">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat.css">
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
-        <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
-        <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-        <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
     </head>
     <body>
-        <%@ include file="Home/nav.jsp" %>
+        <%@ include file="../Home/nav.jsp" %>
         <c:if test="${empty sessionScope.authUser}">
-            <c:redirect url="/SWP_HUY/LoginJSP/LoginIndex.jsp"/>
+            <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>
 
         <section class="chat-container">
@@ -61,7 +56,11 @@
                 </div>
             </div>
         </section>
-
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
         <script src="${pageContext.request.contextPath}/chat/chat.js"></script>
     </body>
 </html>

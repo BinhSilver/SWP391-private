@@ -18,7 +18,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeReque
 @WebServlet("/login-google")
 public class GoogleLoginServlet extends HttpServlet {
     private static final String CLIENT_ID = "1025289027596-qkbrdlnf5s31pjg2s7mkmdg0tj8s5c65.apps.googleusercontent.com";
-    private static final String REDIRECT_URI = "http://localhost:8080/SWP_HUY/oauth2callback";
+    private static final String REDIRECT_URI = "http://localhost:8080/test/oauth2callback";
     private static final String SCOPE = "openid email profile";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

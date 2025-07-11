@@ -46,136 +46,159 @@ public class ReturnFromPayOS extends HttpServlet {
         System.out.println("- id: " + id);
         
         HttpSession session = request.getSession(false);
-        Connection conn = null;
         
         System.out.println("Session available: " + (session != null));
         
-        if ("PAID".equals(status) && session != null) {
+        // *** ALWAYS UPDATE PAYMENT STATUS FIRST - REGARDLESS OF SESSION ***
+        boolean paymentStatusUpdated = false;
+        long orderCode = 0;
+        
+        if (orderCodeParam != null) {
             try {
-                // Parse orderCode
-                long orderCode = 0;
-                if (orderCodeParam != null) {
-                    try {
-                        orderCode = Long.parseLong(orderCodeParam);
-                        System.out.println("Parsed OrderCode: " + orderCode);
-                    } catch (NumberFormatException e) {
-                        System.out.println("ERROR: Invalid orderCode format: " + orderCodeParam);
-                    }
-                }
+                orderCode = Long.parseLong(orderCodeParam);
+                System.out.println("Parsed OrderCode: " + orderCode);
                 
-                // Bắt đầu transaction
-                conn = JDBCConnection.getConnection();
-                conn.setAutoCommit(false);
+                PaymentDAO paymentDAO = new PaymentDAO();
                 
-                System.out.println("Transaction started");
-                
-                // *** UPDATE PAYMENT STATUS IN DATABASE ***
-                try {
-                    PaymentDAO paymentDAO = new PaymentDAO();
-                    
-                    if (orderCode > 0) {
-                        System.out.println("Updating payment status in database...");
-                        boolean updateSuccess = paymentDAO.updatePaymentStatus(
-                            orderCode, 
-                            "Success", 
-                            id, // Use PayOS transaction ID
-                            null, // BankCode (may be provided by PayOS in some cases)
-                            code,  // Response code from PayOS
-                            conn  // Use transaction connection
-                        );
-                        
-                        if (updateSuccess) {
-                            System.out.println("✓ Payment status updated successfully in database");
-                        } else {
-                            System.out.println("✗ Failed to update payment status in database");
-                            throw new SQLException("Failed to update payment status for OrderCode: " + orderCode);
-                        }
-                    } else {
-                        System.out.println("WARNING: No valid orderCode provided, skipping payment status update");
-                    }
-                    
-                } catch (SQLException e) {
-                    System.out.println("✗ Database error while updating payment status: " + e.getMessage());
-                    e.printStackTrace();
-                    throw e; // Re-throw to trigger rollback
-                }
-                
-                // Payment successful
-                session.setAttribute("paymentSuccess", true);
-                session.setAttribute("paymentMessage", "Thanh toán thành công!");
-
-                // Lấy thông tin user và plan
-                model.User user = (model.User) session.getAttribute("authUser");
-                Integer planId = (Integer) session.getAttribute("selectedPlanId");
-                
-                System.out.println("User: " + (user != null ? user.getEmail() : "null"));
-                System.out.println("Plan ID: " + planId);
-                
-                if (user != null && planId != null) {
-                    // Cập nhật role thành premium (2) trong database
-                    user.setRoleID(2);
-                    service.UserService userService = new service.UserService();
-                    userService.updateUserWithConnection(user, conn);
-                    session.setAttribute("authUser", user);
-                    
-                    System.out.println("User role updated to Premium");
-
-                    // Lấy thời lượng gói premium
-                    PremiumPlanDAO planDAO = new PremiumPlanDAO();
-                    int durationInMonths = planDAO.getPlanDuration(planId);
-                    
-                    System.out.println("Plan duration: " + durationInMonths + " months");
-
-                    // Sử dụng method mới để cộng dồn/tạo premium
-                    UserPremiumDAO userPremiumDAO = new UserPremiumDAO();
-                    userPremiumDAO.extendOrCreatePremium(user.getUserID(), planId, durationInMonths, conn);
-                    
-                    // Commit transaction
-                    conn.commit();
-                    System.out.println("Transaction committed successfully");
-                    
-                    // Log thông tin timezone
-                    Calendar vietnamCal = Calendar.getInstance(VIETNAM_TIMEZONE);
-                    System.out.println("Payment processed at Vietnam time: " + vietnamCal.getTime());
-                    
-                    // Clean up session
-                    session.removeAttribute("currentPaymentId");
-                    session.removeAttribute("currentOrderCode");
-                    session.removeAttribute("selectedPlanId");
-                    
-                    // Redirect to success page
-                    response.sendRedirect(request.getContextPath() + "/PaymentJSP/PaymentSuccess.jsp");
-                    return;
+                if ("PAID".equals(status)) {
+                    // Payment successful - update to success
+                    System.out.println("Payment successful - updating status to Success");
+                    paymentStatusUpdated = paymentDAO.updatePaymentStatus(
+                        orderCode, 
+                        "Success", 
+                        id, // Use PayOS transaction ID
+                        null, // BankCode (may be provided by PayOS in some cases)
+                        code  // Response code from PayOS
+                    );
                 } else {
-                    System.out.println("ERROR: Missing user or plan information");
-                    throw new SQLException("Missing user or plan information");
+                    // Payment failed or cancelled
+                    String failedStatus = "true".equals(cancel) ? "Cancelled" : "Failed";
+                    System.out.println("Payment not successful - updating status to: " + failedStatus);
+                    paymentStatusUpdated = paymentDAO.updatePaymentStatus(
+                        orderCode, 
+                        failedStatus, 
+                        id, 
+                        null, 
+                        code
+                    );
                 }
+                
+                System.out.println("Payment status update result: " + (paymentStatusUpdated ? "SUCCESS" : "FAILED"));
+                
+            } catch (NumberFormatException e) {
+                System.out.println("ERROR: Invalid orderCode format: " + orderCodeParam);
             } catch (SQLException e) {
-                // Rollback nếu có lỗi
-                System.out.println("ERROR: SQL Exception occurred - " + e.getMessage());
+                System.out.println("ERROR: Failed to update payment status: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("WARNING: No orderCode provided in callback");
+        }
+        
+        // *** PROCESS PREMIUM UPGRADE IF PAYMENT SUCCESSFUL ***
+        if ("PAID".equals(status) && paymentStatusUpdated && orderCode > 0) {
+            System.out.println("Processing premium upgrade...");
+            
+            Connection conn = null;
+            try {
+                // Get payment info from database to get user and plan details
+                PaymentDAO paymentDAO = new PaymentDAO();
+                Payment payment = paymentDAO.getPaymentByOrderCode(orderCode);
+                
+                if (payment != null) {
+                    System.out.println("Payment found in database:");
+                    System.out.println("- UserID: " + payment.getUserID());
+                    System.out.println("- PlanID: " + payment.getPlanID());
+                    System.out.println("- Amount: " + payment.getAmount());
+                    
+                    // Start transaction for premium upgrade
+                    conn = JDBCConnection.getConnection();
+                    conn.setAutoCommit(false);
+                    
+                    System.out.println("Premium upgrade transaction started");
+                    
+                                         // Update user role to premium (2)
+                     service.UserService userService = new service.UserService();
+                     Dao.UserDAO userDAO = new Dao.UserDAO();
+                     model.User user = userDAO.getUserById(payment.getUserID());
+                    
+                    if (user != null) {
+                        user.setRoleID(2); // Premium role
+                        userService.updateUserWithConnection(user, conn);
+                        
+                        System.out.println("User role updated to Premium for UserID: " + payment.getUserID());
+                        
+                        // Get plan duration
+                        PremiumPlanDAO planDAO = new PremiumPlanDAO();
+                        int durationInMonths = planDAO.getPlanDuration(payment.getPlanID());
+                        
+                        System.out.println("Plan duration: " + durationInMonths + " months");
+                        
+                        // Extend or create premium subscription
+                        UserPremiumDAO userPremiumDAO = new UserPremiumDAO();
+                        userPremiumDAO.extendOrCreatePremium(payment.getUserID(), payment.getPlanID(), durationInMonths, conn);
+                        
+                        // Commit transaction
+                        conn.commit();
+                        System.out.println("Premium upgrade transaction committed successfully");
+                        
+                                                 // Update session if available
+                         if (session != null) {
+                             user = userDAO.getUserById(payment.getUserID()); // Get fresh user data
+                            session.setAttribute("authUser", user);
+                            session.setAttribute("paymentSuccess", true);
+                            session.setAttribute("paymentMessage", "Thanh toán thành công!");
+                            
+                            // Clean up session
+                            session.removeAttribute("currentPaymentId");
+                            session.removeAttribute("currentOrderCode");
+                            session.removeAttribute("selectedPlanId");
+                            
+                            System.out.println("Session updated successfully");
+                        } else {
+                            System.out.println("WARNING: Session not available, but premium upgrade completed");
+                        }
+                        
+                        // Redirect to success page
+                        response.sendRedirect(request.getContextPath() + "/PaymentJSP/PaymentSuccess.jsp");
+                        return;
+                        
+                    } else {
+                        System.out.println("ERROR: User not found for UserID: " + payment.getUserID());
+                        throw new SQLException("User not found for UserID: " + payment.getUserID());
+                    }
+                    
+                } else {
+                    System.out.println("ERROR: Payment not found in database for OrderCode: " + orderCode);
+                    throw new SQLException("Payment not found in database for OrderCode: " + orderCode);
+                }
+                
+            } catch (SQLException e) {
+                // Rollback premium upgrade transaction if error
+                System.out.println("ERROR: Premium upgrade failed - " + e.getMessage());
                 try {
                     if (conn != null) {
                         conn.rollback();
-                        System.out.println("Transaction rolled back");
+                        System.out.println("Premium upgrade transaction rolled back");
                     }
                 } catch (SQLException ex) {
                     System.out.println("ERROR: Rollback failed - " + ex.getMessage());
                     ex.printStackTrace();
                 }
                 
-                // Log lỗi và set thông báo lỗi
                 e.printStackTrace();
                 if (session != null) {
                     session.setAttribute("paymentSuccess", false);
-                    session.setAttribute("paymentMessage", "Có lỗi xảy ra khi xử lý thanh toán: " + e.getMessage());
+                    session.setAttribute("paymentMessage", "Thanh toán thành công nhưng có lỗi khi nâng cấp Premium: " + e.getMessage());
                 }
+                
             } catch (Exception e) {
                 // Handle other exceptions
-                System.out.println("ERROR: Unexpected exception - " + e.getMessage());
+                System.out.println("ERROR: Unexpected error during premium upgrade - " + e.getMessage());
                 try {
                     if (conn != null) {
                         conn.rollback();
-                        System.out.println("Transaction rolled back due to unexpected error");
+                        System.out.println("Premium upgrade transaction rolled back due to unexpected error");
                     }
                 } catch (SQLException ex) {
                     System.out.println("ERROR: Rollback failed - " + ex.getMessage());
@@ -185,46 +208,36 @@ public class ReturnFromPayOS extends HttpServlet {
                 e.printStackTrace();
                 if (session != null) {
                     session.setAttribute("paymentSuccess", false);
-                    session.setAttribute("paymentMessage", "Có lỗi không mong đợi xảy ra: " + e.getMessage());
+                    session.setAttribute("paymentMessage", "Thanh toán thành công nhưng có lỗi không mong đợi khi nâng cấp Premium: " + e.getMessage());
                 }
+                
             } finally {
-                // Đóng connection
+                // Close connection
                 try {
                     if (conn != null) {
                         conn.setAutoCommit(true);
                         conn.close();
-                        System.out.println("Connection closed");
+                        System.out.println("Premium upgrade connection closed");
                     }
                 } catch (SQLException e) {
-                    System.out.println("ERROR: Failed to close connection - " + e.getMessage());
+                    System.out.println("ERROR: Failed to close premium upgrade connection - " + e.getMessage());
                     e.printStackTrace();
                 }
             }
         } else {
-            // Payment failed, cancelled, or other status
-            System.out.println("Payment not successful. Status: " + status);
-            
-            // Try to update payment status in database if orderCode is available
-            if (orderCodeParam != null) {
-                try {
-                    long orderCode = Long.parseLong(orderCodeParam);
-                    PaymentDAO paymentDAO = new PaymentDAO();
-                    
-                    String failedStatus = "true".equals(cancel) ? "Cancelled" : "Failed";
-                    System.out.println("Updating payment status to: " + failedStatus);
-                    
-                    paymentDAO.updatePaymentStatus(orderCode, failedStatus, id, null, code);
-                    System.out.println("✓ Payment status updated to " + failedStatus);
-                    
-                } catch (Exception e) {
-                    System.out.println("ERROR: Failed to update payment status for failed payment: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
+            // Payment failed, cancelled, or payment status update failed
+            System.out.println("Payment not successful or payment status update failed");
             
             if (session != null) {
                 session.setAttribute("paymentSuccess", false);
-                String message = "true".equals(cancel) ? "Thanh toán đã bị hủy!" : "Thanh toán không thành công!";
+                String message;
+                if (!paymentStatusUpdated) {
+                    message = "Có lỗi khi cập nhật trạng thái thanh toán!";
+                } else if ("true".equals(cancel)) {
+                    message = "Thanh toán đã bị hủy!";
+                } else {
+                    message = "Thanh toán không thành công!";
+                }
                 session.setAttribute("paymentMessage", message);
                 
                 // Clean up session
@@ -235,7 +248,7 @@ public class ReturnFromPayOS extends HttpServlet {
         
         System.out.println("=== ReturnFromPayOS: Processing completed ===");
         
-        // Redirect về trang chủ nếu có lỗi hoặc thanh toán không thành công
+        // Redirect to home page if not already redirected
         response.sendRedirect(request.getContextPath() + "/HomeServlet");
     }
 } 
