@@ -90,6 +90,7 @@
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
                     <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
                     <a class="nav-link px-2" href="#">FlashCard</a>
+                    <a class="nav-link px-2" href="search.jsp">Tra Cứu</a>
                 </div>
             </div>
 
