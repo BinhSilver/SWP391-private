@@ -8,12 +8,13 @@ import model.Course;
 
 public class CoursesDAO {
 
-    public static ArrayList<Course> searchCourse(String keyword) {
+ public static ArrayList<Course> searchCourse(String keyword) {
         ArrayList<Course> list = new ArrayList<>();
-        String sql = "SELECT * FROM [dbo].[Courses] WHERE title LIKE ?";
+        String sql = "SELECT * FROM [dbo].[Courses] WHERE dbo.RemoveDiacritics(title) LIKE '%' + dbo.RemoveDiacritics(?) + '%'";
 
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + keyword + "%");
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, keyword);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -22,7 +23,7 @@ public class CoursesDAO {
                 c.setTitle(rs.getString("title"));
                 c.setDescription(rs.getString("description"));
                 c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested")); // ✅ Mới thêm
+                c.setSuggested(rs.getBoolean("isSuggested"));
                 list.add(c);
             }
         } catch (Exception e) {

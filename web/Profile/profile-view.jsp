@@ -1,17 +1,15 @@
 <%@page import="model.User"%>
 <%@page session="true" contentType="text/html" pageEncoding="UTF-8"%>
 <%
-    User user = (User) session.getAttribute("authUser");
+    User user = (User) request.getAttribute("user");
     if (user == null) {
-        response.sendRedirect("login.jsp");
+        user = (User) session.getAttribute("authUser");
+    }
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
-
-    byte[] avatar = user.getAvatar();
-    String base64 = "";
-    if (avatar != null && avatar.length > 0) {
-        base64 = java.util.Base64.getEncoder().encodeToString(avatar);
-    }
+    String avatarUrl = user.getAvatar();
     String defaultAvatar = "assets/avatar/nam.jpg";
     if ("Nữ".equalsIgnoreCase(user.getGender())) {
         defaultAvatar = "assets/avatar/nu.jpg";
@@ -28,7 +26,9 @@
         <div class="container">
             <div class="sidebar">
                 <div class="profile-pic">
-                    <img src="<%= (!base64.isEmpty() ? ("data:image/jpeg;base64," + base64) : defaultAvatar) %>" alt="avatar" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">
+                    <img src="<%= (avatarUrl != null && !avatarUrl.trim().isEmpty() ? avatarUrl : request.getContextPath() + "/" + defaultAvatar) %>" 
+                         alt="avatar" 
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;">
                 </div>
                 <h3><%= user.getFullName()%></h3>
                 <p class="title">User ID: <%= user.getUserID()%></p>

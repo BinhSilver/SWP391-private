@@ -8,7 +8,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
 
 @WebServlet(name = "PremiumPlanManagementServlet", urlPatterns = {"/admin/premium-plans"})
 public class PremiumPlanManagementServlet extends HttpServlet {
@@ -56,8 +58,13 @@ public class PremiumPlanManagementServlet extends HttpServlet {
     }
 
     private void listPlans(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<PremiumPlan> premiumPlans = premiumPlanDAO.getAllPremiumPlans();
-        request.setAttribute("premiumPlans", premiumPlans);
+        try {
+            List<PremiumPlan> premiumPlans = premiumPlanDAO.getAllPremiumPlans();
+            request.setAttribute("premiumPlans", premiumPlans);
+        } catch (SQLException e) {
+            request.setAttribute("premiumPlans", new ArrayList<>());
+            request.setAttribute("error", "Không thể tải danh sách gói Premium");
+        }
         request.getRequestDispatcher("/admin/premium-plans.jsp").forward(request, response);
     }
 
@@ -71,7 +78,7 @@ public class PremiumPlanManagementServlet extends HttpServlet {
             PremiumPlan plan = premiumPlanDAO.getPremiumPlanByID(planId);
             request.setAttribute("plan", plan);
             request.getRequestDispatcher("/admin/edit-premium-plan.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | SQLException e) {
             response.sendRedirect(request.getContextPath() + "/admin/premium-plans");
         }
     }
@@ -107,7 +114,7 @@ public class PremiumPlanManagementServlet extends HttpServlet {
         try {
             int planId = Integer.parseInt(request.getParameter("planId"));
             premiumPlanDAO.deletePremiumPlan(planId);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | SQLException e) {
             // Log error or set an error message
         }
         response.sendRedirect(request.getContextPath() + "/admin/premium-plans");

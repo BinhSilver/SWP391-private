@@ -8,6 +8,10 @@ nbdist/
 *.orig
 src/DB/db.properties
 
+# Ensure lib directory is not ignored
+!lib/
+!lib/**
+
 # Cache files
 *.class
 *.log
@@ -52,4 +56,10 @@ src/java/DB/JDBCConnection.java
 
 # Ignore build.xml
 build.xml
+
+# PayOS API Configuration
+src/java/resources/payOSAPI.properties
+
+# Cloud API Configuration
+src/java/resources/cloudinary.properties
 
