@@ -3,16 +3,13 @@ package controller.courses;
 import Dao.CoursesDAO;
 import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
-import model.Course;
-import model.Lesson;
-import model.LessonMaterial;
-import model.User;
+import Dao.QuizDAO;
+import model.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,9 +33,7 @@ public class CreateCourseServlet extends HttpServlet {
 
         try {
             User user = getCurrentUser(request);
-
             Course course = getCourseInfoFromRequest(request, user);
-
             int courseId = saveCourseAndReturnId(course);
 
             int maxLesson = getMaxLessonIndex(request);
@@ -51,8 +46,6 @@ public class CreateCourseServlet extends HttpServlet {
 
             handleAllLessons(request, courseId, maxLesson, uploadRoot);
 
-            // Nếu có quiz thì xử lý thêm quiz ở đây (không viết phần quiz chi tiết ở đây)
-            // handleQuiz(request, lessons);
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,13 +70,12 @@ public class CreateCourseServlet extends HttpServlet {
         course.setDescription(description);
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
-        // Có thể set thêm userId nếu model Course của bạn có trường này
         return course;
     }
 
     private int saveCourseAndReturnId(Course course) throws SQLException {
         CoursesDAO dao = new CoursesDAO();
-        return dao.addAndReturnID(course); // method này cần có trong CoursesDAO
+        return dao.addAndReturnID(course);
     }
 
     private int getMaxLessonIndex(HttpServletRequest request) {
@@ -112,28 +104,27 @@ public class CreateCourseServlet extends HttpServlet {
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
 
         for (int i = 0; i <= maxLesson; i++) {
-            String lessonTitle = request.getParameter("lessons[" + i + "][name]"); // hoặc [title] nếu form bạn đặt vậy
-            // Nếu có checkbox ẩn hiện cho từng bài học:
+            String title = request.getParameter("lessons[" + i + "][name]");
+            String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
 
             Lesson lesson = new Lesson();
-            lesson.setTitle(lessonTitle);
+            lesson.setTitle(title);
+            lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
 
             int lessonId = lessonsDao.addAndReturnID(lesson);
-            lesson.setLessonID(lessonId);
 
-            // Lưu từng loại tài liệu
             saveMaterialsForLesson(request, i, lessonId, uploadRoot, materialsDao);
+            saveQuizForLesson(request, i, lessonId);
         }
     }
 
     private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String uploadRoot, LessonMaterialsDAO materialsDao)
             throws Exception {
-        String[] fieldTypes = {
-            "vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"
-        };
+        String[] fieldTypes = {"vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"};
+
         for (Part part : request.getParts()) {
             for (String type : fieldTypes) {
                 String fieldName = "lessons[" + lessonIndex + "][" + type + "][]";
@@ -143,26 +134,14 @@ public class CreateCourseServlet extends HttpServlet {
                         continue;
                     }
 
-                    // Đặt tên file lưu trữ duy nhất
-                    String ext = "";
-                    int dotIdx = originalName.lastIndexOf('.');
-                    if (dotIdx > 0) {
-                        ext = originalName.substring(dotIdx);
-                    }
+                    String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
                     String savePath = uploadRoot + File.separator + savedFileName;
                     part.write(savePath);
 
-                    // Xác định loại tài liệu (grammar/kanji/vocab), loại file (pdf/video)
-                    String materialType = "";
-                    if (type.startsWith("vocab")) {
-                        materialType = "Từ Vựng";
-                    } else if (type.startsWith("grammar")) {
-                        materialType = "Ngữ pháp";
-                    } else if (type.startsWith("kanji")) {
-                        materialType = "Kanji";
-                    }
-
+                    String materialType = type.startsWith("vocab") ? "Từ Vựng"
+                            : type.startsWith("grammar") ? "Ngữ pháp"
+                            : type.startsWith("kanji") ? "Kanji" : "";
                     String fileType = type.endsWith("Video") ? "video" : "PDF";
 
                     LessonMaterial material = new LessonMaterial();
@@ -170,9 +149,71 @@ public class CreateCourseServlet extends HttpServlet {
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
                     material.setFilePath("files/" + savedFileName);
-                    materialsDao.add(material); // thêm vào DB
+                    materialsDao.add(material);
                 }
             }
+        }
+    }
+
+    private void saveQuizForLesson(HttpServletRequest request, int lessonIndex, int lessonId) {
+        List<QuizQuestion> questions = new ArrayList<>();
+        Map<String, String[]> paramMap = request.getParameterMap();
+
+        // Collect các chỉ số question thực sự tồn tại cho lessonIndex này
+        Set<Integer> questionIndexes = new HashSet<>();
+        String questionPrefix = "lessons[" + lessonIndex + "][questions][";
+        for (String key : paramMap.keySet()) {
+            if (key.startsWith(questionPrefix) && key.endsWith("][question]")) {
+                String sub = key.substring(questionPrefix.length(), key.length() - "][question]".length());
+                try {
+                    questionIndexes.add(Integer.parseInt(sub));
+                } catch (Exception ignore) {
+                }
+            }
+        }
+        // Duyệt từng chỉ số thực tế
+        for (int qIdx : questionIndexes) {
+            String base = "lessons[" + lessonIndex + "][questions][" + qIdx + "]";
+            String questionText = request.getParameter(base + "[question]");
+            String optionA = request.getParameter(base + "[optionA]");
+            String optionB = request.getParameter(base + "[optionB]");
+            String optionC = request.getParameter(base + "[optionC]");
+            String optionD = request.getParameter(base + "[optionD]");
+            String answer = request.getParameter(base + "[answer]");
+            if (questionText == null || answer == null) {
+                continue;
+            }
+            int correct = switch (answer) {
+                case "B" ->
+                    2;
+                case "C" ->
+                    3;
+                case "D" ->
+                    4;
+                default ->
+                    1;
+            };
+
+            List<Answer> answers = List.of(
+                    new Answer(0, 0, optionA, 1, correct == 1 ? 1 : 0),
+                    new Answer(0, 0, optionB, 2, correct == 2 ? 1 : 0),
+                    new Answer(0, 0, optionC, 3, correct == 3 ? 1 : 0),
+                    new Answer(0, 0, optionD, 4, correct == 4 ? 1 : 0)
+            );
+            QuizQuestion quizQuestion = new QuizQuestion();
+            quizQuestion.setQuestion(questionText);
+            quizQuestion.setTimeLimit(60);
+            quizQuestion.setCorrectAnswer(correct);
+            quizQuestion.setAnswers(answers);
+
+            questions.add(quizQuestion);
+        }
+
+        if (!questions.isEmpty()) {
+            System.out.println("📥 Đang lưu " + questions.size() + " câu quiz cho lessonId = " + lessonId);
+            QuizDAO.saveQuestions(lessonId, questions);
+        } else {
+            System.out.println("⚠️ Không có câu hỏi nào được lưu cho lessonId = " + lessonId);
         }
     }
 

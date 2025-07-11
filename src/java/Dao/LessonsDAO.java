@@ -8,27 +8,32 @@ import java.util.List;
 
 public class LessonsDAO {
 
+    // Thêm bài học
     public void add(Lesson l) throws SQLException {
-        String sql = "INSERT INTO Lessons (CourseID, Title, IsHidden) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Lessons (CourseID, Title, Description, IsHidden) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, l.getCourseID());
             stmt.setString(2, l.getTitle());
-            stmt.setBoolean(3, l.isIsHidden());
+            stmt.setString(3, l.getDescription());
+            stmt.setBoolean(4, l.isIsHidden());
             stmt.executeUpdate();
         }
     }
 
+    // Cập nhật bài học
     public void update(Lesson l) throws SQLException {
-        String sql = "UPDATE Lessons SET CourseID=?, Title=?, IsHidden=? WHERE LessonID=?";
+        String sql = "UPDATE Lessons SET CourseID=?, Title=?, Description=?, IsHidden=? WHERE LessonID=?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, l.getCourseID());
             stmt.setString(2, l.getTitle());
-            stmt.setBoolean(3, l.isIsHidden());
-            stmt.setInt(4, l.getLessonID());
+            stmt.setString(3, l.getDescription());
+            stmt.setBoolean(4, l.isIsHidden());
+            stmt.setInt(5, l.getLessonID());
             stmt.executeUpdate();
         }
     }
 
+    // Xóa bài học
     public void delete(int lessonID) throws SQLException {
         String sql = "DELETE FROM Lessons WHERE LessonID=?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -37,6 +42,7 @@ public class LessonsDAO {
         }
     }
 
+    // Lấy danh sách bài học theo CourseID
     public List<Lesson> getLessonsByCourseID(int courseID) {
         List<Lesson> list = new ArrayList<>();
         String sql = "SELECT * FROM Lessons WHERE CourseID = ?";
@@ -48,7 +54,8 @@ public class LessonsDAO {
                         rs.getInt("LessonID"),
                         courseID,
                         rs.getString("Title"),
-                        rs.getBoolean("IsHidden")
+                        rs.getBoolean("IsHidden"), // boolean trước
+                        rs.getString("Description") // description sau
                 ));
             }
         } catch (Exception e) {
@@ -57,11 +64,10 @@ public class LessonsDAO {
         return list;
     }
 
-    // ✅ Bổ sung để sử dụng trong StudyLessonServlet
+    // Lấy 1 bài học theo ID
     public static Lesson getLessonById(int lessonId) {
         String sql = "SELECT * FROM Lessons WHERE LessonID = ?";
-        try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, lessonId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -69,7 +75,8 @@ public class LessonsDAO {
                         rs.getInt("LessonID"),
                         rs.getInt("CourseID"),
                         rs.getString("Title"),
-                        rs.getBoolean("IsHidden")
+                        rs.getBoolean("IsHidden"), // boolean trước
+                        rs.getString("Description") // description sau
                 );
             }
         } catch (Exception e) {
@@ -77,16 +84,15 @@ public class LessonsDAO {
         }
         return null;
     }
-    
-    public int addAndReturnID(Lesson lesson) throws SQLException {
-        String sql = "INSERT INTO Lessons (CourseID, Title, IsHidden) VALUES (?, ?, ?)";
-        try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+    // Thêm bài học và trả về ID vừa tạo
+    public int addAndReturnID(Lesson lesson) throws SQLException {
+        String sql = "INSERT INTO Lessons (CourseID, Title, Description, IsHidden) VALUES (?, ?, ?, ?)";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, lesson.getCourseID());
             stmt.setString(2, lesson.getTitle());
-            stmt.setBoolean(3, lesson.isIsHidden());
-
+            stmt.setString(3, lesson.getDescription());
+            stmt.setBoolean(4, lesson.isIsHidden());
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();

@@ -56,10 +56,161 @@ public class CoursesDAO {
     }
 
     public void delete(int courseID) throws SQLException {
-        String sql = "DELETE FROM [dbo].[Courses] WHERE CourseID=?";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, courseID);
-            stmt.executeUpdate();
+        try (Connection conn = JDBCConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                // 1. Lấy toàn bộ LessonID của khóa học này
+                List<Integer> lessonIds = new ArrayList<>();
+                String lessonSql = "SELECT LessonID FROM Lessons WHERE CourseID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(lessonSql)) {
+                    ps.setInt(1, courseID);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            lessonIds.add(rs.getInt("LessonID"));
+                        }
+                    }
+                }
+
+                // 2. Xóa toàn bộ dữ liệu phụ thuộc theo LessonID
+                for (int lessonId : lessonIds) {
+                    // a. Xóa LessonAccess
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // b. Xóa LessonMaterials
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // c. Xóa GrammarPoints
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // d. Xóa Kanji
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // e. Xóa LessonVocabulary
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // f. Xóa Feedbacks
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // g. Xóa Progress liên quan LessonID
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                    // h. Xóa Quiz, Question, Answer, QuizResults liên quan LessonID
+                    List<Integer> quizIds = new ArrayList<>();
+                    try (PreparedStatement ps = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        try (ResultSet rs = ps.executeQuery()) {
+                            while (rs.next()) {
+                                quizIds.add(rs.getInt("QuizID"));
+                            }
+                        }
+                    }
+                    for (int quizId : quizIds) {
+                        // Xóa Answers của Quiz
+                        try (PreparedStatement ps = conn.prepareStatement(
+                                "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
+                            ps.setInt(1, quizId);
+                            ps.executeUpdate();
+                        }
+                        // Xóa Questions của Quiz
+                        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
+                            ps.setInt(1, quizId);
+                            ps.executeUpdate();
+                        }
+                        // Xóa QuizResults
+                        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
+                            ps.setInt(1, quizId);
+                            ps.executeUpdate();
+                        }
+                    }
+                    // Xóa Quizzes
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
+                        ps.setInt(1, lessonId);
+                        ps.executeUpdate();
+                    }
+                }
+
+                // 3. Xóa Lessons
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+
+                // 4. Xóa các bảng liên kết CourseID
+                // a. Enrollment
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+                // b. CourseRatings
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM CourseRatings WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+                // c. Progress (course-level)
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+                // d. Tests, Questions, Answers, TestResults liên quan course
+                List<Integer> testIds = new ArrayList<>();
+                try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            testIds.add(rs.getInt("TestID"));
+                        }
+                    }
+                }
+                for (int testId : testIds) {
+                    // Xóa Answers của Test
+                    try (PreparedStatement ps = conn.prepareStatement(
+                            "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)")) {
+                        ps.setInt(1, testId);
+                        ps.executeUpdate();
+                    }
+                    // Xóa Questions của Test
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE TestID = ?")) {
+                        ps.setInt(1, testId);
+                        ps.executeUpdate();
+                    }
+                    // Xóa TestResults
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM TestResults WHERE TestID = ?")) {
+                        ps.setInt(1, testId);
+                        ps.executeUpdate();
+                    }
+                }
+                // Xóa Tests
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Tests WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+
+                // 5. Xóa khóa học cuối cùng
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            }
         }
     }
 
@@ -210,6 +361,5 @@ public class CoursesDAO {
         }
         return 0;
     }
-
 
 }

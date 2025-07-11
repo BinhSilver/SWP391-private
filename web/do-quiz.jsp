@@ -10,7 +10,6 @@
         <link rel="stylesheet" href="<c:url value='/css/do-quiz.css'/>">
     </head>
     <body>
-        <%@ include file="/Home/nav.jsp" %>
 
         <div class="page-wrapper">
             <%@ include file="../Home/nav.jsp" %>
@@ -20,6 +19,7 @@
 
                 <form method="post" action="doQuiz">
                     <input type="hidden" name="lessonId" value="${lessonId}"/>
+                    <input type="hidden" name="courseId" value="${courseId}"/>
 
                     <c:forEach var="q" items="${questions}" varStatus="loop">
                         <div class="card shadow-sm mb-4">

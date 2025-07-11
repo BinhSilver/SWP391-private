@@ -116,39 +116,45 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Câu hỏi {{questionLabel}}</h6>
                     <button class="btn btn-link p-0 text-decoration-none quiz-collapse-toggle" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{index}}" aria-expanded="false"
-                            aria-controls="questionCollapse-{{index}}">
+                            data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{lessonIndex}}-{{questionIndex}}" aria-expanded="false"
+                            aria-controls="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
                         <i class="fas fa-chevron-down"></i>
                     </button>
                 </div>
-                <div class="collapse" id="questionCollapse-{{index}}">
+                <div class="collapse" id="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
                     <div class="mb-3">
                         <label class="form-label">Nội dung câu hỏi</label>
-                        <input type="text" class="form-control" name="questions[{{index}}][question]" required>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][question]" required>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Lựa chọn A</label>
-                            <input type="text" class="form-control" name="questions[{{index}}][optionA]" required>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionA]" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Lựa chọn B</label>
-                            <input type="text" class="form-control" name="questions[{{index}}][optionB]" required>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionB]" required>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Lựa chọn C</label>
-                            <input type="text" class="form-control" name="questions[{{index}}][optionC]" required>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionC]" required>
                         </div>
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Lựa chọn D</label>
-                            <input type="text" class="form-control" name="questions[{{index}}][optionD]" required>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionD]" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Đáp án đúng</label>
-                        <select class="form-select" name="questions[{{index}}][answer]" required>
+                        <select class="form-select"
+                                name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][answer]" required>
                             <option value="">-- Chọn đáp án --</option>
                             <option value="A">A</option>
                             <option value="B">B</option>
@@ -161,6 +167,7 @@
                 </div>
             </div>
         </template>
+
         <template id="lessonTemplate">
             <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
                 <div class="lesson-block course-card border p-3 rounded mb-3" data-lesson-index="{{index}}">

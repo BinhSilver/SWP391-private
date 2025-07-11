@@ -319,20 +319,6 @@ VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùn
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
 
 GO
-CREATE TRIGGER TR_Users_SetAvatarOnGender
-ON Users
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    UPDATE Users
-    SET Avatar = CASE
-                    WHEN i.Gender = N'Nữ' THEN 'img/nu.jpg'
-                    ELSE 'img/nam.jpg'
-                END
-    FROM Users u
-    INNER JOIN inserted i ON u.UserID = i.UserID
-    WHERE (i.Gender IS NOT NULL AND u.Avatar IS NULL) OR (UPDATE(Gender) AND u.Avatar IS NULL);
-END;
 
 
 --thêm user này vô để coi được khóa học nha

@@ -14,7 +14,6 @@
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/teacher_dashboard.css'/>">
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
     </head>
     <body>
         <%@ include file="../Home/nav.jsp" %>
@@ -27,7 +26,7 @@
                         <a href="#" class="main-link"><i class="fas fa-book"></i> Courses</a>
                         <div class="submenu">
                             <a href="<c:url value='/Statistic.jsp'/>"><i class="fas fa-chart-line"></i> Statistic</a>
-                            <a href="<c:url value='/create_course.jsp'/>"><i class="fas fa-plus"></i> Create Course</a>
+                            <a href="<c:url value='/CreateCourseServlet'/>"><i class="fas fa-plus"></i> Create Course</a>
                         </div>
                     </div>
                     <div class="sidebar-item">
@@ -49,7 +48,13 @@
 
                 <!-- Content -->
                 <div class="content">
-                    <h2>Sensei Tanaka <span style="font-size: 0.9rem; color: #666;">Teacher Dashboard</span></h2>
+                    <!-- Chỉ hiển thị tên giáo viên -->
+                    <div class="teacher-profile mb-3">
+                        <div class="teacher-name" style="font-size: 1.22rem; font-weight: 700;">
+                            <c:out value="${teacher.fullName}"/>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #666;">Teacher Dashboard</div>
+                    </div>
                     <p>Quản lý các khóa học tiếng Nhật của bạn</p>
                     <a href="<c:url value='/CreateCourseServlet'/>" class="btn-primary">+ Create New Course</a>
 
@@ -68,12 +73,10 @@
                                 <p>${course.description}</p>
                             </div>
                             <div class="mt-2 d-flex gap-2">
-                                <!-- Chuyển tới trang chỉnh sửa -->
-                                <a href="<c:url value='/edit_course.jsp'/>?id=${course.courseID}" class="btn btn-sm btn-warning">
+                                <a href="<c:url value='/EditCourseServlet'/>?id=${course.courseID}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
 
-                                <!-- Nút Delete xử lý bằng JS -->
                                 <button onclick="deleteCourse(${course.courseID})" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
@@ -82,7 +85,6 @@
                     </c:forEach>
                 </div>
             </div>
-
         </div>
         <%@ include file="../Home/footer.jsp" %>
 
@@ -108,13 +110,11 @@
                         })
                                 .then(response => {
                                     if (response.ok) {
-                                        // Hiệu ứng ẩn dòng đã xóa
                                         const courseDiv = document.getElementById("course-" + courseId);
                                         if (courseDiv) {
                                             courseDiv.classList.add("fade-out");
                                             setTimeout(() => courseDiv.remove(), 500);
                                         }
-
                                         Swal.fire(
                                                 'Đã xóa!',
                                                 'Khóa học đã được xóa thành công.',
@@ -140,10 +140,7 @@
                 });
             }
         </script>
-
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     </body>
 </html>

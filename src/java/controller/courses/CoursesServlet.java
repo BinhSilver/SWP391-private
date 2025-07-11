@@ -20,12 +20,16 @@ public class CoursesServlet extends HttpServlet {
         CoursesDAO dao = new CoursesDAO();
         try {
             List<Course> courses = dao.getAllCourses();
+            if (courses == null) {
+                throw new RuntimeException("getAllCourses() trả về null!");
+            }
             request.setAttribute("courses", courses);
             request.getRequestDispatcher("Course.jsp").forward(request, response);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi truy vấn dữ liệu: " + e.getMessage());
         }
+
     }
 
     @Override

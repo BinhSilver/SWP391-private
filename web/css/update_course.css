@@ -1,157 +1,281 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : Jun 15, 2025, 4:01:17 PM
-    Author     : LAPTOP LENOVO
-*/
+/* RESET scope update-course-page */
+.update-course-page * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-body {
+.update-course-page {
     background-color: #f8f9fa;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
+    color: #333;
+    line-height: 1.6;
 }
 
-h2 {
+/* Container không override ngoài */
+.update-course-page .container {
+    width: 95%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.update-course-page h2 {
+    font-weight: 800;
+    color: #e94f64;
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.5px;
+}
+
+/* Tab dọc lesson */
+.update-course-page .nav-tabs-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.update-course-page .nav-tabs-vertical .nav-link {
+    color: #e94f64;
     font-weight: 700;
-    color: #dc3545;
-}
-
-.lesson-block,
-.quiz-question-block {
-    background-color: #ffffff;
-    border: 2px solid #dee2e6;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border: 1.5px solid #dee2e6;
     border-radius: 10px;
-    padding: 20px;
-    transition: all 0.3s ease;
+    background: #fff;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.update-course-page .nav-tabs-vertical .nav-link.active,
+.update-course-page .nav-tabs-vertical .nav-link:focus {
+    background-color: #e94f64;
+    color: #fff;
+    border-color: #e94f64;
+}
+@media (max-width: 768px) {
+    .update-course-page .nav-tabs-vertical {
+        flex-direction: row;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 14px;
+        padding-right: 0;
+    }
+    .update-course-page .nav-tabs-vertical .nav-link {
+        border-radius: 20px;
+        margin-right: 8px;
+        min-width: 120px;
+        white-space: nowrap;
+    }
+}
+/* Scrollbar cho tab */
+.update-course-page .nav-tabs-vertical::-webkit-scrollbar {
+    width: 6px;
+}
+.update-course-page .nav-tabs-vertical::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.update-course-page .nav-tabs-vertical::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
 }
 
-.lesson-block:hover,
-.quiz-question-block:hover {
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+/* Lesson block */
+.update-course-page .lesson-block {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+    margin-bottom: 1.5rem;
+    border: 1.5px solid #edecec;
+    transition: box-shadow 0.18s, border-color 0.18s;
+}
+.update-course-page .lesson-block:hover {
+    box-shadow: 0 6px 24px rgba(233, 79, 100, 0.13);
+    border-color: #e94f64;
+}
+.update-course-page .lesson-block h6 {
+    font-weight: 700;
+    color: #e94f64;
+    margin-bottom: 1.2rem;
+    font-size: 1.13rem;
+    letter-spacing: -0.5px;
 }
 
-.form-label {
+/* Form elements đẹp */
+.update-course-page .form-label {
     font-weight: 600;
     color: #495057;
 }
+.update-course-page form input[type="text"],
+.update-course-page form textarea,
+.update-course-page form select,
+.update-course-page form input[type="file"],
+.update-course-page form input[type="number"] {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 0.55rem 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 8px;
+}
+.update-course-page form input:focus,
+.update-course-page form textarea:focus,
+.update-course-page form select:focus {
+    border-color: #e94f64;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(233,79,100,0.07);
+    background-color: #fff;
+}
+/* Đảm bảo input video cũng đẹp */
+.update-course-page form input[type="file"][accept^="video"] {
+    border-color: #a21d33;
+}
 
-.btn {
-    border-radius: 8px !important;
+/* Nút bấm đồng bộ style index */
+.update-course-page .btn {
+    font-weight: 700;
+    border-radius: 8px;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+}
+.update-course-page .btn:hover, .update-course-page .btn:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(233,79,100,0.09);
+}
+.update-course-page .btn-outline-primary {
+    color: #e94f64;
+    border:2px solid #e94f64;
+    background: #fff;
+}
+.update-course-page .btn-outline-primary:hover {
+    background: #e94f64;
+    color: #fff;
+}
+.update-course-page .btn-outline-danger {
+    color: #dc3545;
+    border:2px solid #dc3545;
+    background: #fff;
+}
+.update-course-page .btn-outline-danger:hover {
+    background: #dc3545;
+    color: #fff;
+}
+.update-course-page .btn-outline-success {
+    color: #28a745;
+    border:2px solid #28a745;
+    background: #fff;
+}
+.update-course-page .btn-outline-success:hover {
+    background: #28a745;
+    color: #fff;
+}
+.update-course-page .btn-outline-info {
+    color: #17a2b8;
+    border:2px solid #17a2b8;
+    background: #fff;
+}
+.update-course-page .btn-outline-info:hover {
+    background: #17a2b8;
+    color: #fff;
+}
+.update-course-page .btn-danger, .update-course-page .btn-lg.btn-danger {
+    background: #e94f64;
+    border: 2px solid #e94f64;
+    color: #fff;
+}
+.update-course-page .btn-danger:hover, .update-course-page .btn-lg.btn-danger:hover {
+    background: #d43e55;
+    border:2px solid #d43e55;
+    color: #fff;
+}
+
+/* Quiz modal */
+.update-course-page .modal-content {
+    border-radius: 1rem;
+    border: none;
+    overflow: hidden;
+}
+.update-course-page .modal-header {
+    border-bottom: none;
+    padding-bottom: 0.5rem;
+    background-color: #e94f64;
+    color: #fff;
+}
+.update-course-page .modal-header .btn-close {
+    filter: invert(1);
+}
+.update-course-page .modal-body {
+    padding-top: 0;
+}
+
+/* Quiz question block */
+.update-course-page .quiz-question-block {
+    background: #fcfcfc;
+    border: 1.2px solid #ddd;
+    border-radius: 10px;
+    padding: 1.1rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.update-course-page .quiz-question-block h6 {
     font-weight: 600;
+    color: #e94f64;
+    font-size: 1rem;
 }
 
-.btn-outline-primary,
-.btn-outline-success,
-.btn-outline-info,
-.btn-outline-danger {
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-outline-primary:hover {
-    background-color: #0d6efd;
-    color: white;
-}
-
-.btn-outline-success:hover {
-    background-color: #198754;
-    color: white;
-}
-
-.btn-outline-info:hover {
-    background-color: #0dcaf0;
-    color: white;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-.nav-tabs-vertical {
-    display: flex;
-    flex-direction: column;
-    border-right: 2px solid #dee2e6;
-    padding-right: 10px;
-}
-
-.nav-tabs-vertical .nav-link {
-    margin-bottom: 5px;
-    color: #6c757d;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    text-align: left;
-}
-
-.nav-tabs-vertical .nav-link.active {
-    background-color: #dc3545;
-    color: white;
-    border-color: #dc3545;
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 60px;
-}
-
-input[type="file"] {
-    border: 1px dashed #ced4da;
-    background-color: #fdfdfd;
-    padding: 6px;
-    border-radius: 5px;
-}
-
-.modal-content {
-    border-radius: 16px;
-    box-shadow: 0 0 20px rgba(220, 53, 69, 0.2);
-}
-
-.modal-header {
-    background-color: #dc3545;
-    color: white;
-}
-
-.quiz-question-block .form-select,
-.quiz-question-block .form-control {
-    background-color: #fcfcfc;
-}
-
-button.btn-delete-question,
-button.btn-delete-lesson {
-    margin-top: 10px;
-}
-
-ul.existing-files {
+/* File list & delete */
+.update-course-page ul.existing-files,
+.update-course-page ul.list-group.list-group-flush {
     list-style: none;
     padding-left: 0;
-    margin-top: 10px;
+    margin-top: 8px;
 }
-
-ul.existing-files li {
-    background-color: #f1f3f5;
-    padding: 6px 10px;
+.update-course-page ul.existing-files li,
+.update-course-page ul.list-group li {
+    background: #f8f9fa;
+    padding: 7px 10px;
     margin-bottom: 4px;
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 0.99rem;
 }
-
-ul.existing-files li .btn-delete-file {
+.update-course-page ul.existing-files li .btn-delete-file,
+.update-course-page ul.list-group li .btn-delete-file {
     border: none;
     background: transparent;
     color: #dc3545;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.13s;
+}
+.update-course-page ul.existing-files li .btn-delete-file:hover,
+.update-course-page ul.list-group li .btn-delete-file:hover {
+    color: #fff;
+    background: #dc3545;
+    text-decoration: none;
 }
 
-ul.existing-files li .btn-delete-file:hover {
-    color: #a71d2a;
-    text-decoration: underline;
+.update-course-page .alert {
+    margin-top: 18px;
 }
 
-.alert {
-    margin-top: 15px;
+/* Responsive */
+@media (max-width: 991.98px) {
+    .update-course-page .lesson-block,
+    .update-course-page .quiz-question-block {
+        padding: 1rem;
+    }
+}
+
+/* Đảm bảo modal quiz responsive */
+@media (max-width: 600px) {
+    .update-course-page .modal-dialog {
+        max-width: 96vw;
+        margin: 8px auto;
+    }
 }

@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initial population of lessons when the page loads (using allCourseData)
-    if (allCourseData && allCourseData.lessons.length > 0) {
+    if (typeof allCourseData !== 'undefined' && allCourseData && allCourseData.lessons && allCourseData.lessons.length > 0) {
         // Clear the default lesson 1 if it exists
         const defaultLessonTab = document.getElementById('tab-0');
         const defaultLessonPane = document.getElementById('lesson-0');
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             quizQuestionsContainer.innerHTML = ''; // Clear previous quiz questions
 
-            const lessonData = allCourseData.lessons[lessonIndex];
+            const lessonData = typeof allCourseData !== 'undefined' && allCourseData && allCourseData.lessons ? allCourseData.lessons[lessonIndex] : null;
             if (lessonData && lessonData.quizzes && lessonData.quizzes.length > 0) {
                 lessonData.quizzes.forEach((question, qIndex) => {
                     let templateHtml = document.getElementById('quizQuestionTemplate').innerHTML;
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Pre-fill fields
                     newQuestionBlock.querySelector('input[name*="[id]"]').value = question.id; // Pre-fill question ID
-                    newQuestionBlock.querySelector('input[name*="[question]"]').value = question.question;
+newQuestionBlock.querySelector('textarea[name*="[question]"]').value = question.question;
                     newQuestionBlock.querySelector('input[name*="[optionA]"]').value = question.optionA;
                     newQuestionBlock.querySelector('input[name*="[optionB]"]').value = question.optionB;
                     newQuestionBlock.querySelector('input[name*="[optionC]"]').value = question.optionC;
@@ -277,9 +277,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Submit handler for the main form
     document.getElementById('wizardForm').addEventListener('submit', function(event) {
-        // You might want to add client-side validation here
-        // If using AJAX, prevent default submission and send data via fetch/XMLHttpRequest
-        // For a full form submission, ensure all hidden inputs for deletions are in place.
+        // Serialize quiz data from allCourseData to JSON and add as hidden input
+        const quizData = [];
+        
+        if (typeof allCourseData !== 'undefined' && allCourseData && allCourseData.lessons) {
+            allCourseData.lessons.forEach((lesson, lessonIndex) => {
+                if (lesson && lesson.quizzes && lesson.quizzes.length > 0) {
+                    quizData.push({
+                        lessonIndex: lessonIndex,
+                        questions: lesson.quizzes
+                    });
+                }
+            });
+        }
+        
+        // Remove existing quizJson input if present
+        const existingQuizInput = document.querySelector('input[name="quizJson"]');
+        if (existingQuizInput) {
+            existingQuizInput.remove();
+        }
+        
+        // Add new quizJson input
+        const quizJsonInput = document.createElement('input');
+        quizJsonInput.type = 'hidden';
+        quizJsonInput.name = 'quizJson';
+        quizJsonInput.value = JSON.stringify(quizData);
+        document.getElementById('wizardForm').appendChild(quizJsonInput);
+        
+        console.log('Quiz data being submitted:', quizData);
     });
 
     // Submit handler for the quiz form (within the modal)
@@ -303,6 +328,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Store the quiz questions in your `allCourseData` structure
         // This is a client-side representation, needs to be sent to server on main form submit
+        if (typeof allCourseData === 'undefined') {
+            allCourseData = { lessons: [] };
+        }
         if (!allCourseData.lessons[currentLessonIndex]) {
             allCourseData.lessons[currentLessonIndex] = {}; // Initialize if not present
         }

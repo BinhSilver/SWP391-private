@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 public class Answer {
@@ -23,11 +19,18 @@ public class Answer {
     public Answer() {
     }
 
-    public Answer(int id, int questionId, String answerText, int answerNumber) {
+    // Constructor đầy đủ
+    public Answer(int id, int questionId, String answerText, int answerNumber, int isCorrect) {
         this.id = id;
         this.questionId = questionId;
         this.answerText = answerText;
         this.answerNumber = answerNumber;
+        this.isCorrect = isCorrect;
+    }
+
+    // Constructor cũ vẫn giữ lại nếu cần
+    public Answer(int id, int questionId, String answerText, int answerNumber) {
+        this(id, questionId, answerText, answerNumber, 0); // mặc định isCorrect = 0
     }
 
     public int getId() {
