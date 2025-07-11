@@ -1,16 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ page import="model.Lesson, model.LessonMaterial, model.QuizQuestion" %>
+<%@ page import="model.Lesson, model.LessonMaterial, model.QuizQuestion, model.Vocabulary" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Bài học</title>
+        <title>Bài học - ${lesson.title}</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
         <link rel="stylesheet" href="<c:url value='/css/study.css'/>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <script src="https://code.responsivevoice.org/responsivevoice.js?key=YC77U5uD"></script>
     </head>
     <body>
         <div class="page-wrapper">
@@ -30,7 +31,6 @@
                             </li>
                         </c:forEach>
                     </ul>
-
                 </div>
                 <!-- Content -->
                 <div class="lesson-content" id="lessonContent">
@@ -49,7 +49,7 @@
                     </ul>
 
                     <div class="tab-content">
-                        <!-- Grammar -->
+                        <!-- Ngữ pháp -->
                         <div class="tab-pane fade show active" id="grammar">
                             <h4 class="section-title">🧠 Ngữ pháp</h4>
                             <div class="row">
@@ -61,16 +61,14 @@
                                                 <strong>${m.title}</strong>
                                                 <div class="file-viewer position-relative">
                                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                   <video controls>
-    <source src="${pageContext.request.contextPath}/${m.filePath}" type="video/mp4">
-</video>
-
+                                                    <video controls>
+                                                        <source src="${pageContext.request.contextPath}/${m.filePath}" type="video/mp4">
+                                                    </video>
                                                 </div>
                                             </div>
                                         </c:if>
                                     </c:forEach>
                                 </div>
-
                                 <div class="col-md-6 grammar-pdf-section">
                                     <h5>📄 Tài liệu PDF</h5>
                                     <c:forEach var="m" items="${materials}">
@@ -88,20 +86,53 @@
                             </div>
                         </div>
 
-                        <!-- Vocab -->
+                        <!-- Từ vựng -->
                         <div class="tab-pane fade" id="vocab">
-                            <h4 class="section-title">📄 Từ vựng</h4>
-                            <c:forEach var="m" items="${materials}">
-                                <c:if test="${m.materialType eq 'Từ vựng'}">
-                                    <div class="material-item mb-3">
-                                        <strong>${m.title}</strong>
-                                        <div class="file-viewer position-relative">
-                                            <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                            <iframe src="${pageContext.request.contextPath}/${m.filePath}"></iframe>
+                            <h4 class="section-title">📖 Từ vựng</h4>
+                            <div class="vocab-container">
+                                <div class="vocab-slideshow">
+                                    <c:forEach var="vocab" items="${vocabulary}" varStatus="loop">
+                                        <div class="vocab-item ${loop.index == 0 ? 'active' : ''}">
+                                            <div class="vocab-header">こんにちは 今日は</div>
+                                            <div class="vocab-body">
+                                                <div class="vocab-text">
+                                                    <div class="vocab-languages">
+                                                        <div>Vietnamese</div>
+                                                        <div>${vocab.word}</div>
+                                                        <div>English</div>
+                                                        <div>${vocab.meaning}</div>
+                                                    </div>
+                                                    <div class="vocab-examples">
+                                                        <div>Examples</div>
+                                                        <div>${vocab.reading != null ? vocab.reading : ''}</div>
+                                                        <div>${vocab.example != null ? vocab.example : ''}</div>
+                                                    </div>
+                                                    <button class="play-btn" data-word="${vocab.word}"><i class="fa-solid fa-volume-up"></i> Phát phát âm</button>
+                                                </div>
+                                                <c:if test="${not empty vocab.imagePath}">
+                                                    <img src="${pageContext.request.contextPath}/imgvocab/${vocab.imagePath}" alt="${vocab.word}" class="vocab-image">
+                                                </c:if>
+                                            </div>
                                         </div>
-                                    </div>
-                                </c:if>
-                            </c:forEach>
+                                    </c:forEach>
+                                </div>
+                                <div class="vocab-nav">
+                                    <button class="vocab-prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button class="vocab-next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                                </div>
+                                <c:forEach var="m" items="${materials}">
+                                    <c:if test="${m.materialType eq 'Từ vựng' && m.fileType eq 'PDF'}">
+                                        <div class="material-item mb-3">
+                                            <p>Sau đây là tài liệu PDF tham khảo cho:</p>
+                                            <strong>${m.title}</strong>
+                                            <div class="file-viewer position-relative">
+                                                <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
+                                                <iframe src="${pageContext.request.contextPath}/${m.filePath}"></iframe>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                </c:forEach>
+                            </div>
                         </div>
 
                         <!-- Kanji -->
@@ -128,6 +159,9 @@
                                     <a href="doQuiz?lessonId=${lesson.lessonID}" class="btn">Làm Quiz</a>
                                 </div>
                             </c:if>
+                            <c:if test="${empty quiz}">
+                                <p class="text-muted">Chưa có bài kiểm tra cho bài học này.</p>
+                            </c:if>
                         </div>
                     </div>
 
@@ -142,7 +176,6 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Toggle fullscreen
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.fullscreen-toggle').forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -154,7 +187,6 @@
                     });
                 });
 
-                // Toggle sidebar
                 const toggleBtn = document.getElementById('toggleSidebar');
                 const sidebar = document.getElementById('lessonSidebar');
                 const content = document.getElementById('lessonContent');
@@ -166,7 +198,51 @@
                     icon.classList.toggle('fa-caret-left');
                     icon.classList.toggle('fa-caret-right');
                 });
+
+                // Slideshow functionality
+                const slides = document.querySelectorAll('.vocab-item');
+                const prevBtn = document.querySelector('.vocab-prev-btn');
+                const nextBtn = document.querySelector('.vocab-next-btn');
+                let currentSlide = 0;
+
+                function showSlide(index) {
+                    slides.forEach((slide, i) => {
+                        slide.classList.remove('active', 'prev', 'next');
+                        if (i === index) {
+                            slide.classList.add('active');
+                        } else if (i < index) {
+                            slide.classList.add('prev');
+                        } else {
+                            slide.classList.add('next');
+                        }
+                    });
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    currentSlide = (currentSlide > 0) ? currentSlide - 1 : slides.length - 1;
+                    showSlide(currentSlide);
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    currentSlide = (currentSlide < slides.length - 1) ? currentSlide + 1 : 0;
+                    showSlide(currentSlide);
+                });
+
+                // Phát âm từ vựng với ResponsiveVoice
+                document.querySelectorAll('.play-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const word = btn.getAttribute('data-word');
+                        if (word && responsiveVoice) {
+                            responsiveVoice.speak(word, "Japanese Female", { rate: 0.9 });
+                        }
+                    });
+                });
             });
         </script>
+          <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
     </body>
 </html>
