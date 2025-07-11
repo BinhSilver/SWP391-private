@@ -1,10 +1,12 @@
 package controller.Authentication;
 
 import controller.Email.EmailUtil;
+import Dao.CoursesDAO;
 import Dao.UserDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -12,6 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Course;
 import model.User;
 import service.PasswordService;
 
@@ -44,6 +47,11 @@ public class LoginServlet extends HttpServlet {
             doPut(request, response);
             return;
         }
+
+        if ("forgot_pass".equals(action)) {
+            handleForgotPassword(request, response);
+            return;
+        }
     }
 
     @Override
@@ -52,7 +60,6 @@ public class LoginServlet extends HttpServlet {
         String oldpass = request.getParameter("oldPassword");
         String newpass = request.getParameter("newPassword");
 
-// Gọi dịch vụ để thay đổi mật khẩu
         boolean isPasswordChanged = new PasswordService().changePassword(email, oldpass, newpass);
         User checkEmailExist = new UserDAO().getUserByEmail(email);
         if (isPasswordChanged) {
@@ -61,6 +68,7 @@ public class LoginServlet extends HttpServlet {
         } else {
             if (checkEmailExist == null) {
                 request.setAttribute("message", "Email does not exist!");
+
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
@@ -69,6 +77,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 //Dang nhap
+
     private void handleSignIn(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -80,28 +89,29 @@ public class LoginServlet extends HttpServlet {
         User user = dao.getUserByEmail(email);
 
         if (user != null && checkPassword(password, user.getPasswordHash())) {
-            // Kiểm tra nếu tài khoản chưa được kích hoạt (IsActive = 0)
-            if (!user.isActive()) {  // Sử dụng phương thức getter isActive() nếu trường là boolean
-                request.setAttribute("message", "Your account is not active. Please verify OTP.");
+            if (!user.isActive()) {
+                request.setAttribute("message", "Tài khoản chưa được mở khóa. Vui lòng xác thực tài khoản .");
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
-            // Đăng nhập thành công
-            // Lấy lại user mới nhất từ DB (để đảm bảo luôn đồng bộ thông tin)
             User fullUser = null;
             try {
                 fullUser = dao.getUserById(user.getUserID());
             } catch (SQLException e) {
-                e.printStackTrace(); // log lỗi hoặc chuyển hướng đến trang báo lỗi
+                e.printStackTrace();
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
+
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+
+                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
+
                 return;
             }
 
             HttpSession session = request.getSession();
-            session.setAttribute("authUser", fullUser); // Cập nhật lại phiên bản user đầy đủ
-            session.setAttribute("userID", fullUser.getUserID()); // Có thể dùng để truy xuất lại sau này
-            session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
+            session.setAttribute("authUser", fullUser);
+            session.setAttribute("userID", fullUser.getUserID());
+            session.setMaxInactiveInterval(60 * 60 * 24);
 
             if ("on".equals(rememberMe)) {
                 setRememberMeCookies(response, email);
@@ -109,11 +119,15 @@ public class LoginServlet extends HttpServlet {
                 clearRememberMeCookies(response);
             }
 
-            // Chuyển hướng về trang chủ
-            response.sendRedirect("index.jsp");
+            // ✅ Thêm danh sách khóa học đề xuất
+            CoursesDAO coursesDAO = new CoursesDAO();
+            List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();
+            request.setAttribute("suggestedCourses", suggestedCourses);
+
+            // ✅ Forward về index.jsp để giữ lại dữ liệu
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
         } else {
-            // Đăng nhập thất bại
-            request.setAttribute("message", "Invalid email or password!");
+            request.setAttribute("message", "Sai email hoặc mật khẩu");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }
@@ -125,18 +139,17 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String repass = request.getParameter("repass");
 
-        // Đặt trạng thái form để hiển thị form đăng ký khi có lỗi
         request.setAttribute("showRegisterForm", true);
         request.setAttribute("registerActive", "active");
 
-        // Kiểm tra mật khẩu có khớp không
+        // Kiểm tra mật khẩu và xác nhận mật khẩu
         if (!password.equals(repass)) {
             request.setAttribute("message_signup", "Passwords do not match!");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
 
-        // Kiểm tra email đã tồn tại chưa
+        // Kiểm tra email đã tồn tại
         User existingUser = new UserDAO().getUserByEmail(email);
         if (existingUser != null) {
             request.setAttribute("message_signup", "Email already exists!");
@@ -144,24 +157,57 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Nếu không có lỗi, tạo tài khoản mới
-        new UserDAO().createNewUser(email, password);
+        // Lưu email vào session để xác thực sau này
+        HttpSession session = request.getSession();
+        session.setAttribute("pendingEmail", email);  // Lưu email tạm thời cho việc xác thực
+
+        // Chuyển hướng tới trang xác thực OTP
         request.setAttribute("showOtpForm", true);
         request.setAttribute("email", email);
-        request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
 
+        // Không gửi OTP ở đây, mà đã được xử lý qua JavaScript trong JSP
+        request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+        new UserDAO().createNewUser(email, password);
+    }
+
+// Quên mật khẩu
+    private void handleForgotPassword(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String email = request.getParameter("email");
+
+        // Kích hoạt giao diện form quên mật khẩu (ẩn hiện bằng JSTL)
+        request.setAttribute("showForgotForm", true);
+
+        if (email == null || email.trim().isEmpty()) {
+            request.setAttribute("message_forgot", "Vui lòng nhập email.");
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+            return;
+        }
+
+        User user = new UserDAO().getUserByEmail(email);
+        if (user == null) {
+            request.setAttribute("message_forgot", "Email không tồn tại.");
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+            return;
+        }
+
+        // ✅ Email hợp lệ → hiển thị form OTP giống như khi đăng ký
+        request.getSession().setAttribute("resetEmail", email); // dùng cho gửi OTP và verify
+        request.setAttribute("showOtpForm", true);              // JSP dùng để hiện form nhập mã OTP
+        request.setAttribute("email", email);                   // binding lại để form hiển thị email
+
+        request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
     }
 
     private boolean checkPassword(String rawPassword, String hashedPassword) {
-        // TODO: Thay bằng hàm kiểm tra mật khẩu băm thực tế, ví dụ dùng BCrypt
-        // Ví dụ đơn giản giả định mật khẩu lưu thô (KHÔNG NÊN làm vậy ở thực tế)
         return rawPassword.equals(hashedPassword);
     }
 
     private void setRememberMeCookies(HttpServletResponse response, String email) {
         Cookie emailCookie = new Cookie("email", email);
         emailCookie.setHttpOnly(true);
-        emailCookie.setMaxAge(60 * 60 * 24 * 7); // 7 ngày
+        emailCookie.setMaxAge(60 * 60 * 24 * 7);
         response.addCookie(emailCookie);
     }
 

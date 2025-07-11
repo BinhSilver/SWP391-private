@@ -35,6 +35,16 @@
             <c:import url="/LoginJSP/ForgotPassword.jsp" />
         </div>
         <script src="<c:url value='/js/login.js' />"></script>
+        <script>
+            window.onload = function () {
+                // Kiểm tra nếu URL có chứa tham số 'signup'
+                var urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('signup')) {               
+                    container.classList.add('active');
+                    container.classList.remove('active-change');
+                }
+            };
+        </script>
     </body>
 
 </html>

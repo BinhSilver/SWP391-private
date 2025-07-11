@@ -9,9 +9,10 @@ import jakarta.mail.MessagingException;
 
 @WebServlet("/send-otp")
 public class SendOtpServlet extends HttpServlet {
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
-        if(email == null || email.isEmpty()) {
+        if (email == null || email.isEmpty()) {
             response.getWriter().write("error");
             return;
         }
@@ -29,5 +30,10 @@ public class SendOtpServlet extends HttpServlet {
             e.printStackTrace();
             response.getWriter().write("error");
         }
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request, response);
     }
 }

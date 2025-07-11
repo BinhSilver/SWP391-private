@@ -47,6 +47,13 @@
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
                     </div>
+                    <c:if test="${sessionScope.authUser != null && sessionScope.authUser.role == 'admin'}">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="isSuggested" name="isSuggested" />
+                            <label class="form-check-label" for="isSuggested">Đánh dấu là khóa học nổi bật</label>
+                        </div>
+                    </c:if>
+
                 </div>
 
                 <!-- LESSONS -->

@@ -12,23 +12,15 @@
             <!-- Navigation Links -->
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
-                    <a class="nav-link px-2" href="<c:url value='/index.jsp'/>">Trang Chủ</a>
+                    <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
-                    <c:choose>
-                        <c:when test="${authUser.roleID == 1 || authUser.roleID == 2}">
-                            <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
-                        </c:when>
-                        <c:when test="${authUser.roleID == 3 || authUser.roleID == 4}">
-                            <a class="nav-link px-2" href="teacher_dashboard">Khóa Học</a>
-                        </c:when>
-                    </c:choose>
-
+                    <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="#">Premium</a>
+                    <a class="nav-link px-2" href="<c:url value='/PaymentJSP/Payment.jsp'/>">Premium</a>
                     <a class="nav-link px-2" href="#">FlashCard</a>
-
                 </div>
             </div>
+
 
             <!-- Search -->
             <div class="col-3 d-flex justify-content-end">
@@ -43,17 +35,36 @@
                 <c:choose>
                     <c:when test="${empty authUser}">
                         <a href="<c:url value='login' />" class="btn-wasabii">Đăng Nhập</a>
-                        <a href="<c:url value='register' />" class="btn-wasabii">Đăng Ký</a>
+                        <a href="<c:url value='login?signup=true' />" class="btn-wasabii">Đăng Ký</a>
                     </c:when>
                     <c:otherwise>
-                        <div class="d-flex align-items-center gap-2">
-                            <ion-icon name="person-outline"></ion-icon>
-                            <span>${authUser.fullName}</span>
+                        <div class="dropdown">
+                            <a class="btn dropdown-toggle d-flex align-items-center" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <ion-icon name="person-circle-outline" style="font-size: 24px;"></ion-icon>
+                                <span class="ms-2">${authUser.fullName}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<c:url value='profile'/>">Profile</a>
+                                </li>
+                                <c:if test="${authUser.roleID == 3 || authUser.roleID == 4}">
+                                    <li>
+                                        <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
+                                    </li>
+                                </c:if>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="<c:url value='/logout'/>">Đăng Xuất</a>
+                                </li>
+                            </ul>
+
+
+
                         </div>
+
                     </c:otherwise>
                 </c:choose>
             </div>
-
 
         </div>
     </div>

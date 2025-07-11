@@ -30,7 +30,7 @@ public class EditCourseServlet extends HttpServlet {
         course.setCourseID(courseId);
         course.setTitle(title);
         course.setDescription(description);
-        course.setIsHidden(isHidden);
+        course.setHidden(isHidden);
 
         CoursesDAO dao = new CoursesDAO();
         try {
