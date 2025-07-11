@@ -1,8 +1,8 @@
 -- Trong phiên bản này Huy đã thay đổi thêm một hàm để format ký tự ghép và dấu với bảng liên quan đến chat messenger conversation 
-CREATE DATABASE Wasabii_Huy
-GO;
-USE Wasabii_Huy;
-GO;
+CREATE DATABASE Wasabii;
+GO
+USE Wasabii;
+GO
 
 -- 1. Roles
 CREATE TABLE Roles (
@@ -36,7 +36,7 @@ CREATE TABLE Users (
     JapaneseLevel NVARCHAR(50),
     Address NVARCHAR(255),
     Country NVARCHAR(100),
-    Avatar VARBINARY(MAX),
+    Avatar NVARCHAR(MAX),
     Gender NVARCHAR(10) CONSTRAINT DF_Users_Gender DEFAULT N'Khác'
 );
 
@@ -342,9 +342,9 @@ VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùn
 UPDATE Courses SET CreatedAt = GETDATE() WHERE CreatedAt IS NULL;
 
 GO
---thêm user này vì để coi được khóa học nha
+--thêm user này để coi được khóa học nha
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
-VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', null, N'Nữ');
+VALUES (3,'teacher@gmail.com', '123', NULL, 'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ');
 
 --Thêm mấy bảng này nha
 CREATE TABLE LessonAccess (

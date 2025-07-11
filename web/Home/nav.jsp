@@ -1,78 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<style>
-    .navbar {
-        position: relative;
-    }
-    .nav-links .nav-link {
-        font-size: 1rem;
-        color: #333;
-        transition: color 0.3s;
-    }
-    .nav-links .nav-link:hover {
-        color: #28a745;
-    }
-    .input-group {
-        max-width: 250px;
-    }
-
-    .search-container {
-        position: relative;
-    }
-    #searchResults {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        width: 100%; /* Khớp với .input-group */
-        max-height: 400px;
-        overflow-y: auto;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 0.25rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        z-index: 1000;
-        display: none;
-        padding: 0;
-    }
-    #searchResults.show {
-        display: block;
-    }
-    #searchResults .list-group-item {
-        border: none;
-        padding: 0.75rem;
-        display: block;
-    }
-    #searchResults .list-group-item h5 {
-        margin: 0;
-        font-size: 1rem;
-        color: #333;
-        display: block;
-    }
-    #searchResults .list-group-item p {
-        margin: 0.25rem 0 0;
-        font-size: 0.85rem;
-        color: #666;
-        display: block;
-    }
-    #searchResults .btn-wasabii {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .dropdown-menu {
-        min-width: 120px;
-    }
-    @media (max-width: 992px) {
-        .input-group {
-            max-width: 200px;
-        }
-        #searchResults {
-            width: 100%;
-        }
-    }
-</style>
-
 <nav class="navbar navbar-expand-lg bg-light py-3">
     <div class="container-fluid">
         <div class="row align-items-center w-100">
@@ -88,8 +16,22 @@
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
-                    <a class="nav-link px-2" href="#">FlashCard</a>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">Premium</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">FlashCard</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="#">FlashCard</a>
+                        </c:otherwise>
+                    </c:choose>
                     <a class="nav-link px-2" href="search.jsp">Tra Cứu</a>
                 </div>
             </div>
@@ -180,7 +122,7 @@
                                     var $p = $('<p>').text(courseDesc);
                                     var $a = $('<a>')
                                             .addClass('btn btn-sm btn-wasabii')
-                                            .attr('href', '<c:url value="/courseDetails.jsp"/>?courseID=' + encodeURIComponent(courseId))
+                                            .attr('href', '<c:url value="/course-detail.jsp"/>?courseID=' + encodeURIComponent(courseId))
                                             .text('Xem chi tiết');
 
                                     $li.append($h5).append($p).append($a);
