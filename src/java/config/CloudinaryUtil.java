@@ -1,6 +1,7 @@
 package config;
 
 import com.cloudinary.Cloudinary;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,5 +47,22 @@ public class CloudinaryUtil {
             }
         }
         return cloudinary;
+    }
+
+    public static String uploadImage(InputStream inputStream) throws IOException {
+        try {
+            Cloudinary cloudinary = getCloudinary();
+            Map<String, Object> options = new HashMap<>();
+            options.put("resource_type", "image");
+            options.put("folder", "flashcard");
+            
+            // Chuyển InputStream thành byte array
+            byte[] imageBytes = inputStream.readAllBytes();
+            
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(imageBytes, options);
+            return (String) uploadResult.get("url");
+        } catch (Exception e) {
+            throw new IOException("Error uploading image to Cloudinary: " + e.getMessage(), e);
+        }
     }
 } 

@@ -29,7 +29,7 @@
                             <a class="nav-link px-2" href="<c:url value='login'/>">FlashCard</a>
                         </c:when>
                         <c:otherwise>
-                            <a class="nav-link px-2" href="#">FlashCard</a>
+                            <a class="nav-link px-2" href="<c:url value='/flashcard'/>">FlashCard</a>
                         </c:otherwise>
                     </c:choose>
                     <a class="nav-link px-2" href="search.jsp">Tra Cứu</a>
