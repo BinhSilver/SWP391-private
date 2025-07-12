@@ -1,106 +1,140 @@
 package Dao;
 
 import DB.JDBCConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.PremiumPlan;
 
 public class PremiumPlanDAO {
-    private Connection conn = null;
-    private PreparedStatement ps = null;
-    private ResultSet rs = null;
-
-    public List<PremiumPlan> getAllPremiumPlans() {
-        List<PremiumPlan> list = new ArrayList<>();
-        String query = "SELECT * FROM PremiumPlans";
-        try {
-            conn = new JDBCConnection().getConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
+    
+    /**
+     * Lấy thời hạn (số tháng) của gói premium
+     * @param planId ID của gói premium
+     * @return số tháng của gói premium
+     */
+    public int getPlanDuration(int planId) throws SQLException {
+        String sql = "SELECT DurationInMonths FROM PremiumPlans WHERE PlanID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, planId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("DurationInMonths");
+                }
+            }
+        }
+        return 0; // Trả về 0 nếu không tìm thấy plan
+    }
+    
+    /**
+     * Lấy danh sách tất cả các gói premium
+     */
+    public List<PremiumPlan> getAllPremiumPlans() throws SQLException {
+        List<PremiumPlan> plans = new ArrayList<>();
+        String sql = "SELECT * FROM PremiumPlans";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                list.add(new PremiumPlan(
-                    rs.getInt("PlanID"),
-                    rs.getString("PlanName"),
-                    rs.getDouble("Price"),
-                    rs.getInt("DurationInMonths"),
-                    rs.getString("Description")
-                ));
+                PremiumPlan plan = new PremiumPlan();
+                plan.setPlanID(rs.getInt("PlanID"));
+                plan.setPlanName(rs.getString("PlanName"));
+                plan.setPrice(rs.getDouble("Price"));
+                plan.setDurationInMonths(rs.getInt("DurationInMonths"));
+                plan.setDescription(rs.getString("Description"));
+                plans.add(plan);
             }
-        } catch (SQLException e) {
-            System.out.println(e);
         }
-        return list;
+        return plans;
     }
-
-    public boolean addPremiumPlan(String planName, double price, int durationInMonths, String description) {
-        String query = "INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description) VALUES (?, ?, ?, ?)";
-        try {
-            conn = new JDBCConnection().getConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, planName);
-            ps.setDouble(2, price);
-            ps.setInt(3, durationInMonths);
-            ps.setString(4, description);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println(e);
-            return false;
-        }
-    }
-
-    public boolean updatePremiumPlan(int planID, String planName, double price, int durationInMonths, String description) {
-        String query = "UPDATE PremiumPlans SET PlanName=?, Price=?, DurationInMonths=?, Description=? WHERE PlanID=?";
-        try {
-            conn = new JDBCConnection().getConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, planName);
-            ps.setDouble(2, price);
-            ps.setInt(3, durationInMonths);
-            ps.setString(4, description);
-            ps.setInt(5, planID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println(e);
-            return false;
-        }
-    }
-
-    public boolean deletePremiumPlan(int planID) {
-        String query = "DELETE FROM PremiumPlans WHERE PlanID=?";
-        try {
-            conn = new JDBCConnection().getConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, planID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println(e);
-            return false;
-        }
-    }
-
-    public PremiumPlan getPremiumPlanByID(int planID) {
-        String query = "SELECT * FROM PremiumPlans WHERE PlanID=?";
-        try {
-            conn = new JDBCConnection().getConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, planID);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return new PremiumPlan(
-                    rs.getInt("PlanID"),
-                    rs.getString("PlanName"),
-                    rs.getDouble("Price"),
-                    rs.getInt("DurationInMonths"),
-                    rs.getString("Description")
-                );
+    
+    /**
+     * Lấy thông tin gói premium theo ID
+     */
+    public PremiumPlan getPremiumPlanByID(int planId) throws SQLException {
+        String sql = "SELECT * FROM PremiumPlans WHERE PlanID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, planId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    PremiumPlan plan = new PremiumPlan();
+                    plan.setPlanID(rs.getInt("PlanID"));
+                    plan.setPlanName(rs.getString("PlanName"));
+                    plan.setPrice(rs.getDouble("Price"));
+                    plan.setDurationInMonths(rs.getInt("DurationInMonths"));
+                    plan.setDescription(rs.getString("Description"));
+                    return plan;
+                }
             }
-        } catch (SQLException e) {
-            System.out.println(e);
         }
         return null;
+    }
+
+    public PremiumPlan getPlanById(int planId) throws SQLException {
+        String sql = "SELECT * FROM PremiumPlans WHERE PlanID = ?";
+        
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, planId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    PremiumPlan plan = new PremiumPlan();
+                    plan.setPlanID(rs.getInt("PlanID"));
+                    plan.setPlanName(rs.getString("PlanName"));
+                    plan.setPrice(rs.getDouble("Price"));
+                    plan.setDurationInMonths(rs.getInt("DurationInMonths"));
+                    plan.setDescription(rs.getString("Description"));
+                    return plan;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Thêm gói premium mới
+     */
+    public boolean addPremiumPlan(String planName, double price, int durationInMonths, String description) throws SQLException {
+        String sql = "INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description) VALUES (?, ?, ?, ?)";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, planName);
+            stmt.setDouble(2, price);
+            stmt.setInt(3, durationInMonths);
+            stmt.setString(4, description);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * Cập nhật thông tin gói premium
+     */
+    public boolean updatePremiumPlan(int planId, String planName, double price, int durationInMonths, String description) throws SQLException {
+        String sql = "UPDATE PremiumPlans SET PlanName=?, Price=?, DurationInMonths=?, Description=? WHERE PlanID=?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, planName);
+            stmt.setDouble(2, price);
+            stmt.setInt(3, durationInMonths);
+            stmt.setString(4, description);
+            stmt.setInt(5, planId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * Xóa gói premium
+     */
+    public boolean deletePremiumPlan(int planId) throws SQLException {
+        String sql = "DELETE FROM PremiumPlans WHERE PlanID=?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, planId);
+            return stmt.executeUpdate() > 0;
+        }
     }
 } 

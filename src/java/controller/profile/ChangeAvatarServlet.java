@@ -2,6 +2,8 @@ package controller.profile;
 
 import Dao.UserDAO;
 import model.User;
+import config.CloudinaryUtil;
+import com.cloudinary.Cloudinary;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -9,8 +11,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.HashMap;
 
 @WebServlet("/changeAvatar")
 @MultipartConfig(
@@ -47,10 +50,22 @@ public class ChangeAvatarServlet extends HttpServlet {
                 return;
             }
 
-            // Lưu avatar vào DB
-            InputStream avatarStream = filePart.getInputStream();
+            // Upload ảnh lên Cloudinary
+            Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
+            Map<String, Object> options = new HashMap<>();
+            options.put("folder", "avatars");
+            options.put("public_id", "user_" + user.getUserID());
+            options.put("overwrite", true);
+
+            Map uploadResult = cloudinary.uploader().upload(filePart.getInputStream(), options);
+
+            // Lấy URL của ảnh từ kết quả upload
+            String avatarUrl = (String) uploadResult.get("secure_url");
+
+            // Cập nhật URL avatar trong database
             UserDAO dao = new UserDAO();
-            dao.updateAvatarBlob(user.getUserID(), avatarStream);
+            dao.updateAvatar(user.getUserID(), avatarUrl);
+
             // Cập nhật lại avatar cho user trong session
             user = dao.getUserById(user.getUserID());
             session.setAttribute("authUser", user);
