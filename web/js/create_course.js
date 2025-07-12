@@ -208,6 +208,32 @@ quizQuestionsContainer.addEventListener("click", (e) => {
     }
 });
 
+// --- EVENT LISTENER: ADD/REMOVE VOCAB ENTRY ---
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('btn-add-vocab')) {
+        const container = e.target.closest('.vocab-entry-container');
+        const lessonIndex = container.getAttribute('data-lesson-index');
+        const vocabEntries = container.querySelectorAll('.input-group');
+        const vocabIndex = vocabEntries.length;
+        const newInput = `
+            <div class="input-group mb-2">
+                <input type="text" class="form-control vocab-text" name="lessons[${lessonIndex}][vocabText][${vocabIndex}]" placeholder="Word:Meaning:Reading:Example" />
+                <input type="file" class="form-control vocab-image" name="lessons[${lessonIndex}][vocabImage][${vocabIndex}]" accept="image/*" />
+                <button type="button" class="btn btn-outline-success btn-add-vocab ms-2">+</button>
+                <button type="button" class="btn btn-outline-danger btn-remove-vocab ms-1">-</button>
+            </div>
+        `;
+        e.target.closest('.input-group').insertAdjacentHTML('afterend', newInput);
+    }
+
+    if (e.target.classList.contains('btn-remove-vocab')) {
+        const group = e.target.closest('.input-group');
+        if (group.parentElement.querySelectorAll('.input-group').length > 1) {
+            group.remove();
+        }
+    }
+});
+
 // --- QUIZ FORM SUBMIT ---
 quizForm.addEventListener('submit', function (e) {
     e.preventDefault();
