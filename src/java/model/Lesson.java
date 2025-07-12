@@ -6,8 +6,22 @@ public class Lesson {
     private String title;
     private boolean isHidden;
 
+    // ✅ Thêm thuộc tính mô tả
+    private String description;
+
+    // ✅ Constructor mặc định
     public Lesson() {}
 
+    // ✅ Constructor đầy đủ có cả mô tả
+    public Lesson(int lessonID, int courseID, String title, boolean isHidden, String description) {
+        this.lessonID = lessonID;
+        this.courseID = courseID;
+        this.title = title;
+        this.isHidden = isHidden;
+        this.description = description;
+    }
+
+    // ✅ Constructor cũ (nếu bạn vẫn dùng ở chỗ khác)
     public Lesson(int lessonID, int courseID, String title, boolean isHidden) {
         this.lessonID = lessonID;
         this.courseID = courseID;
@@ -47,5 +61,12 @@ public class Lesson {
         this.isHidden = isHidden;
     }
 
-  
+    // ✅ Getter/Setter cho mô tả
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

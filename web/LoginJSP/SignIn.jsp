@@ -41,5 +41,3 @@
         </c:if>
     </form>
 
-</div>
-<script src="<c:url value='/js/login.js' />"></script>

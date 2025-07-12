@@ -1,0 +1,236 @@
+/* Reset cơ bản */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background: #fafafa;
+  overflow: hidden; /* Ngăn scroll toàn trang, chỉ scroll phần chat-body khi cần */
+}
+
+/* Container tổng */
+.chat-container {
+  display: flex;
+  height: calc(100vh - 70px); /* Trừ chiều cao navbar nếu có */
+  overflow: hidden;
+}
+
+/* Sidebar user list */
+.chat-sidebar {
+  width: 250px;
+  background: #f8f9fa;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.chat-sidebar input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}
+
+/* User list items */
+#userList {
+  padding: 0;
+  margin: 0;
+}
+
+#userList li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+#userList li:hover {
+  background: #e9ecef;
+}
+
+#userList li img {
+  margin-right: 10px;
+}
+
+/* Main chat area */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.chat-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+}
+
+/* Chat body */
+.chat-body {
+  flex: 1;
+  padding: 15px;
+  background: #fff;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tin nhắn chung */
+.chat-msg {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-end;
+}
+
+.chat-msg.me {
+  justify-content: flex-end;
+}
+
+.chat-msg .chat-msg-content {
+  max-width: 60%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  word-wrap: break-word;
+}
+
+/* Tin nhắn của người khác: xám */
+.chat-msg:not(.me) .chat-msg-content {
+  background: #f1f0f0;
+  text-align: left;
+}
+
+/* Tin nhắn của mình: hồng */
+.chat-msg.me .chat-msg-content {
+  background: #f8b4d9;
+  color: white;
+  text-align: right;
+}
+
+/* Avatar */
+.chat-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+/* Input */
+.chat-input-wrap {
+  display: flex;
+  padding: 10px 15px;
+  border-top: 1px solid #ddd;
+  background: #f8f9fa;
+}
+
+.chat-input-wrap input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.chat-input-wrap button {
+  background: #f8b4d9;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input-wrap button:hover {
+  background: #f488ad;
+}
+
+/* Dropdown */
+.dropdown-content {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  min-width: 120px;
+  z-index: 10;
+}
+
+.dropdown-content button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-content button:hover {
+  background: #f1f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-container {
+    flex-direction: column;
+  }
+
+  .chat-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .chat-main {
+    flex: 1;
+  }
+}
+.revoke-btn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.2s;
+}
+
+.revoke-btn:hover {
+  color: #e94f64;
+}
+.chat-actions {
+    margin-top: 5px;
+}
+
+.recall-btn {
+    background-color: #dc3545; /* Red color */
+    border: none;
+    border-radius: 50%; /* Circular shape */
+    width: 24px; /* Small size */
+    height: 24px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 8px;
+}
+
+.recall-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+.recall-btn .fas {
+    margin: 0;
+}

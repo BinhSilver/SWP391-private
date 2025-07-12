@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ include file="../Home/nav.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,7 +15,7 @@
                     <h4>Thanh Toán Đã Bị Hủy</h4>
                     <p>${message}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/PaymentJSP/Payment.jsp" class="btn btn-primary">Quay Lại Trang Thanh Toán</a>
+                <a href="${pageContext.request.contextPath}/HomeServlet" class="btn btn-primary">Về Trang Chủ</a>
             </div>
         </div>
     </div>

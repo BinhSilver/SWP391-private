@@ -16,18 +16,33 @@
                     <a class="nav-link px-2" href="#">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
-                    <a class="nav-link px-2" href="<c:url value='/PaymentJSP/Payment.jsp'/>">Premium</a>
-                    <a class="nav-link px-2" href="#">FlashCard</a>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">Premium</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="<c:url value='/payment'/>">Premium</a>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:choose>
+                        <c:when test="${empty authUser}">
+                            <a class="nav-link px-2" href="<c:url value='login'/>">FlashCard</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="nav-link px-2" href="#">FlashCard</a>
+                        </c:otherwise>
+                    </c:choose>
+                    <a class="nav-link px-2" href="search.jsp">Tra Cứu</a>
                 </div>
             </div>
 
-
             <!-- Search -->
-            <div class="col-3 d-flex justify-content-end">
-                <div class="input-group" style="max-width: 100%;">
+            <div class="col-3 d-flex justify-content-end search-container">
+                <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="search" class="form-control" placeholder="Tìm kiếm khóa học..." aria-label="Tìm kiếm khóa học">
+                    <input type="search" class="form-control" id="searchCourseInput" placeholder="Tìm kiếm khóa học..." aria-label="Tìm kiếm khóa học">
                 </div>
+                <div id="searchResults"></div>
             </div>
 
             <!-- Auth Links -->
@@ -35,7 +50,7 @@
                 <c:choose>
                     <c:when test="${empty authUser}">
                         <a href="<c:url value='login' />" class="btn-wasabii">Đăng Nhập</a>
-                        <a href="<c:url value='login?signup=true' />" class="btn-wasabii">Đăng Ký</a>
+                        <a href="<c:url value='register' />" class="btn-wasabii">Đăng Ký</a>
                     </c:when>
                     <c:otherwise>
                         <div class="dropdown">
@@ -47,25 +62,95 @@
                                 <li>
                                     <a class="dropdown-item" href="<c:url value='profile'/>">Profile</a>
                                 </li>
-                                <c:if test="${authUser.roleID == 3 || authUser.roleID == 4}">
+                                 <li>
+                                    <a class="dropdown-item" href="<c:url value='chatrealtime.jsp'/>">chat</a>
+                                </li>
+                              <li>
+                                    <a class="dropdown-item" href="<c:url value='videocall.jsp'/>">Video Call</a>
+                                </li>
+                                <c:if test="${authUser.roleID == 3}">
                                     <li>
                                         <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>
+                                    </li>
+                                </c:if>
+                                <c:if test="${authUser.roleID == 4}">
+                                    <li>
+                                        <a class="dropdown-item" href="<c:url value='statis.jsp'/>">Admin</a>
                                     </li>
                                 </c:if>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="<c:url value='/logout'/>">Đăng Xuất</a>
                                 </li>
+                               
                             </ul>
-
-
-
                         </div>
-
                     </c:otherwise>
                 </c:choose>
             </div>
-
         </div>
     </div>
 </nav>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#searchCourseInput').on('input', function () {
+            var query = $(this).val().trim();
+            var $searchResults = $('#searchResults');
+            $searchResults.empty().removeClass('show');
+
+            if (query.length > 0) {
+                $.ajax({
+                    url: '<c:url value="/SearchCourse" />',
+                    type: 'GET',
+                    data: {query: query},
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log('Raw search response:', data);
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            var $ul = $('<ul>').addClass('list-group');
+                            $.each(data, function (idx, course) {
+                                console.log('Course object:', course);
+                                if (course.isHidden === false) {
+                                    var courseTitle = course.title ? String(course.title) : 'Không có tiêu đề';
+                                    var courseDesc = course.description ? String(course.description) : 'Không có mô tả';
+                                    var courseId = course.courseID ? String(course.courseID) : '';
+
+                                    var $li = $('<li>').addClass('list-group-item');
+                                    var $h5 = $('<h5>').text(courseTitle);
+                                    var $p = $('<p>').text(courseDesc);
+                                    var $a = $('<a>')
+                                            .addClass('btn btn-sm btn-wasabii')
+                                            .attr('href', '<c:url value="/course-detail.jsp"/>?courseID=' + encodeURIComponent(courseId))
+                                            .text('Xem chi tiết');
+
+                                    $li.append($h5).append($p).append($a);
+                                    $ul.append($li);
+                                }
+                            });
+                            if ($ul.children().length > 0) {
+                                $searchResults.append($ul).addClass('show');
+                            } else {
+                                $searchResults.append('<div class="alert alert-info m-0">Không tìm thấy khóa học nào.</div>').addClass('show');
+                            }
+                        } else {
+                            $searchResults.append('<div class="alert alert-info m-0">Không tìm thấy khóa học nào.</div>').addClass('show');
+                        }
+                        console.log('Rendered HTML:', $searchResults.html());
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX error:', status, error, xhr.responseText);
+                        $searchResults.append('<div class="alert alert-danger m-0">Đã xảy ra lỗi khi tìm kiếm: ' + error + '</div>').addClass('show');
+                    }
+                });
+            }
+        });
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.search-container').length) {
+                $('#searchResults').empty().removeClass('show');
+            }
+        });
+    });
+</script>

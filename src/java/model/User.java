@@ -241,12 +241,18 @@ public class User {
     }
 
     public int getAge() {
-    if (birthDate == null) return -1;
+        if (birthDate == null) {
+            return -1;
+        }
 
-    LocalDate birth = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    LocalDate today = LocalDate.now();
-
-    return Period.between(birth, today).getYears();
-}
+        LocalDate birth;
+        if (birthDate instanceof java.sql.Date) {
+            birth = ((java.sql.Date) birthDate).toLocalDate();
+        } else {
+            birth = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        LocalDate today = LocalDate.now();
+        return Period.between(birth, today).getYears();
+    }
 }
 

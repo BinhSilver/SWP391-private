@@ -18,18 +18,17 @@ public class DeleteCourseServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("text/plain;charset=UTF-8");
 
-        int courseId = Integer.parseInt(request.getParameter("courseId"));
-
-        CoursesDAO dao = new CoursesDAO();
         try {
+            int courseId = Integer.parseInt(request.getParameter("courseId"));
+            CoursesDAO dao = new CoursesDAO();
             dao.delete(courseId);
-            response.sendRedirect("CourseServlet");
-        } catch (SQLException e) {
+
+            response.setStatus(HttpServletResponse.SC_OK); // Thành công
+        } catch (NumberFormatException | SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi xóa khóa học: " + e.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi khi xóa khóa học: " + e.getMessage());
         }
     }
 }

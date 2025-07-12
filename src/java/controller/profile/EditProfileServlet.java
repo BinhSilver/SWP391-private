@@ -8,8 +8,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.User;
 import Dao.UserDAO;
+import jakarta.servlet.annotation.MultipartConfig;
+// import java.util.HashMap;
+// import java.util.Map;
+// import com.cloudinary.Cloudinary;
+// import config.CloudinaryUtil;
+// import java.io.File;
+// import java.io.FileOutputStream;
+// import java.io.InputStream;
 
 @WebServlet("/editprofile")
+@MultipartConfig
 public class EditProfileServlet extends HttpServlet {
 
     @Override
@@ -42,7 +51,6 @@ public class EditProfileServlet extends HttpServlet {
             String japaneseLevel = request.getParameter("japaneseLevel");
             String address = request.getParameter("address");
             String country = request.getParameter("country");
-            String avatar = request.getParameter("avatar");
 
             // Parse ngày sinh
             Date birthDate = null;
@@ -58,16 +66,23 @@ public class EditProfileServlet extends HttpServlet {
             currentUser.setJapaneseLevel(japaneseLevel);
             currentUser.setAddress(address);
             currentUser.setCountry(country);
-            currentUser.setAvatar(avatar);
+
+            // TODO: Tạm thời tắt upload avatar cho đến khi có thư viện json-simple và cloudinary-core
+            // Part filePart = request.getPart("avatar");
+            // if (filePart != null && filePart.getSize() > 0) {
+            //     // Avatar upload sẽ được implement sau khi thêm đầy đủ thư viện Cloudinary
+            //     System.out.println("Avatar upload disabled - missing Cloudinary dependencies");
+            // }
 
             UserDAO dao = new UserDAO();
             boolean success = dao.updateProfile(currentUser);
 
             if (success) {
-                session.setAttribute("authUser", currentUser); // Cập nhật session
-                // Điều hướng về trang xem hồ sơ (profile-view.jsp)
-                request.getRequestDispatcher("/Profile/profile-view.jsp").forward(request, response);
-
+                // Cập nhật session với thông tin mới
+                session.setAttribute("authUser", currentUser);
+                
+                // Redirect về ProfileServlet để load đầy đủ thông tin bao gồm cả Premium
+                response.sendRedirect(request.getContextPath() + "/profile");
             } else {
                 // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");

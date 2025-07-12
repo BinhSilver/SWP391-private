@@ -1,27 +1,53 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Chatbot Course</title>
-    <style>
-        #chatBox {
-            width: 600px; height: 400px;
-            border: 1px solid #ccc;
-            overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
-        }
-        .user { font-weight: bold; color: #0055cc; margin-top: 5px; }
-        .bot { font-style: italic; color: #009900; margin-left: 10px; }
-    </style>
-</head>
-<body>
-<h2>💬 Hỏi đáp về khóa học</h2>
-<div id="chatBox"></div>
-<input type="text" id="userInput" placeholder="Nhập câu hỏi..." style="width:400px;" />
-<button onclick="sendMessage()">Gửi</button>
+    <meta charset="UTF-8">
+    <title>Chat với AI</title>
 
-<script src="chat/chatbox.js"></script>
+    <!-- Font đẹp -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+    <!-- JS chat box -->
+    <script src="chat/chatbox.js"></script>
+</head>
+
+<body>
+
+<section id="chatbox">
+    <div id="chatButton" onclick="toggleChat()">💬 Hỗ trợ thông tin</div>
+
+    <div id="chatContainer">
+        <div id="chatHeader">
+            <span>Chat với AI</span>
+            <button onclick="toggleChat()">✖</button>
+        </div>
+
+        <div id="chatBox">
+          <div class="aiMessage">
+        <b>AI:</b> 🎌 Xin chào! Tôi là trợ lý Wasabii. Hãy hỏi tôi về tiếng Nhật hoặc các khóa học nhé!
+    </div>
+        </div>
+
+        <div id="suggestBox">
+            <button onclick="sendSampleQuestion()">Gợi ý: Đồ ăn tiếng Nhật là gì?</button>
+        </div>
+
+        <div id="butt">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeypress="handleKeyPress(event)" />
+            <button id="buttonChat" onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+</section>
+
+<script>
+    function sendSampleQuestion() {
+        document.getElementById("userInput").value = "Đồ ăn tiếng Nhật là gì?";
+        sendMessage();
+    }
+</script>
+
 </body>
 </html>

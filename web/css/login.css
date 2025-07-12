@@ -33,8 +33,8 @@ body::before {
 
 .container {
     position: relative;
-    width: 1000px;
-    height: 700px;
+    width: 850px;
+    height: 550px;
     background: #fff;
     margin: 20px;
     border-radius: 30px;
@@ -329,10 +329,9 @@ form {
         opacity: 0;
     }
 }
-/*add*/
+
 body {
     background: #f9f9f9;
-    
 }
 
 body::before {
@@ -393,40 +392,3 @@ body::before {
 .form-box.change-password {
     background: #fff;
 }
-/*role*/
-/* Giống input trước đó */
-.input-box {
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.custom-select-box select {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    font-size: 16px;
-    color: #333;
-    background: #f0f0f0;
-    border: none;
-    border-radius: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    font-family: inherit;
-}
-
-/* Icon hoặc dấu mũi tên nếu bạn muốn */
-.custom-select-box {
-    position: relative;
-}
-
-.custom-select-box::after {
-    content: '\25BC'; /* mũi tên ▼ */
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #e74c3c;
-    font-size: 14px;
-}
-

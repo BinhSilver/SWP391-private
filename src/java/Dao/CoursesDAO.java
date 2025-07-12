@@ -8,12 +8,13 @@ import model.Course;
 
 public class CoursesDAO {
 
-    public static ArrayList<Course> searchCourse(String keyword) {
+ public static ArrayList<Course> searchCourse(String keyword) {
         ArrayList<Course> list = new ArrayList<>();
-        String sql = "SELECT * FROM [dbo].[Courses] WHERE title LIKE ?";
+        String sql = "SELECT * FROM [dbo].[Courses] WHERE dbo.RemoveDiacritics(title) LIKE '%' + dbo.RemoveDiacritics(?) + '%'";
 
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + keyword + "%");
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, keyword);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -22,7 +23,7 @@ public class CoursesDAO {
                 c.setTitle(rs.getString("title"));
                 c.setDescription(rs.getString("description"));
                 c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested")); // ✅ Mới thêm
+                c.setSuggested(rs.getBoolean("isSuggested"));
                 list.add(c);
             }
         } catch (Exception e) {
@@ -37,8 +38,9 @@ public class CoursesDAO {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested()); // ✅
+            stmt.setBoolean(4, c.isSuggested());
             stmt.executeUpdate();
+            System.out.println("abc");
         }
     }
 
@@ -143,20 +145,72 @@ public class CoursesDAO {
         return null;
     }
 
-    public int addAndReturnID(Course c) throws SQLException {
-        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested) OUTPUT INSERTED.CourseID VALUES (?, ?, ?, ?)";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, c.getTitle());
-            stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested());
+    public int addAndReturnID(Course course) throws SQLException {
+        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, GETDATE())";
 
-            ResultSet rs = stmt.executeQuery();
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, course.getTitle());
+            ps.setString(2, course.getDescription());
+            ps.setBoolean(3, course.getHidden());
+            ps.setBoolean(4, course.isSuggested());
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1);
+                return rs.getInt(1); // Trả về CourseID vừa tạo
             }
         }
         return -1;
     }
+
+    // Thêm các phương thức mới
+    public int getTotalEnrollments() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Enrollment]";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Total");
+            }
+        }
+        return 0;
+    }
+
+    public int getEnrollmentsByMonthAndYear(int month, int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Enrollment] WHERE MONTH(EnrolledAt) = ? AND YEAR(EnrolledAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, month);
+            stmt.setInt(2, year);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
+    public int getHiddenCoursesCount() throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE IsHidden = 1";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
+    public int getCoursesByYear(int year) throws SQLException {
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE YEAR(CreatedAt) = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, year);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Count");
+            }
+        }
+        return 0;
+    }
+
 
 }

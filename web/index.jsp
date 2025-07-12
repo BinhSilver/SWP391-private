@@ -12,13 +12,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
         <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
+        <link rel="stylesheet" href="<c:url value='/css/stylechat.css'/>">
     </head>
     <body>
 
         <div class="page-wrapper">
             <%@ include file="Home/nav.jsp" %>
 
-
+            <%@ include file="chatBoxjsp/chatBox.jsp" %>
             <!-- Hero Section -->
             <section class="hero">
                 <div class="container">

@@ -121,7 +121,8 @@ public class UserManagementServlet extends HttpServlet {
             boolean matchesRole = role == null || role.equals("All Roles") ||
                     (role.equals("1") && user.getRoleID() == 1) ||
                     (role.equals("2") && user.getRoleID() == 2) ||
-                    (role.equals("3") && user.getRoleID() == 3);
+                    (role.equals("3") && user.getRoleID() == 3) ||
+                    (role.equals("4") && user.getRoleID() == 4);
 
             boolean matchesStatus = status == null || status.equals("All Status") ||
                     (status.equals("Active") && user.isActive() && !user.isLocked()) ||
@@ -154,7 +155,8 @@ public class UserManagementServlet extends HttpServlet {
             boolean matchesRole = role == null || role.equals("All Roles") ||
                     (role.equals("1") && user.getRoleID() == 1) ||
                     (role.equals("2") && user.getRoleID() == 2) ||
-                    (role.equals("3") && user.getRoleID() == 3);
+                    (role.equals("3") && user.getRoleID() == 3) ||
+                    (role.equals("4") && user.getRoleID() == 4);
 
             boolean matchesStatus = status == null || status.equals("All Status") ||
                     (status.equals("Active") && user.isActive() && !user.isLocked()) ||

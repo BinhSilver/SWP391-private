@@ -18,13 +18,14 @@
     </head>
     <body>
         <div class="container">
-            <form action="editprofile" method="post" class="edit-form">
+            <form action="editprofile" method="post" class="edit-form" enctype="multipart/form-data">
                 <h2>Edit Profile</h2>
                 <% if (request.getAttribute("error") != null) {%>
                 <p style="color: red;"><%= request.getAttribute("error")%></p>
                 <% }%>
                 <input type="hidden" name="userID" value="<%= user.getUserID()%>" />
 
+                
                 <div class="form-grid">
                     <div class="form-group">
                         <label><i class="fa-solid fa-envelope"></i> Email</label>
@@ -64,10 +65,10 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label><i class="fa-solid fa-image"></i> Avatar URL</label>
-                        <input type="url" name="avatar" value="<%= user.getAvatar() != null ? user.getAvatar() : ""%>" placeholder="https://example.com/avatar.jpg" />
+                        <label><i class="fa-solid fa-image"></i> Ảnh đại diện</label>
+                        <input type="file" name="avatar" accept="image/*" />
                     </div>
-
+                    
                     <div class="form-group full-width">
                         <label><i class="fa-solid fa-location-dot"></i> Address</label>
                         <input type="text" id="address" name="address" list="address-options"
