@@ -79,7 +79,7 @@ public class UserDAO {
             stmt.setString(10, user.getJapaneseLevel());
             stmt.setString(11, user.getAddress());
             stmt.setString(12, user.getCountry());
-            stmt.setBytes(13, user.getAvatar());
+            stmt.setString(13, user.getAvatar());
             stmt.setInt(14, user.getUserID());
             stmt.executeUpdate();
         }
@@ -96,7 +96,7 @@ public class UserDAO {
             stmt.setString(5, user.getJapaneseLevel());
             stmt.setString(6, user.getAddress());
             stmt.setString(7, user.getCountry());
-            stmt.setBytes(8, user.getAvatar());
+            stmt.setString(8, user.getAvatar());
             stmt.setInt(9, user.getUserID());
             return stmt.executeUpdate() > 0;
         }
@@ -246,10 +246,11 @@ public class UserDAO {
         return jsonArray;
     }
 
-    public void updateAvatarBlob(int userId, InputStream avatarStream) throws SQLException {
+    public void updateAvatar(int userId, String avatarUrl) throws SQLException {
         String sql = "UPDATE Users SET Avatar = ? WHERE UserID = ?";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setBlob(1, avatarStream);
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, avatarUrl);
             stmt.setInt(2, userId);
             stmt.executeUpdate();
         }
@@ -272,7 +273,7 @@ public class UserDAO {
             user.setJapaneseLevel(rs.getString("JapaneseLevel"));
             user.setAddress(rs.getString("Address"));
             user.setCountry(rs.getString("Country"));
-            user.setAvatar(rs.getBytes("Avatar"));
+            user.setAvatar(rs.getString("Avatar")); // Sử dụng setAvatar thay vì setAvatarUrl
             user.setGender(rs.getString("Gender"));
         } catch (SQLException | NullPointerException ignored) {
         }
@@ -338,11 +339,25 @@ public class UserDAO {
         return users;
     }
 
+    public List<User> searchUsersByFullName(String keyword) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM [dbo].[Users] WHERE dbo.RemoveDiacritics(FullName) LIKE '%' + dbo.RemoveDiacritics(?) + '%' AND IsActive = 1";
+
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, keyword); 
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        }
+        return users;
+    }
+
     public static void main(String[] args) throws SQLException {
         UserDAO dao = new UserDAO();
-        List<User> users = dao.getAllUsers();
-        for (User u : users) {
-            System.out.println(u);
-        }
+        User users = dao.getUserById(1);
+     
+            System.out.println(users);
+        
     }
 }

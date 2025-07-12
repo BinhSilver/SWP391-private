@@ -15,7 +15,7 @@
                     <h4>Thanh Toán Đã Bị Hủy</h4>
                     <p>${message}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/index.jsp" class="btn btn-primary">Về Trang Chủ</a>
+                <a href="${pageContext.request.contextPath}/HomeServlet" class="btn btn-primary">Về Trang Chủ</a>
             </div>
         </div>
     </div>
