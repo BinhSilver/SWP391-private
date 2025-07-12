@@ -7,7 +7,7 @@
   <form id="sendOtpForm">
     <h1>Forgot Password</h1>
     <div class="input-box">
-      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      <input type="email" id="forgotEmail" name="email" placeholder="Enter your email" required />
       <i class="bx bxs-envelope"></i>
     </div>
     <button type="submit" id="sendOtpBtn" class="btn">Send OTP</button>
@@ -18,7 +18,7 @@
   <form id="verifyOtpForm" style="display:none; margin-top: 20px;">
     <h1>Verify OTP</h1>
     <div class="input-box">
-      <input type="text" id="otp" name="otp" placeholder="Enter OTP" maxlength="6" required />
+      <input type="text" id="forgotOtp" name="otp" placeholder="Enter OTP" maxlength="6" required />
       <i class="bx bxs-key"></i>
     </div>
     <button type="submit" id="verifyOtpBtn" class="btn">Verify OTP</button>
@@ -51,101 +51,96 @@
   const sendOtpForm = document.getElementById('sendOtpForm');
   const verifyOtpForm = document.getElementById('verifyOtpForm');
   const resetPasswordForm = document.getElementById('resetPasswordForm');
+
   const messageSendOtp = document.getElementById('messageSendOtp');
   const messageVerifyOtp = document.getElementById('messageVerifyOtp');
   const messageResetPass = document.getElementById('messageResetPass');
 
-
-// Xử lý gửi OTP
-  sendOtpForm.addEventListener('submit', function(e) {
+  // Gửi OTP
+  sendOtpForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const email = sendOtpForm.email.value.trim();
+    const email = document.getElementById('forgotEmail').value.trim();
     if (!email) {
       messageSendOtp.style.color = 'red';
       messageSendOtp.textContent = 'Vui lòng nhập email.';
       return;
     }
 
-    fetch(contextPath + '/login', {
+    fetch(contextPath + '/send-forgot-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        action: 'forgot_pass',
-        email: email
-      }),
+      body: new URLSearchParams({ email: email })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        messageVerifyOtp.style.color = 'green';
-        messageVerifyOtp.textContent = 'Mã OTP đã được gửi vào email của bạn.';
-        currentEmail = email;
+      .then(res => res.text())
+      .then(response => {
+        if (response.trim() === 'ok') {
+          messageSendOtp.style.color = 'green';
+          messageSendOtp.textContent = 'OTP đã được gửi đến email của bạn.';
+          currentEmail = email;
 
-        // Ẩn form gửi OTP, hiện form nhập OTP
-        sendOtpForm.style.display = 'none';
-        verifyOtpForm.style.display = 'block';
-      } else {
+          sendOtpForm.style.display = 'none';
+          verifyOtpForm.style.display = 'block';
+        } else {
+          messageSendOtp.style.color = 'red';
+          messageSendOtp.textContent = 'Gửi OTP thất bại. Vui lòng thử lại.';
+        }
+      })
+      .catch(() => {
         messageSendOtp.style.color = 'red';
-        messageSendOtp.textContent = data.message || 'Gửi mã OTP thất bại.';
-      }
-    })
-    .catch(() => {
-      messageSendOtp.style.color = 'red';
-      messageSendOtp.textContent = 'Lỗi khi gửi yêu cầu.';
-    });
+        messageSendOtp.textContent = 'Đã xảy ra lỗi khi gửi yêu cầu.';
+      });
   });
 
-// Xử lý xác thực OTP
-  verifyOtpForm.addEventListener('submit', function(e) {
+  // Xác thực OTP
+  verifyOtpForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const otp = verifyOtpForm.otp.value.trim();
-    if (!otp) {
+    const otp = document.getElementById('forgotOtp').value.trim();
+    if (otp.length !== 6) {
       messageVerifyOtp.style.color = 'red';
-      messageVerifyOtp.textContent = 'Vui lòng nhập mã OTP.';
+      messageVerifyOtp.textContent = 'Mã OTP phải có đúng 6 ký tự.';
       return;
     }
 
-    if (!currentEmail) {
-      messageVerifyOtp.style.color = 'red';
-      messageVerifyOtp.textContent = 'Vui lòng gửi mã OTP trước.';
-      return;
-    }
-
-    fetch(contextPath + '/verifyOtp', {
+    fetch(contextPath + '/verify-forgot-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        email: currentEmail,
-        otp: otp
-      }),
+      body: new URLSearchParams({ email: currentEmail, otp: otp })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        messageResetPass.style.color = 'green';
-        messageResetPass.textContent = 'Xác thực OTP thành công. Vui lòng đặt lại mật khẩu.';
-        verifyOtpForm.style.display = 'none';
-        resetPasswordForm.style.display = 'block';
-        document.getElementById('resetEmail').value = currentEmail;
-      } else {
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          messageVerifyOtp.style.color = 'green';
+          messageVerifyOtp.textContent = 'Xác thực thành công. Vui lòng đặt lại mật khẩu.';
+
+          verifyOtpForm.style.display = 'none';
+          resetPasswordForm.style.display = 'block';
+          document.getElementById('resetEmail').value = currentEmail;
+        } else {
+          messageVerifyOtp.style.color = 'red';
+          messageVerifyOtp.textContent = data.message || 'Mã OTP không chính xác.';
+        }
+      })
+      .catch(() => {
         messageVerifyOtp.style.color = 'red';
-        messageVerifyOtp.textContent = data.message || 'Xác thực OTP thất bại.';
-      }
-    })
-    .catch(() => {
-      messageVerifyOtp.style.color = 'red';
-      messageVerifyOtp.textContent = 'Lỗi khi gửi yêu cầu.';
-    });
+        messageVerifyOtp.textContent = 'Đã xảy ra lỗi khi xác thực OTP.';
+      });
   });
-  
-// Đặt lại mật khẩu
+
+  // Đặt lại mật khẩu
   resetPasswordForm.addEventListener('submit', function (e) {
     e.preventDefault();
+
     const newPass = document.getElementById('newPassword').value.trim();
     const confirmPass = document.getElementById('confirmPassword').value.trim();
     const email = document.getElementById('resetEmail').value;
+
+    if (newPass.length < 6) {
+      messageResetPass.style.color = 'red';
+      messageResetPass.textContent = 'Mật khẩu phải từ 6 ký tự trở lên.';
+      return;
+    }
 
     if (newPass !== confirmPass) {
       messageResetPass.style.color = 'red';
@@ -153,25 +148,24 @@
       return;
     }
 
-    fetch(contextPath + '/login', {
+    fetch(contextPath + '/reset-password', {
       method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: new URLSearchParams({
-        action: 'reset_pass',
-        email: email,
-        newPassword: newPass
-      })
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ email: email, newPassword: newPass })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        messageResetPass.style.color = 'green';
-        messageResetPass.textContent = 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập.';
-      } else {
+      .then(res => res.text())
+      .then(response => {
+        if (response.trim() === 'ok') {
+          messageResetPass.style.color = 'green';
+          messageResetPass.textContent = 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập.';
+        } else {
+          messageResetPass.style.color = 'red';
+          messageResetPass.textContent = 'Đặt lại mật khẩu thất bại.';
+        }
+      })
+      .catch(() => {
         messageResetPass.style.color = 'red';
-        messageResetPass.textContent = data.message || 'Có lỗi xảy ra.';
-      }
-    });
+        messageResetPass.textContent = 'Lỗi khi gửi yêu cầu.';
+      });
   });
 </script>
-
