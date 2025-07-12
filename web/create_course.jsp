@@ -38,6 +38,11 @@
                         <textarea class="form-control" id="courseDescription" name="courseDescription" rows="3"></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="thumbnailFile" class="form-label">Thumbnail khóa học</label>
+                        <input type="file" class="form-control" id="thumbnailFile" name="thumbnailFile" accept="image/*" />
+                    </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
@@ -48,6 +53,7 @@
                             <label class="form-check-label" for="isSuggested">Đánh dấu là khóa học nổi bật</label>
                         </div>
                     </c:if>
+
                 </div>
 
                 <!-- LESSONS -->
