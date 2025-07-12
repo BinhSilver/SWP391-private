@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // --- Quiz Modal setup ---
     const quizQuestionTemplate = document.getElementById("quizQuestionTemplate");
     const quizQuestionsContainer = document.getElementById("quizQuestionsContainer");
     const quizForm = document.getElementById("quizForm");
@@ -7,13 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let activeQuizLessonIndex = null;
     let quizModal = null;
 
-    // Initialize modal once
+    const contextPath = window.contextPath || '';
+
     const quizModalEl = document.getElementById('quizModal');
     if (quizModalEl) {
         quizModal = new bootstrap.Modal(quizModalEl);
     }
 
-    // Function to show modal for a specific lesson
     window.showQuizModalForLesson = function (lessonIndex) {
         activeQuizLessonIndex = lessonIndex;
         loadQuizForLesson(lessonIndex);
@@ -22,19 +21,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Function to close modal
     function closeQuizModal() {
         if (quizModal) {
             quizModal.hide();
         }
     }
 
-    // Load quiz data for a lesson
     function loadQuizForLesson(lessonIndex) {
         quizQuestionsContainer.innerHTML = '';
         let questions = [];
 
-        // Get quiz from preloaded data
         if (typeof allCourseData !== 'undefined' && allCourseData &&
                 allCourseData.lessons && allCourseData.lessons[lessonIndex] &&
                 allCourseData.lessons[lessonIndex].quizzes) {
@@ -48,10 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
         updateQuizQuestionIndices();
     }
 
-    // Add a new question block
     function addQuestionBlock(index, questionData = {}) {
         let html = quizQuestionTemplate.innerHTML
-                .replace(/{{index}}/g, index)
+                .replace(/{{lessonIndex}}/g, activeQuizLessonIndex)
+                .replace(/{{questionIndex}}/g, index)
                 .replace(/{{questionLabel}}/g, index + 1);
 
         const wrapper = document.createElement("div");
@@ -59,17 +55,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const block = wrapper.firstElementChild;
 
         if (questionData.question) {
-            block.querySelector(`[name="questions[${index}][question]"]`).value = questionData.question || '';
-            block.querySelector(`[name="questions[${index}][optionA]"]`).value = questionData.optionA || '';
-            block.querySelector(`[name="questions[${index}][optionB]"]`).value = questionData.optionB || '';
-            block.querySelector(`[name="questions[${index}][optionC]"]`).value = questionData.optionC || '';
-            block.querySelector(`[name="questions[${index}][optionD]"]`).value = questionData.optionD || '';
-            block.querySelector(`[name="questions[${index}][answer]"]`).value = questionData.answer || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][question]"]`).value = questionData.question || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][optionA]"]`).value = questionData.optionA || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][optionB]"]`).value = questionData.optionB || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][optionC]"]`).value = questionData.optionC || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][optionD]"]`).value = questionData.optionD || '';
+            block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][answer]"]`).value = questionData.answer || '';
         }
+
+        const collapse = block.querySelector('.collapse');
+        if (collapse) {
+            new bootstrap.Collapse(collapse, {toggle: false});
+        }
+
         quizQuestionsContainer.appendChild(block);
     }
 
-    // Update question indices after adding/deleting
     function updateQuizQuestionIndices() {
         quizQuestionsContainer.querySelectorAll('.quiz-question-block').forEach((block, idx) => {
             let h6 = block.querySelector('h6');
@@ -79,29 +80,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
             let toggleBtn = block.querySelector('.quiz-collapse-toggle');
             if (toggleBtn) {
-                toggleBtn.dataset.bsTarget = `#questionCollapse-${idx}`;
-                toggleBtn.setAttribute('aria-controls', `questionCollapse-${idx}`);
+                toggleBtn.dataset.bsTarget = `#questionCollapse-${activeQuizLessonIndex}-${idx}`;
+                toggleBtn.setAttribute('aria-controls', `questionCollapse-${activeQuizLessonIndex}-${idx}`);
             }
 
             let collapse = block.querySelector('.collapse');
             if (collapse) {
-                collapse.id = `questionCollapse-${idx}`;
+                collapse.id = `questionCollapse-${activeQuizLessonIndex}-${idx}`;
             }
 
-            block.querySelectorAll('[name^="questions["]').forEach(input => {
-                input.name = input.name.replace(/questions\[\d+\]/g, `questions[${idx}]`);
+            block.querySelectorAll('[name^="lessons["]').forEach(input => {
+                input.name = input.name.replace(/lessons\[\d+]\[questions]\[\d+]/, `lessons[${activeQuizLessonIndex}][questions][${idx}]`);
             });
         });
     }
 
-    // Add question button
     document.getElementById("addQuestionBtn").addEventListener("click", function () {
         const idx = quizQuestionsContainer.querySelectorAll('.quiz-question-block').length;
         addQuestionBlock(idx, {});
         updateQuizQuestionIndices();
     });
 
-    // Delete question handler
     quizQuestionsContainer.addEventListener("click", function (e) {
         if (e.target.classList.contains("btn-delete-question") ||
                 e.target.closest(".btn-delete-question")) {
@@ -120,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Submit quiz form
     quizForm.addEventListener("submit", function (e) {
         e.preventDefault();
         if (activeQuizLessonIndex === null) {
@@ -132,12 +130,12 @@ document.addEventListener("DOMContentLoaded", function () {
         let hasError = false;
 
         quizQuestionsContainer.querySelectorAll('.quiz-question-block').forEach((questionBlock, idx) => {
-            const question = questionBlock.querySelector(`[name="questions[${idx}][question]"]`).value.trim();
-            const optionA = questionBlock.querySelector(`[name="questions[${idx}][optionA]"]`).value.trim();
-            const optionB = questionBlock.querySelector(`[name="questions[${idx}][optionB]"]`).value.trim();
-            const optionC = questionBlock.querySelector(`[name="questions[${idx}][optionC]"]`).value.trim();
-            const optionD = questionBlock.querySelector(`[name="questions[${idx}][optionD]"]`).value.trim();
-            const answer = questionBlock.querySelector(`[name="questions[${idx}][answer]"]`).value;
+            const question = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][question]"]`).value.trim();
+            const optionA = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionA]"]`).value.trim();
+            const optionB = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionB]"]`).value.trim();
+            const optionC = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionC]"]`).value.trim();
+            const optionD = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionD]"]`).value.trim();
+            const answer = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][answer]"]`).value;
 
             if (!question || !optionA || !optionB || !optionC || !optionD || !answer) {
                 alert(`Câu hỏi ${idx + 1}: Vui lòng điền đầy đủ thông tin!`);
@@ -146,12 +144,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             questionsArr.push({
-                question: question,
-                optionA: optionA,
-                optionB: optionB,
-                optionC: optionC,
-                optionD: optionD,
-                answer: answer
+                question,
+                optionA,
+                optionB,
+                optionC,
+                optionD,
+                answer
             });
         });
 
@@ -169,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                lessonId: lessonId,
+                lessonId,
                 quizzes: questionsArr
             })
         })
@@ -188,7 +186,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
     });
 
-    // Attach quiz buttons to lessons
+    if (!window.lessonIndexToIdMap) {
+        window.lessonIndexToIdMap = {};
+    }
+
     function attachQuizButtons() {
         document.querySelectorAll('.btn-toggle-quiz').forEach((btn, idx) => {
             if (!window.lessonIndexToIdMap[idx]) {
@@ -205,7 +206,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Initialize
     attachQuizButtons();
     window.reattachQuizButtons = attachQuizButtons;
 });

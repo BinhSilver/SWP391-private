@@ -183,6 +183,23 @@ wizardForm.addEventListener("submit", function (e) {
         e.preventDefault();
     }
 });
+// --- THUMBNAIL PREVIEW ---
+const courseImageInput = document.getElementById("courseImage");
+const thumbnailPreview = document.getElementById("thumbnailPreview");
+
+if (courseImageInput && thumbnailPreview) {
+    courseImageInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            thumbnailPreview.src = url;
+            thumbnailPreview.style.display = "block";
+        } else {
+            thumbnailPreview.src = "#";
+            thumbnailPreview.style.display = "none";
+        }
+    });
+}
 
 // --- INITIALIZE ---
 updateLessonIndices();

@@ -414,3 +414,188 @@ VALUES
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
 ((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
 
+
+
+
+
+-- x? lí d?u kí t? ghép ( ðo?n này nh? ch?y riêng hàm này ) 
+CREATE OR ALTER FUNCTION dbo.RemoveDiacritics(@input NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @result NVARCHAR(MAX) = LOWER(@input);
+
+    -- B? d?u thanh ti?ng Vi?t
+    SET @result = REPLACE(@result, N'á', 'a');
+    SET @result = REPLACE(@result, N'à', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'ã', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'â', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'ð', 'd');
+    SET @result = REPLACE(@result, N'é', 'e');
+    SET @result = REPLACE(@result, N'è', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'ê', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'í', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'ó', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'ô', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'õ', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'ú', 'u');
+    SET @result = REPLACE(@result, N'ù', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'ý', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+
+    -- Tách các k? t? ghép ti?ng Vi?t
+    SET @result = REPLACE(@result, N'kh', 'k h');
+    SET @result = REPLACE(@result, N'gi', 'g i');
+    SET @result = REPLACE(@result, N'ng', 'n g');
+    SET @result = REPLACE(@result, N'nh', 'n h');
+    SET @result = REPLACE(@result, N'ph', 'p h');
+    SET @result = REPLACE(@result, N'th', 't h');
+    SET @result = REPLACE(@result, N'ch', 'c h');
+    SET @result = REPLACE(@result, N'tr', 't r');
+    SET @result = REPLACE(@result, N'gh', 'g h');
+    SET @result = REPLACE(@result, N'qu', 'q u'); -- Thêm qu
+
+    RETURN @result;
+END;
+-- ðo?n này th? chayj h?t ph?n dý?i v? ch?y l? nó thi?u declare
+-- 1. Thêm 50 ngý?i dùng
+DECLARE @StartDate DATETIME = '2025-01-01';
+DECLARE @EndDate DATETIME = '2025-06-22';
+DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
+DECLARE @UserCount INT = 50;
+DECLARE @Counter INT = 1;
+DECLARE @RoleID INT;
+DECLARE @Email NVARCHAR(255);
+DECLARE @FullName NVARCHAR(100);
+DECLARE @CreatedAt DATETIME;
+
+-- T?m lýu danh sách ngý?i dùng ð? dùng cho Enrollment
+CREATE TABLE #TempUsers (UserID INT, CreatedAt DATETIME);
+
+WHILE @Counter <= @UserCount
+BEGIN
+    -- Phân b? RoleID theo t? l?: Admin (1), Free (4), Premium (3), Teacher (1)
+    SET @RoleID = CASE 
+        WHEN @Counter <= 5 THEN 4 -- 5 Admin
+        WHEN @Counter <= 25 THEN 1 -- 20 Free
+        WHEN @Counter <= 40 THEN 2 -- 15 Premium
+        ELSE 3 -- 5 Teacher
+    END;
+
+    -- T?o email và tên gi? l?p
+    SET @Email = 'user' + CAST(@Counter AS NVARCHAR(10)) + '@example.com';
+    SET @FullName = N'Ngý?i Dùng ' + CAST(@Counter AS NVARCHAR(10));
+
+    -- Tính CreatedAt tr?i ð?u t? 01/01/2025 ð?n 06/22/2025
+    SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @UserCount, @StartDate);
+
+    -- Thêm ngý?i dùng
+    INSERT INTO Users (
+        RoleID, Email, PasswordHash, FullName, CreatedAt, 
+        BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Gender
+    )
+    VALUES (
+        @RoleID, 
+        @Email, 
+        'hashed_password', -- Gi? l?p m?t kh?u
+        @FullName, 
+        @CreatedAt,
+        '2000-01-01', -- Ngày sinh gi? l?p
+        '0123456789', -- S? ði?n tho?i gi? l?p
+        N'N5', 
+        N'Ð?a ch? gi? l?p', 
+        N'Vi?t Nam', 
+        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'N?' END
+    );
+
+    -- Lýu UserID và CreatedAt vào b?ng t?m
+    INSERT INTO #TempUsers (UserID, CreatedAt)
+    VALUES (SCOPE_IDENTITY(), @CreatedAt);
+
+    SET @Counter = @Counter + 1;
+END;
+
+-- 2. Thêm 30 b?n ghi Enrollment
+DECLARE @EnrollmentCount INT = 30;
+SET @Counter = 1;
+DECLARE @UserID INT;
+DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'Khóa h?c Giao ti?p N5');
+DECLARE @EnrolledAt DATETIME;
+
+-- Cursor ð? l?y ng?u nhiên 30 ngý?i dùng t? b?ng t?m
+DECLARE user_cursor CURSOR FOR 
+SELECT TOP 30 UserID, CreatedAt 
+FROM #TempUsers 
+ORDER BY NEWID(); -- Randomize
+
+OPEN user_cursor;
+FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+
+WHILE @Counter <= @EnrollmentCount
+BEGIN
+    -- Tính EnrolledAt tr?i ð?u t? 01/01/2025 ð?n 06/22/2025
+    SET @EnrolledAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @EnrollmentCount, @StartDate);
+
+    -- Thêm b?n ghi Enrollment
+    INSERT INTO Enrollment (UserID, CourseID, EnrolledAt)
+    VALUES (@UserID, @CourseID, @EnrolledAt);
+
+    FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+    SET @Counter = @Counter + 1;
+END;
+
+CLOSE user_cursor;
+DEALLOCATE user_cursor;
+
+-- Xóa b?ng t?m
+DROP TABLE #TempUsers;
+
+
+
+ALTER TABLE Courses
+ADD imageUrl VARCHAR(255);

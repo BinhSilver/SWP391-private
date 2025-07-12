@@ -20,15 +20,14 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.*;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
 import service.QuizService;
 
 @WebServlet(name = "EditCourseServlet", urlPatterns = {"/EditCourseServlet"})
 @MultipartConfig(maxFileSize = 100 * 1024 * 1024, fileSizeThreshold = 1 * 1024 * 1024)
 public class EditCourseServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "uploads/course_materials";
+    private static final String UPLOAD_DIR = "image";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -54,20 +53,19 @@ public class EditCourseServlet extends HttpServlet {
         for (Lesson lesson : lessons) {
             quizMap.put(lesson.getLessonID(), QuizDAO.getQuestionsWithAnswersByLessonId(lesson.getLessonID()));
         }
-        
+
         // Create JSON data for JavaScript
         Gson gson = new Gson();
         Map<String, Object> courseDataForJs = new HashMap<>();
         List<Map<String, Object>> lessonsForJs = new ArrayList<>();
-        
-        for (int i = 0; i < lessons.size(); i++) {
-            Lesson lesson = lessons.get(i);
+
+        for (Lesson lesson : lessons) {
             Map<String, Object> lessonData = new HashMap<>();
             lessonData.put("id", lesson.getLessonID());
             lessonData.put("name", lesson.getTitle());
             lessonData.put("description", lesson.getDescription());
             lessonData.put("quizzes", new ArrayList<>());
-            
+
             List<QuizQuestion> quizQuestions = quizMap.get(lesson.getLessonID());
             if (quizQuestions != null) {
                 List<Map<String, Object>> quizzesForJs = new ArrayList<>();
@@ -75,40 +73,48 @@ public class EditCourseServlet extends HttpServlet {
                     Map<String, Object> quizData = new HashMap<>();
                     quizData.put("id", question.getId());
                     quizData.put("question", question.getQuestion());
-                    
-                    // Get answers in order
+
                     String optionA = "", optionB = "", optionC = "", optionD = "";
                     for (Answer answer : question.getAnswers()) {
                         switch (answer.getAnswerNumber()) {
-                            case 1: optionA = answer.getAnswerText(); break;
-                            case 2: optionB = answer.getAnswerText(); break;
-                            case 3: optionC = answer.getAnswerText(); break;
-                            case 4: optionD = answer.getAnswerText(); break;
+                            case 1 ->
+                                optionA = answer.getAnswerText();
+                            case 2 ->
+                                optionB = answer.getAnswerText();
+                            case 3 ->
+                                optionC = answer.getAnswerText();
+                            case 4 ->
+                                optionD = answer.getAnswerText();
                         }
                     }
-                    
                     quizData.put("optionA", optionA);
                     quizData.put("optionB", optionB);
                     quizData.put("optionC", optionC);
                     quizData.put("optionD", optionD);
-                    
-                    // Convert correct answer to A/B/C/D
-                    String correctAnswer = question.getCorrectAnswer() == 1 ? "A" : 
-                                         question.getCorrectAnswer() == 2 ? "B" : 
-                                         question.getCorrectAnswer() == 3 ? "C" : "D";
+
+                    String correctAnswer = switch (question.getCorrectAnswer()) {
+                        case 1 ->
+                            "A";
+                        case 2 ->
+                            "B";
+                        case 3 ->
+                            "C";
+                        default ->
+                            "D";
+                    };
                     quizData.put("answer", correctAnswer);
-                    
+
                     quizzesForJs.add(quizData);
                 }
                 lessonData.put("quizzes", quizzesForJs);
             }
-            
+
             lessonsForJs.add(lessonData);
         }
-        
+
         courseDataForJs.put("lessons", lessonsForJs);
         String quizDataJson = gson.toJson(courseDataForJs);
-        
+
         request.setAttribute("course", course);
         request.setAttribute("lessons", lessons);
         request.setAttribute("materialsMap", materialsMap);
@@ -122,12 +128,11 @@ public class EditCourseServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         System.out.println("===== EditCourseServlet doPost START =====");
+
         try {
-            // Đọc data cơ bản
             String courseIdRaw = request.getParameter("courseId");
             String title = request.getParameter("courseTitle");
             String description = request.getParameter("courseDescription");
-            String quizJson = request.getParameter("quizJson");
             String isHiddenRaw = request.getParameter("isHidden");
             String isSuggestedRaw = request.getParameter("isSuggested");
 
@@ -140,8 +145,36 @@ public class EditCourseServlet extends HttpServlet {
             boolean isHidden = isHiddenRaw != null;
             boolean isSuggested = isSuggestedRaw != null;
 
-            // 1. Update course info
-            Course course = new Course(courseId, title, description, isHidden, isSuggested);
+            // Xử lý upload thumbnail mới
+            String imageUrl = null;
+            Part imagePart = request.getPart("thumbnailFile");
+            if (imagePart != null && imagePart.getSize() > 0) {
+                String fileName = getFileName(imagePart);
+
+                File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                String filePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
+                try (InputStream is = imagePart.getInputStream();
+                     FileOutputStream os = new FileOutputStream(filePath)) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, bytesRead);
+                    }
+                }
+                imageUrl = "files/" + fileName;
+            } else {
+                CoursesDAO cDao = new CoursesDAO();
+                Course existingCourse = cDao.getCourseByID(courseId);
+                if (existingCourse != null) {
+                    imageUrl = existingCourse.getImageUrl();
+                }
+            }
+
+            Course course = new Course(courseId, title, description, isHidden, isSuggested, imageUrl);
             CoursesDAO cDao = new CoursesDAO();
             try {
                 cDao.update(course);
@@ -155,7 +188,6 @@ public class EditCourseServlet extends HttpServlet {
             LessonsDAO lDao = new LessonsDAO();
             LessonMaterialsDAO mDao = new LessonMaterialsDAO();
 
-            // 2. Dò index bài học động
             Set<Integer> lessonIndexes = new HashSet<>();
             for (String param : request.getParameterMap().keySet()) {
                 Matcher m = Pattern.compile("lessons\\[(\\d+)]\\[name]").matcher(param);
@@ -164,17 +196,14 @@ public class EditCourseServlet extends HttpServlet {
                 }
             }
 
-            // 3. Lấy các lessonID hiện có để biết cái nào bị xóa
             List<Lesson> oldLessons = lDao.getLessonsByCourseID(courseId);
             Set<Integer> oldLessonIds = new HashSet<>();
             for (Lesson l : oldLessons) {
                 oldLessonIds.add(l.getLessonID());
             }
             Set<Integer> keptLessonIds = new HashSet<>();
+            Map<Integer, Integer> lessonIndexToIdMap = new HashMap<>();
 
-            // 4. Thêm/cập nhật bài học và materials, quiz
-            Map<Integer, Integer> lessonIndexToIdMap = new HashMap<>(); // Map lesson index to lesson ID
-            
             for (Integer idx : lessonIndexes) {
                 String lessonIdStr = request.getParameter("lessons[" + idx + "][id]");
                 String lessonName = request.getParameter("lessons[" + idx + "][name]");
@@ -201,25 +230,22 @@ public class EditCourseServlet extends HttpServlet {
                     }
                     keptLessonIds.add(lessonId);
                 }
-                
+
                 lessonIndexToIdMap.put(idx, lessonId);
 
-                // ==== MATERIALS PDF/VIDEO ====
                 try {
                     processMaterialsForLesson(request, lessonId, idx, mDao, request.getParts());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                // ==== QUIZ DYNAMIC ====
                 try {
                     new QuizService().processQuizForLesson(request, lessonId, idx);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            
-            // 5. Process quiz data from JSON (new modal approach)
+
             try {
                 new QuizService().processQuizFromJson(request, lessonIndexToIdMap);
             } catch (Exception e) {
@@ -229,7 +255,6 @@ public class EditCourseServlet extends HttpServlet {
                 return;
             }
 
-            // 6. XÓA các lesson bị xóa trên form (và material/quiz liên quan)
             for (Integer oldLessonId : oldLessonIds) {
                 if (!keptLessonIds.contains(oldLessonId)) {
                     try {
@@ -252,7 +277,6 @@ public class EditCourseServlet extends HttpServlet {
         }
     }
 
-    // ==================== HÀM PHỤ KHÔNG ĐỔI ====================
     private void processMaterialsForLesson(HttpServletRequest request, int lessonId, int idx, LessonMaterialsDAO mDao, Collection<Part> parts) {
         String[] types = {"vocabDoc", "vocabVideo", "grammarDoc", "grammarVideo", "kanjiDoc", "kanjiVideo"};
         for (String type : types) {
@@ -290,7 +314,6 @@ public class EditCourseServlet extends HttpServlet {
             }
         }
 
-        // =========== XỬ LÝ XÓA MATERIAL CŨ ===========
         String[] deleteMatArr = request.getParameterValues("lessons[" + idx + "][deleteMaterials][]");
         if (deleteMatArr != null) {
             for (String midStr : deleteMatArr) {
@@ -328,6 +351,4 @@ public class EditCourseServlet extends HttpServlet {
         }
         return "";
     }
-
-    
 }

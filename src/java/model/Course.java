@@ -6,17 +6,19 @@ public class Course {
     private String title;
     private String description;
     private boolean isHidden;
-    private boolean isSuggested; // thêm thuộc tính mới
+    private boolean isSuggested;
+    private String imageUrl;
 
     public Course() {
     }
 
-    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested) {
+    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested, String imageUrl) {
         this.courseID = courseID;
         this.title = title;
         this.description = description;
         this.isHidden = isHidden;
         this.isSuggested = isSuggested;
+        this.imageUrl = imageUrl;
     }
 
     public Course(int courseID, String title, String description) {
@@ -33,6 +35,7 @@ public class Course {
                 + ", description='" + description + '\''
                 + ", isHidden=" + isHidden
                 + ", isSuggested=" + isSuggested
+                + ", imageUrl='" + imageUrl + '\''
                 + '}';
     }
 
@@ -64,8 +67,8 @@ public class Course {
         return isHidden;
     }
 
-    public void setHidden(boolean isHidden) {
-        this.isHidden = isHidden;
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
     }
 
     public boolean isSuggested() {
@@ -73,7 +76,14 @@ public class Course {
     }
 
     public void setSuggested(boolean suggested) {
-        this.isSuggested = suggested;
+        isSuggested = suggested;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

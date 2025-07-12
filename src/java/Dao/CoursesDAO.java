@@ -17,12 +17,14 @@ public class CoursesDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Course c = new Course();
-                c.setCourseID(rs.getInt("courseID"));
-                c.setTitle(rs.getString("title"));
-                c.setDescription(rs.getString("description"));
-                c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested")); // ✅ Mới thêm
+                Course c = new Course(
+                        rs.getInt("courseID"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getBoolean("isHidden"),
+                        rs.getBoolean("isSuggested"),
+                        rs.getString("imageUrl")
+                );
                 list.add(c);
             }
         } catch (Exception e) {
@@ -32,25 +34,26 @@ public class CoursesDAO {
     }
 
     public void add(Course c) throws SQLException {
-        String sql = "INSERT INTO [dbo].[Courses] (Title, Description, IsHidden, IsSuggested) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO [dbo].[Courses] (Title, Description, IsHidden, IsSuggested, imageUrl) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
             stmt.setBoolean(4, c.isSuggested());
+            stmt.setString(5, c.getImageUrl());
             stmt.executeUpdate();
-            System.out.println("abc");
         }
     }
 
     public void update(Course c) throws SQLException {
-        String sql = "UPDATE [dbo].[Courses] SET Title=?, Description=?, IsHidden=?, IsSuggested=? WHERE CourseID=?";
+        String sql = "UPDATE [dbo].[Courses] SET Title=?, Description=?, IsHidden=?, IsSuggested=?, imageUrl=? WHERE CourseID=?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested()); // ✅
-            stmt.setInt(5, c.getCourseID());
+            stmt.setBoolean(4, c.isSuggested());
+            stmt.setString(5, c.getImageUrl());
+            stmt.setInt(6, c.getCourseID());
             stmt.executeUpdate();
         }
     }
@@ -60,7 +63,7 @@ public class CoursesDAO {
             conn.setAutoCommit(false);
 
             try {
-                // 1. Lấy toàn bộ LessonID của khóa học này
+                // Lấy toàn bộ LessonID của khóa học này
                 List<Integer> lessonIds = new ArrayList<>();
                 String lessonSql = "SELECT LessonID FROM Lessons WHERE CourseID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(lessonSql)) {
@@ -72,44 +75,44 @@ public class CoursesDAO {
                     }
                 }
 
-                // 2. Xóa toàn bộ dữ liệu phụ thuộc theo LessonID
+                // Xóa dữ liệu phụ thuộc LessonID
                 for (int lessonId : lessonIds) {
-                    // a. Xóa LessonAccess
+                    // Xóa LessonAccess
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // b. Xóa LessonMaterials
+                    // Xóa LessonMaterials
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // c. Xóa GrammarPoints
+                    // Xóa GrammarPoints
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // d. Xóa Kanji
+                    // Xóa Kanji
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // e. Xóa LessonVocabulary
+                    // Xóa LessonVocabulary
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // f. Xóa Feedbacks
+                    // Xóa Feedbacks
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // g. Xóa Progress liên quan LessonID
+                    // Xóa Progress liên quan LessonID
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // h. Xóa Quiz, Question, Answer, QuizResults liên quan LessonID
+                    // Xóa Quiz, Question, Answer, QuizResults
                     List<Integer> quizIds = new ArrayList<>();
                     try (PreparedStatement ps = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
@@ -120,13 +123,13 @@ public class CoursesDAO {
                         }
                     }
                     for (int quizId : quizIds) {
-                        // Xóa Answers của Quiz
+                        // Xóa Answers
                         try (PreparedStatement ps = conn.prepareStatement(
                                 "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
                             ps.setInt(1, quizId);
                             ps.executeUpdate();
                         }
-                        // Xóa Questions của Quiz
+                        // Xóa Questions
                         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
                             ps.setInt(1, quizId);
                             ps.executeUpdate();
@@ -144,29 +147,27 @@ public class CoursesDAO {
                     }
                 }
 
-                // 3. Xóa Lessons
+                // Xóa Lessons
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
 
-                // 4. Xóa các bảng liên kết CourseID
-                // a. Enrollment
+                // Xóa các bảng liên kết CourseID
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
-                // b. CourseRatings
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM CourseRatings WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
-                // c. Progress (course-level)
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
-                // d. Tests, Questions, Answers, TestResults liên quan course
+
+                // Xóa Tests liên quan CourseID
                 List<Integer> testIds = new ArrayList<>();
                 try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
@@ -177,30 +178,26 @@ public class CoursesDAO {
                     }
                 }
                 for (int testId : testIds) {
-                    // Xóa Answers của Test
                     try (PreparedStatement ps = conn.prepareStatement(
                             "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)")) {
                         ps.setInt(1, testId);
                         ps.executeUpdate();
                     }
-                    // Xóa Questions của Test
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE TestID = ?")) {
                         ps.setInt(1, testId);
                         ps.executeUpdate();
                     }
-                    // Xóa TestResults
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM TestResults WHERE TestID = ?")) {
                         ps.setInt(1, testId);
                         ps.executeUpdate();
                     }
                 }
-                // Xóa Tests
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Tests WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
 
-                // 5. Xóa khóa học cuối cùng
+                // Cuối cùng xóa khóa học
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
@@ -241,14 +238,15 @@ public class CoursesDAO {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT * FROM [dbo].[Courses]";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
-                Course course = new Course();
-                course.setCourseID(rs.getInt("CourseID"));
-                course.setTitle(rs.getString("Title"));
-                course.setDescription(rs.getString("Description"));
-                course.setHidden(rs.getBoolean("IsHidden"));
-                course.setSuggested(rs.getBoolean("IsSuggested")); // ✅
+                Course course = new Course(
+                        rs.getInt("CourseID"),
+                        rs.getString("Title"),
+                        rs.getString("Description"),
+                        rs.getBoolean("IsHidden"),
+                        rs.getBoolean("IsSuggested"),
+                        rs.getString("imageUrl")
+                );
                 courses.add(course);
             }
         }
@@ -257,15 +255,17 @@ public class CoursesDAO {
 
     public List<Course> getSuggestedCourses() {
         List<Course> list = new ArrayList<>();
-        String sql = "SELECT TOP 4 * FROM Courses WHERE isHidden = 0 AND IsSuggested = 1 ORDER BY NEWID()"; // ✅ thêm điều kiện gợi ý
+        String sql = "SELECT TOP 4 * FROM Courses WHERE isHidden = 0 AND IsSuggested = 1 ORDER BY NEWID()";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Course c = new Course();
-                c.setCourseID(rs.getInt("courseID"));
-                c.setTitle(rs.getString("title"));
-                c.setDescription(rs.getString("description"));
-                c.setHidden(rs.getBoolean("isHidden"));
-                c.setSuggested(rs.getBoolean("isSuggested")); // ✅
+                Course c = new Course(
+                        rs.getInt("courseID"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getBoolean("isHidden"),
+                        rs.getBoolean("isSuggested"),
+                        rs.getString("imageUrl")
+                );
                 list.add(c);
             }
         } catch (Exception e) {
@@ -285,7 +285,8 @@ public class CoursesDAO {
                             rs.getString("title"),
                             rs.getString("description"),
                             rs.getBoolean("isHidden"),
-                            rs.getBoolean("isSuggested")
+                            rs.getBoolean("isSuggested"),
+                            rs.getString("imageUrl")
                     );
                 }
             }
@@ -296,27 +297,25 @@ public class CoursesDAO {
     }
 
     public int addAndReturnID(Course course) throws SQLException {
-        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedAt) "
-                + "VALUES (?, ?, ?, ?, GETDATE())";
+        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, imageUrl, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, GETDATE())";
 
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
             ps.setString(1, course.getTitle());
             ps.setString(2, course.getDescription());
             ps.setBoolean(3, course.getHidden());
             ps.setBoolean(4, course.isSuggested());
-
+            ps.setString(5, course.getImageUrl());
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1); // Trả về CourseID vừa tạo
+                return rs.getInt(1);
             }
         }
         return -1;
     }
 
-    // Thêm các phương thức mới
     public int getTotalEnrollments() throws SQLException {
         String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Enrollment]";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {

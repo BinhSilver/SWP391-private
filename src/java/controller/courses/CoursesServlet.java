@@ -1,6 +1,7 @@
 package controller.courses;
 
 import Dao.CoursesDAO;
+import Dao.UserDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.Course;
 
 @WebServlet(name = "CoursesServlet", urlPatterns = {"/CoursesServlet"})
@@ -17,6 +19,9 @@ public class CoursesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userID");
+
         CoursesDAO dao = new CoursesDAO();
         try {
             List<Course> courses = dao.getAllCourses();
@@ -24,7 +29,9 @@ public class CoursesServlet extends HttpServlet {
                 throw new RuntimeException("getAllCourses() trả về null!");
             }
             request.setAttribute("courses", courses);
-            request.getRequestDispatcher("Course.jsp").forward(request, response);
+
+            request.getRequestDispatcher("UserCourse.jsp").forward(request, response);
+
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi truy vấn dữ liệu: " + e.getMessage());
