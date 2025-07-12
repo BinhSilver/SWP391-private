@@ -110,12 +110,12 @@ public class UserDAO {
         }
     }
 
-    public boolean createNewUser(String email, String rawPassword, String gender) {
+    public boolean createNewUser(String email, String password, String gender) {
         String sql = "INSERT INTO Users (RoleID, Email, PasswordHash, Gender) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, 1); // default role
             pstmt.setString(2, email);
-            pstmt.setString(3, rawPassword);
+            pstmt.setString(3, password);
             pstmt.setString(4, gender);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -124,7 +124,7 @@ public class UserDAO {
         }
     }
 
-    public boolean updatePassword(String email, String newPassword) {
+    public static boolean updatePassword(String email, String newPassword) {
         String sql = "UPDATE Users SET PasswordHash = ? WHERE Email = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPassword);

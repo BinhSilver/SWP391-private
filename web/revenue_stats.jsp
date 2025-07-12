@@ -30,7 +30,7 @@
         .chart-title { font-size: 1.3rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; text-align: center; }
         .chart-note { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 10px 15px; margin: 10px 0; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: #64748b; }
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+/*        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }*/
         .gradient-bg-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .gradient-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .gradient-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
