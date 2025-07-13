@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class JDBCConnection {
     // Đường dẫn tới file properties trong classpath
-    private static final String PROPERTIES_FILE = "resources/db.properties";
+    private static final String PROPERTIES_FILE = "DB/db.properties";
 
     public static Connection getConnection() {
         try {
