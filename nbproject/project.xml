@@ -247,7 +247,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.google-oauth-client-1.34.1-sources.jar-1}</file>
+                    <file>${file.reference.google-oauth-client-1.34.1-sources.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -255,15 +255,15 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.google-oauth-client-java6-1.34.1-sources.jar-1}</file>
+                    <file>${file.reference.google-oauth-client-java6-1.34.1-sources.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.google-oauth-client-java6-1.34.1.jar-1}</file>
+                    <file>${file.reference.google-oauth-client-java6-1.34.1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.google-oauth-client-jetty-1.34.1.jar-1}</file>
+                    <file>${file.reference.google-oauth-client-jetty-1.34.1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -359,7 +359,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.activation-2.0.1.jar-1}</file>
+                    <file>${file.reference.jakarta.activation-2.0.1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -452,6 +452,18 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.mssql-jdbc-12.10.0.jre11-javadoc.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.mssql-jdbc-12.10.0.jre11-sources.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.mssql-jdbc-12.10.0.jre11.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
