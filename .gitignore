@@ -1,55 +1,49 @@
-# Ignore lib directory (JAR files and dependencies)
-lib/
+# Ignore everything by default
+*
 
-# NetBeans IDE
-nbproject/
-build/
-nbbuild/
-dist/
-nbdist/
-.netbeans/
-*.orig
-src/DB/db.properties
+# Allow specific directories and files
+!src/
+!web/
+!Wasabii.sql
+!.gitignore
 
-# Ignore resources directory (config files)
+# But still ignore specific files within allowed directories
+src/java/DB/db.properties
 src/java/resources/
+src/java/DB/JDBCConnection.java
 
-# Cache files
+# Ignore build artifacts and IDE files
 *.class
 *.log
 *.ctxt
 *.jar
 *.war
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# IDE settings (optional)
+*.orig
 *.iml
 *.ipr
 *.iws
-
-# Maven/Gradle (nếu dùng thêm)
-target/
-.gradle/
-
-# Backup and temporary files
 *~
 *.bak
 *.swp
 *.tmp
 *.swo
-
-# Java-specific
 hs_err_pid*
 replay_pid*
 
-# VS Code (nếu dùng song song)
-.vscode/
+# OS-specific files
+.DS_Store
+Thumbs.db
 
-# Ignore JDBCConnection.java
-src/java/DB/JDBCConnection.java
+# IDE directories
+.vscode/
+target/
+.gradle/
+build/
+dist/
+nbproject/
+nbbuild/
+nbdist/
+.netbeans/
 
 # Ignore build.xml
 build.xml
