@@ -2,7 +2,7 @@ package controller.profile;
 
 import Dao.UserDAO;
 import model.User;
-import config.CloudinaryUtil;
+import config.S3Util;
 import com.cloudinary.Cloudinary;
 
 import jakarta.servlet.ServletException;
@@ -50,17 +50,20 @@ public class ChangeAvatarServlet extends HttpServlet {
                 return;
             }
 
-            // Upload ảnh lên Cloudinary
-            Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
-            Map<String, Object> options = new HashMap<>();
-            options.put("folder", "avatars");
-            options.put("public_id", "user_" + user.getUserID());
-            options.put("overwrite", true);
-
-            Map uploadResult = cloudinary.uploader().upload(filePart.getInputStream(), options);
-
-            // Lấy URL của ảnh từ kết quả upload
-            String avatarUrl = (String) uploadResult.get("secure_url");
+            // Upload ảnh lên S3
+            java.io.InputStream is = filePart.getInputStream();
+            long size = filePart.getSize();
+            String originalFileName = filePart.getSubmittedFileName();
+            String key = "avatars/user_" + user.getUserID();
+            if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                key += ".jpg";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                key += ".png";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".gif")) {
+                key += ".gif";
+            }
+            String contentType = filePart.getContentType();
+            String avatarUrl = config.S3Util.uploadFile(is, size, key, contentType);
 
             // Cập nhật URL avatar trong database
             UserDAO dao = new UserDAO();

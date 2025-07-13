@@ -18,7 +18,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import java.io.InputStream;
 import com.cloudinary.Cloudinary;
 import java.util.Map;
-import config.CloudinaryUtil;
+import config.S3Util;
 
 @WebServlet("/editprofile")
 @MultipartConfig
@@ -73,20 +73,23 @@ public class EditProfileServlet extends HttpServlet {
             Part filePart = request.getPart("avatar");
             if (filePart != null && filePart.getSize() > 0) {
                 try {
-                    Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
-                    Map<String, Object> options = new java.util.HashMap<>();
-                    options.put("folder", "avatars");
-                    options.put("public_id", "user_" + currentUser.getUserID());
-                    options.put("overwrite", true);
-                    // Đọc toàn bộ dữ liệu file thành mảng byte
-                    InputStream is = filePart.getInputStream();
-                    byte[] bytes = is.readAllBytes();
-                    Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                    String avatarUrl = (String) uploadResult.get("secure_url");
+                    java.io.InputStream is = filePart.getInputStream();
+                    long size = filePart.getSize();
+                    String originalFileName = filePart.getSubmittedFileName();
+                    String key = "avatars/user_" + currentUser.getUserID();
+                    if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                        key += ".jpg";
+                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                        key += ".png";
+                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".gif")) {
+                        key += ".gif";
+                    }
+                    String contentType = filePart.getContentType();
+                    String avatarUrl = config.S3Util.uploadFile(is, size, key, contentType);
                     currentUser.setAvatar(avatarUrl);
-                    System.out.println("[AvatarUpload] Upload thành công: " + avatarUrl);
+                    System.out.println("[AvatarUpload] Upload thành công S3: " + avatarUrl);
                 } catch (Exception e) {
-                    System.err.println("[AvatarUpload] Lỗi upload avatar: " + e.getMessage());
+                    System.err.println("[AvatarUpload] Lỗi upload avatar S3: " + e.getMessage());
                 }
             }
 
