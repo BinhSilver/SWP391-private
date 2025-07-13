@@ -34,7 +34,6 @@
                             <input type="text" class="form-control" name="courseTitle" value="${course.title}" required/>
                         </div>
 
-
                         <div class="mb-3">
                             <label class="form-label">Mô tả khóa học</label>
                             <textarea class="form-control" name="courseDescription" rows="3">${course.description}</textarea>
@@ -55,7 +54,7 @@
                             <label class="form-label">Tải ảnh thumbnail mới (tuỳ chọn)</label>
                             <input type="file" class="form-control" name="thumbnailFile"/>
                         </div>
-                        <!-- KẾT THÚC THUMBNAIL -->
+
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" <c:if test="${course.hidden}">checked</c:if>/>
                                 <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
@@ -89,6 +88,8 @@
                                     <div class="tab-pane fade <c:if test='${loop.first}'>show active</c:if>'" id="lesson-${loop.index}" role="tabpanel" data-lesson-index="${loop.index}">
                                         <div class="lesson-block border p-3 rounded mb-3" data-lesson-index="${loop.index}">
                                             <input type="hidden" name="lessons[${loop.index}][id]" value="${lesson.lessonID}" />
+                                            <input type="hidden" name="lessons[${loop.index}][orderIndex]" value="${loop.index}" class="lesson-order-index" />
+
                                             <h6 class="fw-semibold mb-3">Lesson ${loop.index + 1}</h6>
 
                                             <div class="mb-2">
@@ -102,14 +103,12 @@
 
                                             <!-- Tài liệu / Video -->
                                             <c:set var="materials" value="${materialsMap[lesson.lessonID]}" />
-                                            <c:forEach var="type" items="${['vocabVideo','vocabDoc','grammarVideo','grammarDoc','kanjiVideo','kanjiDoc']}">
+                                            <c:forEach var="type" items="${['vocabDoc','grammarDoc','kanjiDoc']}">
                                                 <div class="mb-2">
                                                     <label class="form-label">
                                                         <c:choose>
                                                             <c:when test="${type == 'vocabDoc'}">Tài liệu Từ Vựng (PDF)</c:when>
-                                                            <c:when test="${type == 'vocabVideo'}">Video Từ Vựng</c:when>
                                                             <c:when test="${type == 'grammarDoc'}">Tài liệu Ngữ Pháp (PDF)</c:when>
-                                                            <c:when test="${type == 'grammarVideo'}">Video Ngữ Pháp</c:when>
                                                             <c:when test="${type == 'kanjiDoc'}">Tài liệu Kanji (PDF)</c:when>
                                                             <c:otherwise>Video Kanji</c:otherwise>
                                                         </c:choose>
@@ -129,13 +128,11 @@
                                                         </c:forEach>
                                                     </ul>
                                                     <input type="file" class="form-control" name="lessons[${loop.index}][${type}][]"
-                                                           <c:if test="${type.endsWith('Video')}">accept="video/*"</c:if>
                                                            <c:if test="${type.endsWith('Doc')}">accept="application/pdf"</c:if>
                                                                multiple/>
                                                     </div>
                                             </c:forEach>
 
-                                            <!-- Quiz Buttons -->
                                             <div class="d-flex gap-2 mt-2">
                                                 <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
                                                 <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="${loop.index}">
@@ -162,6 +159,8 @@
             <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
                 <div class="lesson-block border p-3 rounded mb-3" data-lesson-index="{{index}}">
                     <input type="hidden" name="lessons[{{index}}][id]" value="" />
+                    <input type="hidden" name="lessons[{{index}}][orderIndex]" value="{{index}}" class="lesson-order-index" />
+
                     <h6 class="fw-semibold mb-3">Lesson {{indexLabel}}</h6>
                     <div class="mb-2">
                         <label class="form-label">Tên Bài Học</label>
@@ -313,7 +312,5 @@ allCourseData.suggested = ${course.suggested};
         </script>
 
         <script src="<c:url value='/js/edit_course.js'/>"></script>
-        <script src="<c:url value='/js/update_course.js'/>"></script>
-
     </body>
 </html>

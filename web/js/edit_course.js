@@ -95,96 +95,89 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    document.getElementById("addQuestionBtn").addEventListener("click", function () {
-        const idx = quizQuestionsContainer.querySelectorAll('.quiz-question-block').length;
-        addQuestionBlock(idx, {});
-        updateQuizQuestionIndices();
-    });
-
-    quizQuestionsContainer.addEventListener("click", function (e) {
-        if (e.target.classList.contains("btn-delete-question") ||
-                e.target.closest(".btn-delete-question")) {
-            const button = e.target.closest(".btn-delete-question");
-            const questionBlock = button.closest(".quiz-question-block");
-
-            if (quizQuestionsContainer.querySelectorAll('.quiz-question-block').length <= 1) {
-                alert("Phải có ít nhất 1 câu hỏi!");
-                return;
-            }
-
-            if (confirm("Bạn có chắc muốn xóa câu hỏi này?")) {
-                questionBlock.remove();
-                updateQuizQuestionIndices();
-            }
-        }
-    });
-
-    quizForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (activeQuizLessonIndex === null) {
-            alert("Lỗi: Không xác định được lesson index!");
-            return;
-        }
-
-        let questionsArr = [];
-        let hasError = false;
-
-        quizQuestionsContainer.querySelectorAll('.quiz-question-block').forEach((questionBlock, idx) => {
-            const question = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][question]"]`).value.trim();
-            const optionA = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionA]"]`).value.trim();
-            const optionB = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionB]"]`).value.trim();
-            const optionC = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionC]"]`).value.trim();
-            const optionD = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionD]"]`).value.trim();
-            const answer = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][answer]"]`).value;
-
-            if (!question || !optionA || !optionB || !optionC || !optionD || !answer) {
-                alert(`Câu hỏi ${idx + 1}: Vui lòng điền đầy đủ thông tin!`);
-                hasError = true;
-                return;
-            }
-
-            questionsArr.push({
-                question,
-                optionA,
-                optionB,
-                optionC,
-                optionD,
-                answer
-            });
+    // Chỉ thêm event listener nếu element tồn tại
+    const addQuestionBtn = document.getElementById("addQuestionBtn");
+    if (addQuestionBtn) {
+        addQuestionBtn.addEventListener("click", function () {
+            const idx = quizQuestionsContainer.querySelectorAll('.quiz-question-block').length;
+            addQuestionBlock(idx, {});
+            updateQuizQuestionIndices();
         });
+    }
 
-        if (hasError) {
-            return;
-        }
+    if (quizQuestionsContainer) {
+        quizQuestionsContainer.addEventListener("click", function (e) {
+            if (e.target.classList.contains("btn-delete-question") ||
+                    e.target.closest(".btn-delete-question")) {
+                const button = e.target.closest(".btn-delete-question");
+                const questionBlock = button.closest(".quiz-question-block");
 
-        const lessonId = window.lessonIndexToIdMap[activeQuizLessonIndex];
-        if (!lessonId) {
-            alert("Không tìm thấy lessonId cho bài học này!");
-            return;
-        }
+                if (quizQuestionsContainer.querySelectorAll('.quiz-question-block').length <= 1) {
+                    alert("Phải có ít nhất 1 câu hỏi!");
+                    return;
+                }
 
-        fetch(contextPath + "/EditQuiz", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                lessonId,
-                quizzes: questionsArr
-            })
-        })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        alert("Quiz đã được lưu thành công!");
-                        closeQuizModal();
-                    } else {
-                        alert("Lưu quiz thất bại! " + (data.msg || ''));
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Lỗi khi lưu quiz!");
+                if (confirm("Bạn có chắc muốn xóa câu hỏi này?")) {
+                    questionBlock.remove();
+                    updateQuizQuestionIndices();
+                }
+            }
+        });
+    }
+
+    // Sửa logic xử lý quiz form để lưu vào allCourseData thay vì gọi API riêng
+    if (quizForm) {
+        quizForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (activeQuizLessonIndex === null) {
+                alert("Lỗi: Không xác định được lesson index!");
+                return;
+            }
+
+            let questionsArr = [];
+            let hasError = false;
+
+            quizQuestionsContainer.querySelectorAll('.quiz-question-block').forEach((questionBlock, idx) => {
+                const question = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][question]"]`).value.trim();
+                const optionA = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionA]"]`).value.trim();
+                const optionB = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionB]"]`).value.trim();
+                const optionC = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionC]"]`).value.trim();
+                const optionD = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][optionD]"]`).value.trim();
+                const answer = questionBlock.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${idx}][answer]"]`).value;
+
+                if (!question || !optionA || !optionB || !optionC || !optionD || !answer) {
+                    alert(`Câu hỏi ${idx + 1}: Vui lòng điền đầy đủ thông tin!`);
+                    hasError = true;
+                    return;
+                }
+
+                questionsArr.push({
+                    question,
+                    optionA,
+                    optionB,
+                    optionC,
+                    optionD,
+                    answer
                 });
-    });
+            });
+
+            if (hasError) {
+                return;
+            }
+
+            // Lưu quiz data vào allCourseData thay vì gọi API riêng
+            if (typeof allCourseData === 'undefined') {
+                allCourseData = {lessons: []};
+            }
+            if (!allCourseData.lessons[activeQuizLessonIndex]) {
+                allCourseData.lessons[activeQuizLessonIndex] = {};
+            }
+            allCourseData.lessons[activeQuizLessonIndex].quizzes = questionsArr;
+
+            alert('Quiz đã được lưu tạm thời. Hãy click "Cập Nhật Khóa Học" để lưu toàn bộ.');
+            closeQuizModal();
+        });
+    }
 
     if (!window.lessonIndexToIdMap) {
         window.lessonIndexToIdMap = {};

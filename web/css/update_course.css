@@ -319,3 +319,39 @@
         margin: 8px auto;
     }
 }
+
+/* NEW: Styles for orderIndex */
+.update-course-page input.lesson-order-index {
+    display: inline-block;
+    width: 70px;
+    border: 1px dashed #e94f64;
+    color: #e94f64;
+    font-weight: bold;
+    text-align: center;
+    background: #fff8f9;
+    margin-left: 8px;
+    margin-bottom: 8px;
+}
+
+.update-course-page input.lesson-order-index.error {
+    border-color: #dc3545;
+    background: #fff0f0;
+}
+
+/* Video styling */
+.update-course-page video.lesson-video {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: #000;
+}
+
+.update-course-page p.text-muted.no-video-text {
+    font-style: italic;
+    color: #888;
+    margin-bottom: 12px;
+}

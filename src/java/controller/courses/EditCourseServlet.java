@@ -47,6 +47,11 @@ public class EditCourseServlet extends HttpServlet {
         LessonMaterialsDAO mDao = new LessonMaterialsDAO();
 
         Course course = cDao.getCourseByID(courseId);
+        if (course == null) {
+            request.setAttribute("error", "Không tìm thấy khóa học với ID " + courseId);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
         List<Lesson> lessons = lDao.getLessonsByCourseID(courseId);
         Map<Integer, List<LessonMaterial>> materialsMap = mDao.getAllMaterialsGroupedByLesson(courseId);
         Map<Integer, List<QuizQuestion>> quizMap = new HashMap<>();
@@ -157,8 +162,7 @@ public class EditCourseServlet extends HttpServlet {
                 }
 
                 String filePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
-                try (InputStream is = imagePart.getInputStream();
-                     FileOutputStream os = new FileOutputStream(filePath)) {
+                try (InputStream is = imagePart.getInputStream(); FileOutputStream os = new FileOutputStream(filePath)) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = is.read(buffer)) != -1) {
@@ -255,20 +259,20 @@ public class EditCourseServlet extends HttpServlet {
                 return;
             }
 
-            for (Integer oldLessonId : oldLessonIds) {
-                if (!keptLessonIds.contains(oldLessonId)) {
-                    try {
-                        QuizDAO.deleteQuestionsByLessonId(oldLessonId);
-                        List<LessonMaterial> oldMats = mDao.getMaterialsByLessonID(oldLessonId);
-                        for (LessonMaterial mat : oldMats) {
-                            mDao.delete(mat.getMaterialID());
-                        }
-                        lDao.delete(oldLessonId);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+//            for (Integer oldLessonId : oldLessonIds) {
+//                if (!keptLessonIds.contains(oldLessonId)) {
+//                    try {
+//                        QuizDAO.deleteQuestionsByLessonId(oldLessonId);
+//                        List<LessonMaterial> oldMats = mDao.getMaterialsByLessonID(oldLessonId);
+//                        for (LessonMaterial mat : oldMats) {
+//                            mDao.delete(mat.getMaterialID());
+//                        }
+//                        lDao.delete(oldLessonId);
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             e.printStackTrace();
