@@ -692,7 +692,6 @@ VALUES
 (N'友達',      N'Bạn bè',       N'ともだち',     N'彼女は友達と遊びます。',          1, N'imgvocab\Doraemon_character.png'),
 (N'先生',      N'Giáo viên',    N'せんせい',     N'先生は日本語を教えます。',        1, N'imgvocab\Doraemon_character.png');
 
-
   ALTER TABLE Users
 ADD IsTeacherPending BIT DEFAULT 0,
     CertificatePath NVARCHAR(500);

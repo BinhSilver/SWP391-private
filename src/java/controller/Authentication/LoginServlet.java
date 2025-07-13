@@ -187,16 +187,22 @@ public class LoginServlet extends HttpServlet {
                     java.io.InputStream is = certificatePart.getInputStream();
                     byte[] bytes = is.readAllBytes();
                     
+                    // Lấy tên file gốc
+                    String originalFileName = certificatePart.getSubmittedFileName();
+                    String publicId = "certificate_" + System.currentTimeMillis();
+                    if (originalFileName != null && originalFileName.toLowerCase().endsWith(".pdf")) {
+                        publicId += ".pdf";
+                    }
                     // Cấu hình upload cho PDF
                     java.util.Map<String, Object> options = new java.util.HashMap<>();
                     options.put("folder", "certificates");
-                    options.put("public_id", "certificate_" + System.currentTimeMillis());
+                    options.put("public_id", publicId);
                     options.put("resource_type", "raw"); // Cho file PDF
                     options.put("overwrite", true);
                     
                     // Upload lên Cloudinary
                     java.util.Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                    certificatePath = (String) uploadResult.get("secure_url");
+                    certificatePath = (String) uploadResult.get("public_id"); // Lưu đúng public_id thay vì secure_url
                     
                     System.out.println("[CertificateUpload] Upload thành công: " + certificatePath);
                 } catch (Exception e) {
