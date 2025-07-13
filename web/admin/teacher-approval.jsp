@@ -73,43 +73,17 @@
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${not empty user.certificatePath}">
-                                                            <c:choose>
-                                                                <c:when test="${fn:endsWith(fn:toLowerCase(user.certificatePath), '.jpg') || fn:endsWith(fn:toLowerCase(user.certificatePath), '.jpeg') || fn:endsWith(fn:toLowerCase(user.certificatePath), '.png') || fn:endsWith(fn:toLowerCase(user.certificatePath), '.gif')}">
-                                                                    <!-- Ảnh: hiển thị thumbnail -->
-                                                                    <a href="${user.certificatePath}" target="_blank">
-                                                                        <img src="${user.certificatePath}" alt="Chứng chỉ" style="max-width: 80px; max-height: 80px; border-radius: 6px; border: 1px solid #ccc;"/>
-                                                                    </a>
-                                                                </c:when>
-                                                                <c:when test="${fn:endsWith(fn:toLowerCase(user.certificatePath), '.pdf')}">
-                                                                    <!-- PDF: hiển thị nút xem -->
-                                                                    <a href="${user.certificatePath}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                                        <i class="fas fa-file-pdf"></i> Xem chứng chỉ
-                                                                    </a>
-                                                                </c:when>
-                                                                <c:when test="${fn:startsWith(user.certificatePath, 'http')}">
-                                                                    <!-- Cloudinary: đoán theo đuôi file -->
-                                                                    <c:choose>
-                                                                        <c:when test="${fn:contains(fn:toLowerCase(user.certificatePath), '.pdf')}">
-                                                                            <a href="${user.certificatePath}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                                                <i class="fas fa-file-pdf"></i> Xem chứng chỉ
-                                                                            </a>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <a href="${user.certificatePath}" target="_blank">
-                                                                                <img src="${user.certificatePath}" alt="Chứng chỉ" style="max-width: 80px; max-height: 80px; border-radius: 6px; border: 1px solid #ccc;"/>
-                                                                            </a>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="text-muted">Không xác định</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
+                                                            <c:set var="cloudinaryUrl" value="https://res.cloudinary.com/dolxyowej/raw/upload/fl_attachment:certificate.pdf/${user.certificatePath}" />
+                                                            <a href="${cloudinaryUrl}"
+                                                               class="btn btn-sm btn-outline-primary"
+                                                               target="_blank"
+                                                               rel="noopener"
+                                                               download="certificate.pdf">
+                                                                <i class="fas fa-file-pdf"></i> Xem/Tải chứng chỉ
+                                                            </a>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="text-muted">
-                                                                <i class="fas fa-times-circle"></i> Không có
-                                                            </span>
+                                                            <span class="text-muted"><i class="fas fa-times-circle"></i> Không có</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>

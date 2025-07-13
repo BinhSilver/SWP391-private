@@ -8,16 +8,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcard - Wasabii</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="<c:url value='/css/flashcard.css'/>" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="<c:url value='/css/flashcard.css'/>" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/stylechat.css'/>" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/nav.css'/>" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>" rel="stylesheet">
+    
+    <!-- Config injection -->
+    <script>
+        window.contextPath = '${pageContext.request.contextPath}';
+        console.log('Context path loaded:', window.contextPath);
+    </script>
+    <script src="<c:url value='/js/config.js'/>"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <jsp:include page="Home/nav.jsp" />
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <%@ include file="Home/nav.jsp" %>
 
-    <!-- Main Content -->
-    <div class="container mt-4">
+        <%@ include file="chatBoxjsp/chatBox.jsp" %>
+
+        <!-- Main Content -->
+        <div class="container mt-4">
         <!-- Header -->
         <div class="row mb-4">
             <div class="col-md-8">
@@ -218,6 +232,8 @@
         </c:if>
     </div>
 
+    <%@ include file="Home/footer.jsp" %>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
@@ -241,7 +257,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
         function deleteFlashcard(flashcardID) {
             document.getElementById('flashcardID').value = flashcardID;
@@ -266,5 +284,6 @@
             }
         }, 5000);
     </script>
+    </div>
 </body>
 </html> 
