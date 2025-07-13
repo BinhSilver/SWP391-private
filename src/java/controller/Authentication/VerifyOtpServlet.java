@@ -1,6 +1,7 @@
 package controller.Authentication;
 
 import Dao.UserDAO;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
