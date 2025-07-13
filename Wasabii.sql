@@ -629,3 +629,65 @@ VALUES
 ( N'車', N'xe ô tô', N'くるま (kuruma)', N'車を運転します。', 2, N'/images/vocab/kuruma.png'),
 ( N'天気', N'thời tiết', N'てんき (tenki)', N'今日の天気はいいです。', 2, N'/images/vocab/tenki.png'),
 ( N'友達', N'bạn bè', N'ともだち (tomodachi)', N'友達と話します。', 2, N'/images/vocab/tomodachi.png');
+
+-- Cập nhật bảng Flashcards
+ALTER TABLE Flashcards 
+ADD 
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+    IsPublic BIT DEFAULT 0,
+    Description NVARCHAR(500),
+    CoverImage NVARCHAR(500);
+
+
+-- Cập nhật bảng FlashcardItems
+ALTER TABLE FlashcardItems 
+ADD 
+    FrontContent NVARCHAR(500),
+    BackContent NVARCHAR(500),
+    FrontImage NVARCHAR(500),
+    BackImage NVARCHAR(500),
+    OrderIndex INT DEFAULT 0;
+
+
+-- Thêm dữ liệu test cho flashcard
+-- Đảm bảo có user với ID = 1 (hoặc thay đổi UserID phù hợp)
+
+-- Thêm flashcard test
+INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage)
+VALUES 
+(1, N'Flashcard Từ Vựng N5', GETDATE(), GETDATE(), 1, N'Bộ flashcard từ vựng N5 cơ bản', NULL),
+(1, N'Flashcard Kanji N5', GETDATE(), GETDATE(), 0, N'Bộ flashcard kanji N5', NULL);
+
+-- Lấy FlashcardID vừa tạo
+DECLARE @FlashcardID1 INT = (SELECT FlashcardID FROM Flashcards WHERE Title = N'Flashcard Từ Vựng N5');
+DECLARE @FlashcardID2 INT = (SELECT FlashcardID FROM Flashcards WHERE Title = N'Flashcard Kanji N5');
+
+-- Thêm flashcard items cho flashcard 1
+INSERT INTO FlashcardItems (FlashcardID, FrontContent, BackContent, Note, OrderIndex)
+VALUES 
+(@FlashcardID1, N'こんにちは', N'Xin chào', N'Chào hỏi cơ bản', 1),
+(@FlashcardID1, N'ありがとう', N'Cảm ơn', N'Lời cảm ơn', 2),
+(@FlashcardID1, N'さようなら', N'Tạm biệt', N'Lời chào tạm biệt', 3);
+
+-- Thêm flashcard items cho flashcard 2
+INSERT INTO FlashcardItems (FlashcardID, FrontContent, BackContent, Note, OrderIndex)
+VALUES 
+(@FlashcardID2, N'人', N'Người', N'Kanji chỉ người', 1),
+(@FlashcardID2, N'水', N'Nước', N'Kanji chỉ nước', 2),
+(@FlashcardID2, N'火', N'Lửa', N'Kanji chỉ lửa', 3); 
+
+INSERT INTO [Wasabii].[dbo].[Vocabulary] (
+    [Word],
+    [Meaning],
+    [Reading],
+    [Example],
+    [LessonID],
+    [imagePath]
+)
+VALUES
+(N'猫',        N'Con mèo',      N'ねこ',         N'私は猫が好きです。',              1, N'imgvocab\Doraemon_character.png'),
+(N'学校',      N'Trường học',   N'がっこう',     N'彼は学校へ行きます。',            1, N'imgvocab\Doraemon_character.png'),
+(N'食べる',    N'Ăn',           N'たべる',       N'私は寿司を食べたいです。',        1, N'imgvocab\Doraemon_character.png'),
+(N'友達',      N'Bạn bè',       N'ともだち',     N'彼女は友達と遊びます。',          1, N'imgvocab\Doraemon_character.png'),
+(N'先生',      N'Giáo viên',    N'せんせい',     N'先生は日本語を教えます。',        1, N'imgvocab\Doraemon_character.png');
