@@ -51,3 +51,7 @@ build.xml
 # Allow specific files within web directory
 !web/js/
 !web/js/*
+
+# Cho phép folder config và tất cả file bên trong
+!src/java/config/
+!src/java/config/**
