@@ -1,5 +1,8 @@
+# Ignore lib directory (JAR files and dependencies)
+lib/
+
 # NetBeans IDE
-nbproject/private/
+nbproject/
 build/
 nbbuild/
 dist/
@@ -8,9 +11,8 @@ nbdist/
 *.orig
 src/DB/db.properties
 
-# Ensure lib directory is not ignored
-!lib/
-!lib/**
+# Ignore resources directory (config files)
+src/java/resources/
 
 # Cache files
 *.class
@@ -31,11 +33,6 @@ Thumbs.db
 # Maven/Gradle (nếu dùng thêm)
 target/
 .gradle/
-build/
-
-# Ant output folders (thường là 'build/' và 'dist/')
-build/
-dist/
 
 # Backup and temporary files
 *~
@@ -56,10 +53,4 @@ src/java/DB/JDBCConnection.java
 
 # Ignore build.xml
 build.xml
-
-# PayOS API Configuration
-src/java/resources/payOSAPI.properties
-
-# Cloud API Configuration
-src/java/resources/cloudinary.properties
 
