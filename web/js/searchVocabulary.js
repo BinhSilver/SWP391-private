@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchDropdown = document.getElementById('searchDropdown');
-    const contextPath = '/SWP_HUY';
+    
+    // Sử dụng context path từ config
+    const contextPath = window.contextPath || '';
 
     console.log('DOM ready');
 
@@ -17,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function searchVocabulary(keyword) {
-        const url = contextPath + '/SearchVocabulary?query=' + encodeURIComponent(keyword);
+        const url = getApiUrl(API_CONFIG.SEARCH_VOCABULARY) + '?query=' + encodeURIComponent(keyword);
         console.log('Sending request to:', url);
 
         const xhr = new XMLHttpRequest();
@@ -51,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const vocab = data[i];
                 const resultHtml = `
                     <div class="search-result">
-                        ${vocab.imagePath ? `<img src="${contextPath}/imgvocab/${vocab.imagePath}" alt="${vocab.word}">` : ''}
+                        ${vocab.imagePath ? `<img src="${getResourceUrl(RESOURCE_CONFIG.VOCAB_IMAGE_PATH + vocab.imagePath)}" alt="${vocab.word}">` : ''}
                         <div class="vocab-details">
-                            <div><span class="label">Tiếng Việt:</span> <span class="value">${vocab.word || 'Không có'}</span></div>
-                            <div><span class="label">Tiếng Anh:</span> <span class="value">${vocab.meaning || 'Không có'}</span></div>
+                            <div><span class="label">Tiếng Nhật:</span> <span class="value">${vocab.word || 'Không có'}</span></div>
+                            <div><span class="label">Tiếng Việt:</span> <span class="value">${vocab.meaning || 'Không có'}</span></div>
                             <div><span class="label">Đọc:</span> <span class="value">${vocab.reading || 'Không có'}</span></div>
                             <div><span class="label">Ví dụ:</span> <span class="value">${vocab.example || 'Không có'}</span></div>
                             <button class="play-btn" data-word="${vocab.word || ''}"><i class="fa-solid fa-volume-up"></i> Phát âm</button>

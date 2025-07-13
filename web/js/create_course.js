@@ -166,7 +166,6 @@ quizQuestionsContainer.addEventListener("click", (e) => {
     }
 });
 
-<<<<<<< HEAD
 // --- EVENT LISTENER: ADD/REMOVE VOCAB ENTRY ---
 document.addEventListener('click', function (e) {
     if (e.target.classList.contains('btn-add-vocab')) {
@@ -194,9 +193,6 @@ document.addEventListener('click', function (e) {
 });
 
 // --- QUIZ FORM SUBMIT ---
-=======
-// --- SUBMIT QUIZ FORM ---
->>>>>>> origin/nguyn
 quizForm.addEventListener('submit', function (e) {
     e.preventDefault();
     alert("Quiz đã được lưu!");
@@ -233,7 +229,4 @@ if (courseImageInput && thumbnailPreview) {
 
 // --- INITIALIZE ---
 updateLessonIndices();
-<<<<<<< HEAD
 updateQuizQuestionIndices();
-=======
->>>>>>> origin/nguyn
