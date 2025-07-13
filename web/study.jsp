@@ -97,13 +97,13 @@
                                             <div class="vocab-body">
                                                 <div class="vocab-text">
                                                     <div class="vocab-languages">
-                                                        <div>Vietnamese</div>
+                                                        <div>từ vựng</div>
                                                         <div>${vocab.word}</div>
-                                                        <div>English</div>
+                                                        <div>nghĩa</div>
                                                         <div>${vocab.meaning}</div>
                                                     </div>
                                                     <div class="vocab-examples">
-                                                        <div>Examples</div>
+                                                        <div>ví dụ</div>
                                                         <div>${vocab.reading != null ? vocab.reading : ''}</div>
                                                         <div>${vocab.example != null ? vocab.example : ''}</div>
                                                     </div>

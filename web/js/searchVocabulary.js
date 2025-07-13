@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchDropdown = document.getElementById('searchDropdown');
-    const contextPath = '/test';
+    const contextPath = '/SWP_HUY';
 
     console.log('DOM ready');
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             searchDropdown.style.display = 'block';
             addPlayButtonListeners();
         } else {
-            searchDropdown.innerHTML = '<div class="search-result">Không tìm thấy kết quả</div>';
+            searchDropdown.innerHTML = '<div id="search-resultt">Không tìm thấy kết quả</div>';
             searchDropdown.style.display = 'block';
         }
     }
@@ -83,10 +83,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Ẩn dropdown khi nhấp ra ngoài
-    document.addEventListener('click', function(event) {
-        if (!searchInput.contains(event.target) && !searchDropdown.contains(event.target)) {
-            searchDropdown.style.display = 'none';
-        }
-    });
 });

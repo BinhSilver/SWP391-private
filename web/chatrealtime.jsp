@@ -29,7 +29,7 @@
                     <c:forEach var="u" items="${userList}">
                         <c:if test="${u.userID != sessionScope.authUser.userID}">
                             <li data-user-id="${u.userID}" onclick="selectChatUser(${u.userID}, '${u.fullName}')">
-                                <img src="${pageContext.request.contextPath}/assets/avatar/nam.jpg" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%;">
+                                <img src="/SWP_HUY/assets/avatar/nam.jpg" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%;">
                                 <strong>${u.fullName}</strong>
                             </li>
                         </c:if>

@@ -18,7 +18,7 @@ import model.User;
 public class OAuth2CallbackServlet extends HttpServlet {
     private static final String CLIENT_ID = "1025289027596-qkbrdlnf5s31pjg2s7mkmdg0tj8s5c65.apps.googleusercontent.com";
     private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URI = "http://localhost:8080/test/oauth2callback";
+    private static final String REDIRECT_URI = "http://localhost:8080/SWP_HUY/oauth2callback";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String code = request.getParameter("code");
@@ -70,7 +70,7 @@ public class OAuth2CallbackServlet extends HttpServlet {
 
             // Lưu thông tin user vào session
             HttpSession session = request.getSession();
-            session.setAttribute("userLogin", user);
+            session.setAttribute("authUser", user);
 
             // Redirect về trang home hoặc dashboard
             response.sendRedirect("index.jsp");

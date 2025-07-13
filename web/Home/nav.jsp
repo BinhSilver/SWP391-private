@@ -50,7 +50,7 @@
                 <c:choose>
                     <c:when test="${empty authUser}">
                         <a href="<c:url value='login' />" class="btn-wasabii">Đăng Nhập</a>
-                        <a href="<c:url value='register' />" class="btn-wasabii">Đăng Ký</a>
+                        <a href="<c:url value='login?signup=true' />" class="btn-wasabii">Đăng Ký</a>
                     </c:when>
                     <c:otherwise>
                         <div class="dropdown">
