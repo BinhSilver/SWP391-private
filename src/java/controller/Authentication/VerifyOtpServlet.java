@@ -1,6 +1,7 @@
 package controller.Authentication;
 
 import Dao.UserDAO;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -41,7 +42,24 @@ public class VerifyOtpServlet extends HttpServlet {
         String gender = (String) session.getAttribute("pending_gender");
 
         // TODO: gọi UserDAO.createNewUser(...) để tạo tài khoản
+        UserDAO dao = new UserDAO();
         new UserDAO().createNewUser(email, password, gender);
+
+        // ✅ Sau khi tạo user, lấy lại từ DB
+        User user = dao.getUserByEmail(email);
+        User fullUser = null;
+            try {
+                fullUser = dao.getUserById(user.getUserID());
+            } catch (java.sql.SQLException e) {
+                e.printStackTrace();
+                request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
+                return;
+            }
+
+        // ✅ Đăng nhập bằng session
+        session.setAttribute("authUser", fullUser);
+        session.setAttribute("userID", fullUser.getUserID());
+        session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
 
         // Xóa dữ liệu tạm
         session.removeAttribute("otp_" + email);

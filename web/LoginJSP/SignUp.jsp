@@ -83,7 +83,7 @@
         </div>
 
         <input type="hidden" name="email" id="otpEmail" value="${email}">
-        <button type="submit" class="btn">Xác thực</button>
+        <button type="submit" class="btn" id="verifyBtn">Xác thực</button>
 
         <c:if test="${not empty message_otp}">
             <p class="error-message" style="color: red">${message_otp}</p>
@@ -97,6 +97,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const sendBtn = document.getElementById("sendOtpBtn");
+        const veriBtn = document.getElementById("verifyBtn");
         const otpMessage = document.getElementById("otpMessage");
         const otpInput = document.getElementById("otp");
         const emailInput = document.getElementById("email");
@@ -195,8 +196,23 @@
             xhr.onload = function () {
                 const responseJson = JSON.parse(xhr.responseText);
                 if (responseJson.success) {
-                    otpMessage.textContent = "Xác thực thành công, tài khoản đã được tạo!";
+                    otpMessage.textContent = "✅ Xác thực thành công, tài khoản đã được tạo!";
                     otpMessage.style.color = "green";
+
+                    if (otpTimeout) {
+                        clearInterval(otpTimeout);
+                    }
+
+                    sendBtn.style.display = "none";
+                    veriBtn.style.display = "none";
+                    otpMessage.style.color = "green";
+
+                    // ✅ Ẩn form OTP hoặc chuyển trang sau vài giây (tùy bạn)
+                    setTimeout(function () {                 
+                        otpMessage.textContent = "✅ Xác thực thành công, tài khoản đã được tạo!";
+                        
+                        window.location.href = "${pageContext.request.contextPath}/index.jsp";
+                    }, 3000);
                 } else {
                     otpMessage.textContent = responseJson.message || "Mã OTP không chính xác.";
                     otpMessage.style.color = "red";
@@ -204,20 +220,21 @@
             };
             xhr.send("otp=" + encodeURIComponent(otpValue) + "&email=" + encodeURIComponent(otpEmail));
         });
+
     });
 </script>
 
 <!--role-->
 <script>
-            document.addEventListener("DOMContentLoaded", function () {
-            const roleSelect = document.getElementById("role");
-                    const certificateBox = document.getElementById("certificateBox");
-                    roleSelect.addEventListener("change", function () {
-                    if (this.value === "teacher") {
-                    certificateBox.style.display = "block";
-                    } else {
-                    certificateBox.style.display = "none";
-                    }
-                    });
-            });
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleSelect = document.getElementById("role");
+        const certificateBox = document.getElementById("certificateBox");
+        roleSelect.addEventListener("change", function () {
+            if (this.value === "teacher") {
+                certificateBox.style.display = "block";
+            } else {
+                certificateBox.style.display = "none";
+            }
+        });
+    });
 </script>

@@ -89,12 +89,7 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.getUserByEmail(email);
 
-        if (user != null && checkPassword(password, user.getPasswordHash())) {
-            if (!user.isActive()) {
-                request.setAttribute("message", "Tài khoản chưa được mở khóa. Vui lòng xác thực tài khoản .");
-                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-                return;
-            }
+        if (user != null && checkPassword(password, user.getPasswordHash())) {           
             User fullUser = null;
             try {
                 fullUser = dao.getUserById(user.getUserID());
@@ -103,9 +98,6 @@ public class LoginServlet extends HttpServlet {
                 request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
 
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
-                request.getRequestDispatcher("/LoginJSP/LoginIndex.jsp").forward(request, response);
-
                 return;
             }
 
