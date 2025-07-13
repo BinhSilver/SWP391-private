@@ -183,6 +183,16 @@ form select:focus {
   padding-top: 0;
 }
 
+/* === THUMBNAIL PREVIEW === */
+.thumbnail-preview {
+  margin-top: 10px;
+  max-width: 300px;
+  max-height: 200px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  object-fit: cover;
+}
+
 /* === QUIZ QUESTION BLOCK === */
 .quiz-question-block {
   background-color: #fefefe;

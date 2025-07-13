@@ -129,6 +129,7 @@ public class LessonMaterialsDAO {
                 return "Kanji";
             }
         }
+        
         if ("Video".equalsIgnoreCase(fileType)) {
             if (titleLower.contains("ngữ pháp")) {
                 return "Ngữ pháp";

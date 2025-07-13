@@ -1,0 +1,187 @@
+/* Reset & Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    background-color: #fefefe;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Section Featured Courses */
+.featured-courses {
+    padding: 4rem 0;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.featured-courses h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2.5rem;
+    color: #e94f64;
+    font-weight: 700;
+}
+
+/* Course Grid using CSS Grid */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* Course Card */
+.course-card {
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    text-align: left;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.course-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Course Thumbnail */
+.course-thumbnail {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-shrink: 0;
+}
+
+.course-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.course-card:hover .course-thumbnail img {
+    transform: scale(1.1);
+}
+
+/* Course Title */
+.course-card h4 {
+    color: #2d3a4b;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+/* Course Description */
+.course-card p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+    height: 4.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5em;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* Course Meta */
+.course-meta {
+    margin-top: auto;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* Badges */
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Footer */
+.footer {
+    background-color: #2d3a4b;
+    color: #eee;
+    padding: 3rem 0;
+    margin-top: 3rem;
+}
+
+.footer .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+}
+
+.footer strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.footer a {
+    color: #e94f64;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+    color: #ff6b81;
+}
+
+.footer p {
+    font-size: 0.9rem;
+}
+
+.footer .copyright {
+    text-align: center;
+    padding-top: 2rem;
+    font-size: 0.85rem;
+    color: #aaa;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .featured-courses h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .featured-courses h2 {
+        font-size: 1.75rem;
+    }
+
+    .course-card {
+        padding: 1.2rem;
+    }
+
+    .course-card h4 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .course-card h4 {
+        font-size: 1.1rem;
+    }
+}
