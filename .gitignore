@@ -47,3 +47,7 @@ nbdist/
 
 # Ignore build.xml
 build.xml
+
+# Allow specific files within web directory
+!web/js/
+!web/js/*
