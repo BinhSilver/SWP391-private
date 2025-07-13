@@ -7,11 +7,16 @@
     <head>
         <meta charset="UTF-8">
         <title>Bài học - ${lesson.title}</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
+
         <link rel="stylesheet" href="<c:url value='/css/study.css'/>">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
         <script src="https://code.responsivevoice.org/responsivevoice.js?key=YC77U5uD"></script>
+        <!-- CSS & Fonts -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+        <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>">
+        <link rel="stylesheet" href="<c:url value='/css/stylechat.css'/>">
     </head>
     <body>
         <div class="page-wrapper">
@@ -173,8 +178,6 @@
 
             <%@ include file="../Home/footer.jsp" %>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.fullscreen-toggle').forEach(btn => {
@@ -233,13 +236,13 @@
                     btn.addEventListener('click', () => {
                         const word = btn.getAttribute('data-word');
                         if (word && responsiveVoice) {
-                            responsiveVoice.speak(word, "Japanese Female", { rate: 0.9 });
+                            responsiveVoice.speak(word, "Japanese Female", {rate: 0.9});
                         }
                     });
                 });
             });
         </script>
-          <!-- Scripts -->
+        <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
