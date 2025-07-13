@@ -175,6 +175,23 @@
             background: #c82333;
         }
         
+        .btn-outline-primary {
+            border-color: #e94f64;
+            color: #e94f64;
+            background: transparent;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #e94f64;
+            border-color: #e94f64;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
         .card-info {
             background: #f8f9fa;
             padding: 1.5rem;
@@ -334,7 +351,7 @@
             <!-- Controls -->
             <div class="flashcard-controls">
                 <div class="row align-items-center">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="progress-container">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Tiến độ học tập</span>
@@ -345,10 +362,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 text-end">
+                    <div class="col-md-4 text-center">
                         <button type="button" class="study-mode-toggle" id="studyModeToggle">
                             <i class="fas fa-random"></i>
                             Chế độ học tập
+                        </button>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button type="button" class="btn btn-outline-primary" id="resetOrderBtn" onclick="resetToOriginalOrder()">
+                            <i class="fas fa-sort-numeric-up"></i>
+                            Sắp xếp theo thứ tự gốc
                         </button>
                     </div>
                 </div>
@@ -448,11 +471,12 @@
             <c:forEach var="item" items="${items}" varStatus="status">
                 {
                     id: ${item.flashcardItemID},
-                    front: '<c:out value="${item.frontContent}"/>',
-                    back: '<c:out value="${item.backContent}"/>',
-                    frontImage: '<c:out value="${item.frontImage}"/>',
-                    backImage: '<c:out value="${item.backImage}"/>',
-                    note: '<c:out value="${item.note}"/>'
+                    front: '${item.frontContent != null ? item.frontContent.replace("'", "\\'") : ""}',
+                    back: '${item.backContent != null ? item.backContent.replace("'", "\\'") : ""}',
+                    frontImage: ${item.frontImage != null ? "'" + item.frontImage + "'" : "null"},
+                    backImage: ${item.backImage != null ? "'" + item.backImage + "'" : "null"},
+                    note: '${item.note != null ? item.note.replace("'", "\\'") : ""}',
+                    orderIndex: ${item.orderIndex}
                 }<c:if test="${!status.last}">,</c:if>
             </c:forEach>
         ];
@@ -460,48 +484,69 @@
         let currentIndex = 0;
         let isStudyMode = false;
         let studyOrder = [];
+        let originalOrder = [...Array(flashcards.length).keys()]; // Lưu thứ tự gốc
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             if (flashcards.length > 0) {
+                console.log('[FlashcardViewer] Flashcards loaded:', flashcards.length, 'items');
+                console.log('[FlashcardViewer] Original order:', originalOrder);
+                console.log('[FlashcardViewer] Flashcards array:', flashcards);
                 updateCard();
                 updateProgress();
             }
         });
 
+        function getRealIndex() {
+            // Nếu đang ở study mode (random), lấy index thực tế từ studyOrder
+            return isStudyMode ? studyOrder[currentIndex] : currentIndex;
+        }
+
         function updateCard() {
-            const card = flashcards[currentIndex];
-            console.log('updateCard - currentIndex:', currentIndex, 'card:', card);
+            const realIndex = getRealIndex();
+            const card = flashcards[realIndex];
+            console.log('[FlashcardViewer] updateCard - currentIndex:', currentIndex, 'realIndex:', realIndex, 'card:', card);
+            console.log('[FlashcardViewer] FrontImage value:', card.frontImage, 'type:', typeof card.frontImage);
+            console.log('[FlashcardViewer] BackImage value:', card.backImage, 'type:', typeof card.backImage);
+            
             const frontContent = document.getElementById('frontContent');
             const backContent = document.getElementById('backContent');
             const noteContent = document.getElementById('noteContent');
             const noteSection = document.getElementById('noteSection');
 
-            // Update front content
-            if (card.frontImage) {
+            // Update front content - ưu tiên ảnh nếu có
+            if (card.frontImage && card.frontImage !== null && card.frontImage.toString().trim() !== '') {
                 frontContent.innerHTML = `<img src="${card.frontImage}" alt="Front" class="flashcard-image">`;
+                console.log('[FlashcardViewer] Front image displayed:', card.frontImage);
             } else {
-                frontContent.textContent = card.front;
+                frontContent.textContent = card.front || 'Không có nội dung';
+                console.log('[FlashcardViewer] Front text displayed:', card.front);
             }
 
-            // Update back content
-            if (card.backImage) {
+            // Update back content - ưu tiên ảnh nếu có
+            if (card.backImage && card.backImage !== null && card.backImage.toString().trim() !== '') {
                 backContent.innerHTML = `<img src="${card.backImage}" alt="Back" class="flashcard-image">`;
+                console.log('[FlashcardViewer] Back image displayed:', card.backImage);
             } else {
-                backContent.textContent = card.back;
+                backContent.textContent = card.back || 'Không có nội dung';
+                console.log('[FlashcardViewer] Back text displayed:', card.back);
             }
 
             // Update note
             if (card.note && card.note.trim() !== '') {
                 noteContent.textContent = card.note;
                 noteSection.style.display = 'block';
+                console.log('[FlashcardViewer] Note displayed:', card.note);
             } else {
                 noteSection.style.display = 'none';
             }
 
-            // Update card info
-            document.getElementById('currentCardInfo').textContent = `${currentIndex + 1} / ${flashcards.length}`;
-            console.log('currentCardInfo updated:', `${currentIndex + 1} / ${flashcards.length}`);
+            // Update card info với OrderIndex
+            const currentCardInfo = document.getElementById('currentCardInfo');
+            if (currentCardInfo) {
+                currentCardInfo.textContent = `${currentIndex + 1} / ${flashcards.length} (OrderIndex: ${card.orderIndex})`;
+                console.log('[FlashcardViewer] currentCardInfo updated:', `${currentIndex + 1} / ${flashcards.length} (OrderIndex: ${card.orderIndex})`);
+            }
 
             // Update navigation buttons
             document.getElementById('prevBtn').disabled = currentIndex === 0;
@@ -554,18 +599,35 @@
                 button.classList.add('active');
                 
                 // Set current index to first in study order
-                currentIndex = studyOrder[0];
+                currentIndex = 0;
+                console.log('[FlashcardViewer] Study mode activated, random order:', studyOrder);
             } else {
                 button.innerHTML = '<i class="fas fa-random"></i> Chế độ học tập';
                 button.classList.remove('active');
                 
                 // Reset to original order
                 currentIndex = 0;
+                console.log('[FlashcardViewer] Study mode deactivated, original order restored');
             }
             
             updateCard();
             updateProgress();
         });
+
+        // Reset to original order
+        function resetToOriginalOrder() {
+            isStudyMode = false;
+            studyOrder = [...originalOrder];
+            currentIndex = 0;
+            
+            const button = document.getElementById('studyModeToggle');
+            button.innerHTML = '<i class="fas fa-random"></i> Chế độ học tập';
+            button.classList.remove('active');
+            
+            console.log('[FlashcardViewer] Reset to original order:', originalOrder);
+            updateCard();
+            updateProgress();
+        }
 
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {

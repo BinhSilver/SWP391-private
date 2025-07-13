@@ -63,6 +63,21 @@ public class ViewFlashcardServlet extends HttpServlet {
             }
             List<FlashcardItem> items = flashcardItemDAO.getFlashcardItemsByFlashcardID(flashcardID);
             System.out.println("[ViewFlashcardServlet] Số lượng items: " + (items != null ? items.size() : 0));
+            
+            // Log chi tiết thứ tự items để debug
+            if (items != null && !items.isEmpty()) {
+                System.out.println("[ViewFlashcardServlet] Thứ tự items theo OrderIndex:");
+                for (int i = 0; i < items.size(); i++) {
+                    FlashcardItem item = items.get(i);
+                    System.out.println("  Item " + (i + 1) + ": ID=" + item.getFlashcardItemID() + 
+                                     ", OrderIndex=" + item.getOrderIndex() + 
+                                     ", Front='" + item.getFrontContent() + "'" +
+                                     ", FrontImage=" + (item.getFrontImage() != null ? "có" : "không") +
+                                     ", Back='" + item.getBackContent() + "'" +
+                                     ", BackImage=" + (item.getBackImage() != null ? "có" : "không"));
+                }
+            }
+            
             request.setAttribute("flashcard", flashcard);
             request.setAttribute("items", items);
             System.out.println("[ViewFlashcardServlet] Forwarding to view-flashcard.jsp");
