@@ -2,7 +2,7 @@ package controller.flashcard;
 
 import Dao.FlashcardDAO;
 import Dao.FlashcardItemDAO;
-import config.CloudinaryUtil;
+import config.S3Util;
 import model.Flashcard;
 import model.FlashcardItem;
 import model.User;
@@ -73,18 +73,21 @@ public class CreateFlashcardServlet extends HttpServlet {
             Part coverPart = request.getPart("coverImage");
             if (coverPart != null && coverPart.getSize() > 0) {
                 try {
-                    Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
-                    Map<String, Object> options = new java.util.HashMap<>();
-                    options.put("folder", "flashcards");
-                    options.put("public_id", "flashcard_cover_" + java.util.UUID.randomUUID());
-                    options.put("overwrite", true);
-                    InputStream is = coverPart.getInputStream();
-                    byte[] bytes = is.readAllBytes();
-                    Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                    coverImageUrl = (String) uploadResult.get("secure_url");
-                    System.out.println("[FlashcardUpload] Cover upload thành công: " + coverImageUrl);
+                    java.io.InputStream is = coverPart.getInputStream();
+                    long size = coverPart.getSize();
+                    String originalFileName = coverPart.getSubmittedFileName();
+                    String key = "flashcards/flashcard_cover_" + java.util.UUID.randomUUID();
+                    if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                        key += ".jpg";
+                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                        key += ".png";
+                    }
+                    String contentType = coverPart.getContentType();
+                    String s3Url = config.S3Util.uploadFile(is, size, key, contentType);
+                    coverImageUrl = s3Url;
+                    System.out.println("[FlashcardUpload] Cover upload thành công S3: " + coverImageUrl);
                 } catch (Exception e) {
-                    System.err.println("[FlashcardUpload] Lỗi upload cover: " + e.getMessage());
+                    System.err.println("[FlashcardUpload] Lỗi upload cover S3: " + e.getMessage());
                 }
             }
 
@@ -127,15 +130,17 @@ public class CreateFlashcardServlet extends HttpServlet {
                             try {
                                 String fileName = frontImagePart.getSubmittedFileName();
                                 System.out.println("[FlashcardUpload] Đang upload frontImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + frontImagePart.getSize());
-                                Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
-                                Map<String, Object> options = new java.util.HashMap<>();
-                                options.put("folder", "flashcards");
-                                options.put("public_id", "flashcard_" + flashcardID + "_front_" + i + "_" + java.util.UUID.randomUUID());
-                                options.put("overwrite", true);
                                 java.io.InputStream is = frontImagePart.getInputStream();
-                                byte[] bytes = is.readAllBytes();
-                                Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                                String frontImageUrl = (String) uploadResult.get("secure_url");
+                                long size = frontImagePart.getSize();
+                                String originalFileName = frontImagePart.getSubmittedFileName();
+                                String key = "flashcards/flashcard_" + flashcardID + "_front_" + i + "_" + java.util.UUID.randomUUID();
+                                if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                                    key += ".jpg";
+                                } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                                    key += ".png";
+                                }
+                                String contentType = frontImagePart.getContentType();
+                                String frontImageUrl = config.S3Util.uploadFile(is, size, key, contentType);
                                 System.out.println("[FlashcardUpload] Front image upload thành công: " + frontImageUrl);
                                 item.setFrontImage(frontImageUrl);
                             } catch (Exception e) {
@@ -150,15 +155,17 @@ public class CreateFlashcardServlet extends HttpServlet {
                             try {
                                 String fileName = backImagePart.getSubmittedFileName();
                                 System.out.println("[FlashcardUpload] Đang upload backImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + backImagePart.getSize());
-                                Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
-                                Map<String, Object> options = new java.util.HashMap<>();
-                                options.put("folder", "flashcards");
-                                options.put("public_id", "flashcard_" + flashcardID + "_back_" + i + "_" + java.util.UUID.randomUUID());
-                                options.put("overwrite", true);
                                 java.io.InputStream is = backImagePart.getInputStream();
-                                byte[] bytes = is.readAllBytes();
-                                Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                                String backImageUrl = (String) uploadResult.get("secure_url");
+                                long size = backImagePart.getSize();
+                                String originalFileName = backImagePart.getSubmittedFileName();
+                                String key = "flashcards/flashcard_" + flashcardID + "_back_" + i + "_" + java.util.UUID.randomUUID();
+                                if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                                    key += ".jpg";
+                                } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                                    key += ".png";
+                                }
+                                String contentType = backImagePart.getContentType();
+                                String backImageUrl = config.S3Util.uploadFile(is, size, key, contentType);
                                 System.out.println("[FlashcardUpload] Back image upload thành công: " + backImageUrl);
                                 item.setBackImage(backImageUrl);
                             } catch (Exception e) {
