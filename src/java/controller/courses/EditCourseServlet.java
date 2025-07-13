@@ -27,7 +27,7 @@ import service.QuizService;
 public class EditCourseServlet extends HttpServlet {
 
     private static final String UPLOAD_DIR = "image";
-    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWP\\SWP391-private\\build\\web\\files";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

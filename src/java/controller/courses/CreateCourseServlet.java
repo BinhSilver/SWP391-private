@@ -19,7 +19,7 @@ import jakarta.servlet.http.*;
 public class CreateCourseServlet extends HttpServlet {
 
     // Đường dẫn tuyệt đối trên ổ đĩa D
-    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWP\\SWP391-private\\build\\web\\files";
 
     private static final String UPLOAD_COURSE_IMAGE_DIR = "files";
 

@@ -1,5 +1,5 @@
 -- Trong phiên bản này Huy đã thay đổi thêm một hàm để format ký tự ghép và dấu với bảng liên quan đến chat messenger conversation 
-CREATE DATABASE Wasabii;
+CREATE DATABASE Wasabii_v1;
 GO
 USE Wasabii;
 GO
@@ -798,7 +798,7 @@ DEALLOCATE user_cursor;
 DROP TABLE #TempUsers;
 
 
-INSERT INTO [Wasabii_Huy].[dbo].[Vocabulary] 
+INSERT INTO [Wasabii_v1].[dbo].[Vocabulary] 
 ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
 VALUES
 ( N'水', N'nước', N'みず (mizu)', N'水を飲みます。', 1, N'/images/vocab/mizu.png'),
@@ -811,3 +811,9 @@ VALUES
 ( N'車', N'xe ô tô', N'くるま (kuruma)', N'車を運転します。', 2, N'/images/vocab/kuruma.png'),
 ( N'天気', N'thời tiết', N'てんき (tenki)', N'今日の天気はいいです。', 2, N'/images/vocab/tenki.png'),
 ( N'友達', N'bạn bè', N'ともだち (tomodachi)', N'友達と話します。', 2, N'/images/vocab/tomodachi.png');
+
+
+
+
+ALTER TABLE Courses
+ADD imageUrl VARCHAR(255);
