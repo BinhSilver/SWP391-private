@@ -89,7 +89,7 @@
                     <a href="${pageContext.request.contextPath}/userManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
                     <a href="${pageContext.request.contextPath}/courseManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
                     <a href="${pageContext.request.contextPath}/admin/premium-plans" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
-                    <a href="#" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Báo cáo</span></a>
+                    <a href="${pageContext.request.contextPath}/BulkEmailAdmin.jsp" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Gửi Mail</span></a>
 
                 </div>
             </div>
@@ -147,8 +147,8 @@
 <script>
     $(document).ready(function () {
         $('#searchCourseInput').on('input', function () {
-            var query = $(this).val().trim();
-            var $searchResults = $('#searchResults');
+            const query = $(this).val().trim();
+            const $searchResults = $('#searchResults');
             $searchResults.empty().removeClass('show');
 
             if (query.length > 0) {
@@ -160,23 +160,20 @@
                     success: function (data) {
                         console.log('Raw search response:', data);
                         if (data && Array.isArray(data) && data.length > 0) {
-                            var $ul = $('<ul>').addClass('list-group');
-                            $.each(data, function (idx, course) {
-                                console.log('Course object:', course);
+                            const $ul = $('<ul>').addClass('list-group');
+                            $.each(data, function (_, course) {
                                 if (course.isHidden === false) {
-                                    var courseTitle = course.title ? String(course.title) : 'Không có tiêu đề';
-                                    var courseDesc = course.description ? String(course.description) : 'Không có mô tả';
-                                    var courseId = course.courseID ? String(course.courseID) : '';
+                                    const courseTitle = course.title ? String(course.title) : 'Không có tiêu đề';
+                                    const courseDesc = course.description ? String(course.description) : 'Không có mô tả';
+                                    const courseId = course.courseID ? String(course.courseID) : '';
 
-                                    var $li = $('<li>').addClass('list-group-item');
-                                    var $h5 = $('<h5>').text(courseTitle);
-                                    var $p = $('<p>').text(courseDesc);
-                                    var $a = $('<a>')
-                                            .addClass('btn btn-sm btn-wasabii')
-                                            .attr('href', '<c:url value="/courseDetails.jsp"/>?courseID=' + encodeURIComponent(courseId))
-                                            .text('Xem chi tiết');
-
-                                    $li.append($h5).append($p).append($a);
+                                    const $li = $('<li>').addClass('list-group-item')
+                                            .append($('<h5>').text(courseTitle))
+                                            .append($('<p>').text(courseDesc))
+                                            .append($('<a>')
+                                                    .addClass('btn btn-sm btn-wasabii')
+                                                    .attr('href', '${pageContext.request.contextPath}/CourseDetailServlet?id=' + encodeURIComponent(courseId))
+                                                    .text('Xem chi tiết'));
                                     $ul.append($li);
                                 }
                             });
@@ -198,10 +195,6 @@
             }
         });
 
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('.search-container').length) {
-                $('#searchResults').empty().removeClass('show');
-            }
-        });
+
     });
 </script>
