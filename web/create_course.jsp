@@ -260,6 +260,73 @@
         </div>
     </div>
 
+    <%-- Modal hiển thị danh sách khóa học của giáo viên --%>
+    <c:if test="${showModal}">
+    <div class="modal fade" id="teacherCoursesModal" tabindex="-1" aria-labelledby="teacherCoursesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="teacherCoursesModalLabel">Danh sách khóa học của bạn</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <c:if test="${not empty successMessage}">
+              <div class="alert alert-success">${successMessage}</div>
+            </c:if>
+            <c:if test="${empty teacherCourses}">
+              <div class="alert alert-info">Bạn chưa có khóa học nào.</div>
+            </c:if>
+            <c:if test="${not empty teacherCourses}">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Tiêu đề</th>
+                    <th>Mô tả</th>
+                    <th>Trạng thái</th>
+                    <th>Gợi ý</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <c:forEach var="course" items="${teacherCourses}">
+                    <tr>
+                      <td>${course.title}</td>
+                      <td>${course.description}</td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${course.hidden}">Ẩn</c:when>
+                          <c:otherwise>Hiển thị</c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${course.suggested}">✔</c:when>
+                          <c:otherwise>✖</c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td>
+                        <a href="CourseDetailServlet?id=${course.courseID}" class="btn btn-primary btn-sm" target="_blank">Xem chi tiết</a>
+                      </td>
+                    </tr>
+                  </c:forEach>
+                </tbody>
+              </table>
+            </c:if>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var modal = new bootstrap.Modal(document.getElementById('teacherCoursesModal'));
+        modal.show();
+      });
+    </script>
+    </c:if>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<c:url value='/js/create_course.js'/>"></script>
     <%@ include file="Home/footer.jsp" %>
