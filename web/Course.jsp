@@ -27,39 +27,30 @@
                         <div class="course-card">
                             <h4>${course.title}</h4>
                             <p>${course.description}</p>
-
-                            <!-- Thông tin meta cho giáo viên hoặc admin -->
-                            <c:if test="${sessionScope.user.roleID == 3 || sessionScope.user.roleID == 4}">
-                                <div class="course-meta small">
-                                    <c:choose>
-                                        <c:when test="${course.isHidden}">
-                                            <span class="badge bg-secondary">Đã ẩn</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge bg-success">Hiển thị công khai</span>
-                                        </c:otherwise>
-                                    </c:choose>
-
-                                    <c:if test="${course.isSuggested}">
-                                        <span class="badge bg-info text-dark ms-2">Gợi ý trên trang chủ</span>
-                                    </c:if>
-                                </div>
-                            </c:if>
-
-                            <!-- Nút chức năng dành cho giáo viên và admin -->
-                            <c:if test="${sessionScope.user.roleID == 3 || sessionScope.user.roleID == 4}">
-                                <div class="mt-2">
-                                    <a href="<c:url value='/edit_course.jsp?courseId=${course.courseID}'/>" class="btn btn-sm btn-warning">
+                            <div class="mb-2">
+                                <a href="CourseDetailServlet?id=${course.courseID}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                                <c:if test="${currentUser != null && (currentUser.roleID == 4 || (currentUser.roleID == 3 && course.createdBy == currentUser.userID))}">
+                                    <a href="edit_course.jsp?courseId=${course.courseID}" class="btn btn-warning btn-sm ms-1">
                                         <i class="fas fa-edit"></i> Sửa
                                     </a>
-                                    <form action="DeleteCourseServlet" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa khóa học này?');">
+                                    <form action="DeleteCourseServlet" method="post" class="d-inline ms-1" onsubmit="return confirm('Bạn có chắc muốn xóa khóa học này?');">
                                         <input type="hidden" name="courseId" value="${course.courseID}" />
-                                        <button type="submit" class="btn btn-sm btn-danger">
+                                        <button type="submit" class="btn btn-danger btn-sm">
                                             <i class="fas fa-trash"></i> Xóa
                                         </button>
                                     </form>
-                                </div>
-                            </c:if>
+                                </c:if>
+                            </div>
+                            <div class="course-meta small mt-2">
+                                <span class="badge ${course.hidden ? 'bg-secondary' : 'bg-success'}">
+                                    ${course.hidden ? 'Đã ẩn' : 'Hiển thị công khai'}
+                                </span>
+                                <c:if test="${course.suggested}">
+                                    <span class="badge bg-info text-dark ms-2">Gợi ý trên trang chủ</span>
+                                </c:if>
+                            </div>
                         </div>
                     </c:forEach>
                 </div>

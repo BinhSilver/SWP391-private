@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.io.InputStream;
+import com.cloudinary.Cloudinary;
 
 @WebServlet(name = "CreateFlashcardServlet", urlPatterns = {"/create-flashcard"})
 @MultipartConfig(
@@ -70,11 +73,25 @@ public class CreateFlashcardServlet extends HttpServlet {
             Part coverPart = request.getPart("coverImage");
             if (coverPart != null && coverPart.getSize() > 0) {
                 try {
-                    coverImageUrl = CloudinaryUtil.uploadImage(coverPart.getInputStream());
+                    Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
+                    Map<String, Object> options = new java.util.HashMap<>();
+                    options.put("folder", "flashcards");
+                    options.put("public_id", "flashcard_cover_" + java.util.UUID.randomUUID());
+                    options.put("overwrite", true);
+                    InputStream is = coverPart.getInputStream();
+                    byte[] bytes = is.readAllBytes();
+                    Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                    coverImageUrl = (String) uploadResult.get("secure_url");
+                    System.out.println("[FlashcardUpload] Cover upload thành công: " + coverImageUrl);
                 } catch (Exception e) {
-                    System.err.println("Error uploading cover image: " + e.getMessage());
-                    // Không dừng quá trình nếu upload ảnh cover thất bại
+                    System.err.println("[FlashcardUpload] Lỗi upload cover: " + e.getMessage());
                 }
+            }
+
+            // Log toàn bộ các part nhận được từ request để debug
+            System.out.println("[FlashcardUpload] Danh sách các part nhận được:");
+            for (Part part : request.getParts()) {
+                System.out.println("  Part name: " + part.getName() + ", filename: " + part.getSubmittedFileName() + ", size: " + part.getSize());
             }
 
             // Tạo flashcard mới
@@ -105,29 +122,54 @@ public class CreateFlashcardServlet extends HttpServlet {
                         item.setOrderIndex(i + 1);
 
                         // Upload ảnh front nếu có
-                        Part frontImagePart = request.getPart("frontImage" + i);
-                        if (frontImagePart != null && frontImagePart.getSize() > 0) {
+                        Part frontImagePart = request.getPart("frontImage-" + (i + 1));
+                        if (frontImagePart != null && frontImagePart.getSize() > 0 && frontImagePart.getSubmittedFileName() != null && !frontImagePart.getSubmittedFileName().isEmpty()) {
                             try {
-                                String frontImageUrl = CloudinaryUtil.uploadImage(frontImagePart.getInputStream());
+                                String fileName = frontImagePart.getSubmittedFileName();
+                                System.out.println("[FlashcardUpload] Đang upload frontImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + frontImagePart.getSize());
+                                Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
+                                Map<String, Object> options = new java.util.HashMap<>();
+                                options.put("folder", "flashcards");
+                                options.put("public_id", "flashcard_" + flashcardID + "_front_" + i + "_" + java.util.UUID.randomUUID());
+                                options.put("overwrite", true);
+                                java.io.InputStream is = frontImagePart.getInputStream();
+                                byte[] bytes = is.readAllBytes();
+                                Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                                String frontImageUrl = (String) uploadResult.get("secure_url");
+                                System.out.println("[FlashcardUpload] Front image upload thành công: " + frontImageUrl);
                                 item.setFrontImage(frontImageUrl);
                             } catch (Exception e) {
-                                System.err.println("Error uploading front image for card " + (i + 1) + ": " + e.getMessage());
-                                // Không dừng quá trình nếu upload ảnh thất bại
+                                System.err.println("[FlashcardUpload] Lỗi upload frontImage cho card " + (i + 1) + ": " + e.getMessage());
                             }
+                        } else {
+                            System.out.println("[FlashcardUpload] Không nhận được frontImage cho card " + (i + 1) + " (part null hoặc không có file)");
                         }
-
                         // Upload ảnh back nếu có
-                        Part backImagePart = request.getPart("backImage" + i);
-                        if (backImagePart != null && backImagePart.getSize() > 0) {
+                        Part backImagePart = request.getPart("backImage-" + (i + 1));
+                        if (backImagePart != null && backImagePart.getSize() > 0 && backImagePart.getSubmittedFileName() != null && !backImagePart.getSubmittedFileName().isEmpty()) {
                             try {
-                                String backImageUrl = CloudinaryUtil.uploadImage(backImagePart.getInputStream());
+                                String fileName = backImagePart.getSubmittedFileName();
+                                System.out.println("[FlashcardUpload] Đang upload backImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + backImagePart.getSize());
+                                Cloudinary cloudinary = config.CloudinaryUtil.getCloudinary();
+                                Map<String, Object> options = new java.util.HashMap<>();
+                                options.put("folder", "flashcards");
+                                options.put("public_id", "flashcard_" + flashcardID + "_back_" + i + "_" + java.util.UUID.randomUUID());
+                                options.put("overwrite", true);
+                                java.io.InputStream is = backImagePart.getInputStream();
+                                byte[] bytes = is.readAllBytes();
+                                Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                                String backImageUrl = (String) uploadResult.get("secure_url");
+                                System.out.println("[FlashcardUpload] Back image upload thành công: " + backImageUrl);
                                 item.setBackImage(backImageUrl);
                             } catch (Exception e) {
-                                System.err.println("Error uploading back image for card " + (i + 1) + ": " + e.getMessage());
-                                // Không dừng quá trình nếu upload ảnh thất bại
+                                System.err.println("[FlashcardUpload] Lỗi upload backImage cho card " + (i + 1) + ": " + e.getMessage());
                             }
+                        } else {
+                            System.out.println("[FlashcardUpload] Không nhận được backImage cho card " + (i + 1) + " (part null hoặc không có file)");
                         }
 
+                        // Log giá trị trước khi lưu vào DB
+                        System.out.println("[FlashcardUpload] Sắp lưu item: frontImage=" + item.getFrontImage() + ", backImage=" + item.getBackImage() + ", frontContent=" + item.getFrontContent() + ", backContent=" + item.getBackContent());
                         flashcardItemDAO.createFlashcardItem(item);
                     }
                 }
