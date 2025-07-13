@@ -87,6 +87,7 @@
 
                     <a href="${pageContext.request.contextPath}/HomeServlet" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Trang Chủ</span></a>
                     <a href="${pageContext.request.contextPath}/userManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>👤</span><span>Người dùng</span></a>
+                    <a href="${pageContext.request.contextPath}/teacherApproval" class="flex items-center space-x-2 hover:text-blue-500"><span>👨‍🏫</span><span>Xác nhận giáo viên</span></a>
                     <a href="${pageContext.request.contextPath}/courseManagement" class="flex items-center space-x-2 hover:text-blue-500"><span>📚</span><span>Khóa học</span></a>
                     <a href="${pageContext.request.contextPath}/admin/premium-plans" class="flex items-center space-x-2 hover:text-blue-500"><span>💰</span><span>Doanh thu</span></a>
                     <a href="${pageContext.request.contextPath}/BulkEmailAdmin.jsp" class="flex items-center space-x-2 hover:text-blue-500"><span>📄</span><span>Gửi Mail</span></a>

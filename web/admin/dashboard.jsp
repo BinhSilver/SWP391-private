@@ -25,7 +25,25 @@
                 </div>
             </div>
             
-            <!-- Add more admin features here -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Teacher Approval</h5>
+                        <p class="card-text">Review and approve teacher applications.</p>
+                        <a href="${pageContext.request.contextPath}/teacherApproval" class="btn btn-success">Review Teachers</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Course Management</h5>
+                        <p class="card-text">Manage courses and content.</p>
+                        <a href="${pageContext.request.contextPath}/courseManagement" class="btn btn-info">Manage Courses</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -15,7 +15,10 @@ import jakarta.servlet.annotation.MultipartConfig;
 // import config.CloudinaryUtil;
 // import java.io.File;
 // import java.io.FileOutputStream;
-// import java.io.InputStream;
+import java.io.InputStream;
+import com.cloudinary.Cloudinary;
+import java.util.Map;
+import config.CloudinaryUtil;
 
 @WebServlet("/editprofile")
 @MultipartConfig
@@ -67,12 +70,25 @@ public class EditProfileServlet extends HttpServlet {
             currentUser.setAddress(address);
             currentUser.setCountry(country);
 
-            // TODO: Tạm thời tắt upload avatar cho đến khi có thư viện json-simple và cloudinary-core
-            // Part filePart = request.getPart("avatar");
-            // if (filePart != null && filePart.getSize() > 0) {
-            //     // Avatar upload sẽ được implement sau khi thêm đầy đủ thư viện Cloudinary
-            //     System.out.println("Avatar upload disabled - missing Cloudinary dependencies");
-            // }
+            Part filePart = request.getPart("avatar");
+            if (filePart != null && filePart.getSize() > 0) {
+                try {
+                    Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
+                    Map<String, Object> options = new java.util.HashMap<>();
+                    options.put("folder", "avatars");
+                    options.put("public_id", "user_" + currentUser.getUserID());
+                    options.put("overwrite", true);
+                    // Đọc toàn bộ dữ liệu file thành mảng byte
+                    InputStream is = filePart.getInputStream();
+                    byte[] bytes = is.readAllBytes();
+                    Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                    String avatarUrl = (String) uploadResult.get("secure_url");
+                    currentUser.setAvatar(avatarUrl);
+                    System.out.println("[AvatarUpload] Upload thành công: " + avatarUrl);
+                } catch (Exception e) {
+                    System.err.println("[AvatarUpload] Lỗi upload avatar: " + e.getMessage());
+                }
+            }
 
             UserDAO dao = new UserDAO();
             boolean success = dao.updateProfile(currentUser);

@@ -19,6 +19,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import config.CloudinaryUtil;
+import com.cloudinary.Cloudinary;
 
 @MultipartConfig
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
@@ -63,7 +65,18 @@ public class CreateCourseServlet extends HttpServlet {
                 // TODO: Thêm logic lưu quiz vào database (bảng riêng nếu có)
             }
 
-            response.sendRedirect("CourseDetailServlet?id=" + courseId);
+            // Lấy danh sách các khóa học của giáo viên
+            List<Course> teacherCourses = new ArrayList<>();
+            if (user != null) {
+                CoursesDAO dao = new CoursesDAO();
+                teacherCourses = dao.getCoursesByTeacher(user.getUserID());
+            }
+            request.setAttribute("teacherCourses", teacherCourses);
+            request.setAttribute("showModal", true);
+            request.setAttribute("successMessage", "Tạo khóa học thành công!");
+            request.getRequestDispatcher("create_course.jsp").forward(request, response);
+            // Không redirect nữa
+            // response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
@@ -87,6 +100,12 @@ public class CreateCourseServlet extends HttpServlet {
         course.setDescription(description);
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
+        
+        // Lưu ID người tạo khóa học
+        if (user != null) {
+            course.setCreatedBy(user.getUserID());
+        }
+        
         return course;
     }
 
@@ -155,7 +174,39 @@ public class CreateCourseServlet extends HttpServlet {
                     if (dotIdx > 0) ext = originalName.substring(dotIdx);
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
                     String savePath = uploadRoot + File.separator + savedFileName;
-                    part.write(savePath);
+
+                    // Log thông tin file nhận được
+                    System.out.println("[MaterialUpload] Nhận file: " + originalName + ", size: " + part.getSize() + ", type: " + type);
+
+                    String fileUrl = null;
+                    try {
+                        Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
+                        java.io.InputStream is = part.getInputStream();
+                        byte[] bytes = is.readAllBytes();
+                        java.util.Map<String, Object> options = new java.util.HashMap<>();
+                        options.put("folder", "lesson_materials");
+                        options.put("public_id", "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis());
+                        options.put("overwrite", true);
+                        // Xác định resource_type
+                        if (type.endsWith("Video")) {
+                            options.put("resource_type", "video");
+                        } else if (ext.equalsIgnoreCase(".pdf")) {
+                            options.put("resource_type", "raw");
+                        } else {
+                            options.put("resource_type", "auto");
+                        }
+                        System.out.println("[MaterialUpload] Đang upload lên Cloudinary với options: " + options);
+                        java.util.Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                        fileUrl = (String) uploadResult.get("secure_url");
+                        System.out.println("[MaterialUpload] Upload Cloudinary thành công: " + fileUrl);
+                    } catch (Exception e) {
+                        System.err.println("[MaterialUpload] Lỗi upload Cloudinary: " + e.getMessage());
+                        e.printStackTrace();
+                        // Fallback: lưu local nếu Cloudinary lỗi
+                        part.write(savePath);
+                        fileUrl = "files/" + savedFileName;
+                        System.out.println("[MaterialUpload] Đã lưu file local: " + fileUrl);
+                    }
 
                     String materialType = "";
                     if (type.startsWith("vocab")) materialType = "Từ Vựng";
@@ -168,8 +219,9 @@ public class CreateCourseServlet extends HttpServlet {
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
-                    material.setFilePath("files/" + savedFileName);
+                    material.setFilePath(fileUrl);
                     materialsDao.add(material);
+                    System.out.println("[MaterialUpload] Đã lưu LessonMaterial vào DB: lessonId=" + lessonId + ", fileUrl=" + fileUrl);
                 }
             }
         }

@@ -40,26 +40,15 @@ public class VerifyOtpServlet extends HttpServlet {
         // Lấy thông tin người dùng đã lưu tạm
         String password = (String) session.getAttribute("pending_password");
         String gender = (String) session.getAttribute("pending_gender");
+        String role = (String) session.getAttribute("pending_role");
+        Boolean isTeacherPending = (Boolean) session.getAttribute("pending_isTeacherPending");
+        String certificatePath = (String) session.getAttribute("pending_certificatePath");
 
-        // TODO: gọi UserDAO.createNewUser(...) để tạo tài khoản
-        UserDAO dao = new UserDAO();
-        new UserDAO().createNewUser(email, password, gender);
-
-        // ✅ Sau khi tạo user, lấy lại từ DB
-        User user = dao.getUserByEmail(email);
-        User fullUser = null;
-            try {
-                fullUser = dao.getUserById(user.getUserID());
-            } catch (java.sql.SQLException e) {
-                e.printStackTrace();
-                request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
-                return;
-            }
-
-        // ✅ Đăng nhập bằng session
-        session.setAttribute("authUser", fullUser);
-        session.setAttribute("userID", fullUser.getUserID());
-        session.setMaxInactiveInterval(60 * 60 * 24); // 1 ngày
+        if (role != null && "teacher".equals(role)) {
+            new UserDAO().createNewUser(email, password, gender, role, isTeacherPending != null && isTeacherPending, certificatePath);
+        } else {
+            new UserDAO().createNewUser(email, password, gender, role, false, null);
+        }
 
         // Xóa dữ liệu tạm
         session.removeAttribute("otp_" + email);
@@ -67,6 +56,9 @@ public class VerifyOtpServlet extends HttpServlet {
         session.removeAttribute("pending_email");
         session.removeAttribute("pending_password");
         session.removeAttribute("pending_gender");
+        session.removeAttribute("pending_role");
+        session.removeAttribute("pending_isTeacherPending");
+        session.removeAttribute("pending_certificatePath");
 
         // Trả về JSON thành công
         response.getWriter().write("{\"success\":true}");

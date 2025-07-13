@@ -18,6 +18,9 @@ import jakarta.servlet.http.HttpSession;
 import model.Course;
 import model.User;
 import service.PasswordService;
+import jakarta.servlet.http.Part;
+import config.CloudinaryUtil;
+import com.cloudinary.Cloudinary;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 @MultipartConfig
@@ -112,6 +115,18 @@ public class LoginServlet extends HttpServlet {
                 clearRememberMeCookies(response);
             }
 
+            // Phân quyền chuyển hướng
+            if (fullUser.getRoleID() == 3) {
+                // Giáo viên
+                response.sendRedirect(request.getContextPath() + "/teacher_dashboard");
+                return;
+            } else if (fullUser.getRoleID() == 1 && fullUser.isTeacherPending()) {
+                // Đang chờ xác nhận giáo viên
+                request.setAttribute("message", "Tài khoản của bạn đang chờ admin xác nhận giáo viên. Vui lòng kiểm tra email sau khi được duyệt!");
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                return;
+            }
+
             // ✅ Thêm danh sách khóa học đề xuất
             CoursesDAO coursesDAO = new CoursesDAO();
             List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();
@@ -132,6 +147,10 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String repass = request.getParameter("repass");
         String gender = request.getParameter("gender");
+        String role = request.getParameter("role");
+        Part certificatePart = null;
+        String certificatePath = null;
+        boolean isTeacherPending = false;
 
         // Kiểm tra mật khẩu và xác nhận mật khẩu
         if (!password.equals(repass)) {
@@ -150,19 +169,67 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        // Nếu là giáo viên, xử lý file chứng chỉ
+        if ("teacher".equals(role)) {
+            isTeacherPending = true;
+            try {
+                certificatePart = request.getPart("certificate");
+                if (certificatePart == null || certificatePart.getSize() == 0) {
+                    request.setAttribute("message_signup", "Bạn phải upload chứng chỉ (ảnh hoặc PDF) để đăng ký giáo viên!");
+                    request.setAttribute("registerActive", "true");
+                    request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                    return;
+                }
+                try {
+                    Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
+                    
+                    // Đọc file từ Part
+                    java.io.InputStream is = certificatePart.getInputStream();
+                    byte[] bytes = is.readAllBytes();
+                    
+                    // Cấu hình upload cho PDF
+                    java.util.Map<String, Object> options = new java.util.HashMap<>();
+                    options.put("folder", "certificates");
+                    options.put("public_id", "certificate_" + System.currentTimeMillis());
+                    options.put("resource_type", "raw"); // Cho file PDF
+                    options.put("overwrite", true);
+                    
+                    // Upload lên Cloudinary
+                    java.util.Map uploadResult = cloudinary.uploader().upload(bytes, options);
+                    certificatePath = (String) uploadResult.get("secure_url");
+                    
+                    System.out.println("[CertificateUpload] Upload thành công: " + certificatePath);
+                } catch (Exception e) {
+                    System.err.println("[CertificateUpload] Lỗi upload chứng chỉ: " + e.getMessage());
+                    e.printStackTrace();
+                    // Fallback: lưu local nếu upload Cloudinary thất bại
+                    String fileName = System.currentTimeMillis() + "_" + certificatePart.getSubmittedFileName();
+                    String uploadPath = getServletContext().getRealPath("/certificates/");
+                    java.io.File uploadDir = new java.io.File(uploadPath);
+                    if (!uploadDir.exists()) uploadDir.mkdirs();
+                    String filePath = uploadPath + java.io.File.separator + fileName;
+                    certificatePart.write(filePath);
+                    certificatePath = "certificates/" + fileName;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         HttpSession session = request.getSession();
         session.setAttribute("pending_email", email);
         session.setAttribute("pending_password", password);
         session.setAttribute("pending_gender", gender);
-        //session.setAttribute("pending_role", role);
+        session.setAttribute("pending_role", role);
+        session.setAttribute("pending_isTeacherPending", isTeacherPending);
+        session.setAttribute("pending_certificatePath", certificatePath);
 
         request.setAttribute("email", email);
         request.setAttribute("password", password);
         request.setAttribute("gender", gender);
-        //request.setAttribute("role", role);
+        request.setAttribute("role", role);
         request.setAttribute("registerActive", "true");
         request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-
     }
 
 // Quên mật khẩu

@@ -8,6 +8,7 @@ import model.User;
 import java.sql.*;
 import java.util.*;
 import java.io.InputStream;
+import controller.Email.EmailUtil;
 
 public class UserDAO {
 
@@ -117,6 +118,25 @@ public class UserDAO {
             pstmt.setString(2, email);
             pstmt.setString(3, password);
             pstmt.setString(4, gender);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean createNewUser(String email, String password, String gender, String role, boolean isTeacherPending, String certificatePath) {
+        String sql = "INSERT INTO Users (RoleID, Email, PasswordHash, Gender, IsTeacherPending, CertificatePath) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int roleId = 1; // default user
+            if ("teacher".equals(role)) roleId = 1; // vẫn là user thường, chờ xác nhận
+            if ("student".equals(role)) roleId = 1;
+            pstmt.setInt(1, roleId);
+            pstmt.setString(2, email);
+            pstmt.setString(3, password);
+            pstmt.setString(4, gender);
+            pstmt.setBoolean(5, isTeacherPending);
+            pstmt.setString(6, certificatePath);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -351,6 +371,49 @@ public class UserDAO {
             }
         }
         return users;
+    }
+
+    public List<User> getPendingTeachers() {
+        List<User> list = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE IsTeacherPending = 1 AND RoleID = 1";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(extractUserFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void approveTeacher(int userId) {
+        String sql = "UPDATE Users SET RoleID = 3, IsTeacherPending = 0 WHERE UserID = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Gửi email xác nhận giáo viên
+        User user = getUserByIdSafe(userId);
+        if (user != null) {
+            try {
+                EmailUtil.sendTeacherApprovedMail(user);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    // Helper để lấy user không throw exception
+    private User getUserByIdSafe(int userId) {
+        try {
+            return getUserById(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void main(String[] args) throws SQLException {
