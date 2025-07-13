@@ -13,7 +13,7 @@
             <div class="col-6">
                 <div class="nav-links d-flex justify-content-evenly align-items-center h-100">
                     <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>
-                    <a class="nav-link px-2" href="#">Giới Thiệu</a>
+                    <a class="nav-link px-2" href="${pageContext.request.contextPath}/introduce.jsp">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
                     <a class="nav-link px-2" href="#">Liên Hệ</a>
                     <c:choose>

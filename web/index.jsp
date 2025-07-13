@@ -27,7 +27,7 @@
                         <h1>Học tiếng Nhật cùng Wasabii</h1>
                         <p>Nền tảng học tiếng Nhật hiệu quả, tương tác, và dễ dàng.</p>
                         <a href="<c:url value='/Courses/Course.jsp'/>" class="btn-primary">Bắt đầu ngay</a>
-                        <a href="#" class="btn-secondary">Tìm hiểu thêm</a>
+                        <a href="<c:url value='/introduce.jsp'/>" class="btn-secondary">Tìm hiểu thêm</a>
                     </div>
                     <div class="hero-image">
                         <img src="<c:url value='/image/homepage.jpg'/>" alt="Học tiếng Nhật">
