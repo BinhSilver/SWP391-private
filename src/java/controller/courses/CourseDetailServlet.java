@@ -50,6 +50,21 @@ public class CourseDetailServlet extends HttpServlet {
             return;
         }
 
+        // 7. Lấy user từ session
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("authUser");
+        request.setAttribute("currentUser", currentUser);
+
+        // Kiểm tra quyền truy cập khóa học
+        if (currentUser != null && currentUser.getRoleID() == 3) {
+            // Nếu là giáo viên, chỉ cho phép xem khóa học do mình tạo
+            if (course.getCreatedBy() != currentUser.getUserID()) {
+                request.setAttribute("error", "Bạn không có quyền truy cập khóa học này.");
+                request.getRequestDispatcher("course-detail.jsp").forward(request, response);
+                return;
+            }
+        }
+
         // 4. Lấy danh sách bài học
         List<Lesson> lessons = lessonDAO.getLessonsByCourseID(courseID);
 
@@ -62,11 +77,6 @@ public class CourseDetailServlet extends HttpServlet {
             List<QuizQuestion> quizQuestions = quizDAO.getQuestionsWithAnswersByLessonId(lesson.getLessonID());
             quizMap.put(lesson.getLessonID(), quizQuestions);
         }
-
-        // 7. Lấy user từ session
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("authUser");
-        request.setAttribute("currentUser", currentUser);
 
         // 8. Lấy danh sách bài học đã "vào học" từ DB (persistent)
         Set<Integer> accessedLessons = new HashSet<>();

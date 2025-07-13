@@ -39,9 +39,15 @@ public class VerifyOtpServlet extends HttpServlet {
         // Lấy thông tin người dùng đã lưu tạm
         String password = (String) session.getAttribute("pending_password");
         String gender = (String) session.getAttribute("pending_gender");
+        String role = (String) session.getAttribute("pending_role");
+        Boolean isTeacherPending = (Boolean) session.getAttribute("pending_isTeacherPending");
+        String certificatePath = (String) session.getAttribute("pending_certificatePath");
 
-        // TODO: gọi UserDAO.createNewUser(...) để tạo tài khoản
-        new UserDAO().createNewUser(email, password, gender);
+        if (role != null && "teacher".equals(role)) {
+            new UserDAO().createNewUser(email, password, gender, role, isTeacherPending != null && isTeacherPending, certificatePath);
+        } else {
+            new UserDAO().createNewUser(email, password, gender, role, false, null);
+        }
 
         // Xóa dữ liệu tạm
         session.removeAttribute("otp_" + email);
@@ -49,6 +55,9 @@ public class VerifyOtpServlet extends HttpServlet {
         session.removeAttribute("pending_email");
         session.removeAttribute("pending_password");
         session.removeAttribute("pending_gender");
+        session.removeAttribute("pending_role");
+        session.removeAttribute("pending_isTeacherPending");
+        session.removeAttribute("pending_certificatePath");
 
         // Trả về JSON thành công
         response.getWriter().write("{\"success\":true}");

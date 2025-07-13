@@ -87,6 +87,12 @@ public class CreateCourseServlet extends HttpServlet {
         course.setDescription(description);
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
+        
+        // Lưu ID người tạo khóa học
+        if (user != null) {
+            course.setCreatedBy(user.getUserID());
+        }
+        
         return course;
     }
 

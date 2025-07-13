@@ -146,8 +146,8 @@ public class CoursesDAO {
     }
 
     public int addAndReturnID(Course course) throws SQLException {
-        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedAt) "
-                + "VALUES (?, ?, ?, ?, GETDATE())";
+        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedBy, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, GETDATE())";
 
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -155,6 +155,7 @@ public class CoursesDAO {
             ps.setString(2, course.getDescription());
             ps.setBoolean(3, course.getHidden());
             ps.setBoolean(4, course.isSuggested());
+            ps.setInt(5, course.getCreatedBy());
 
             ps.executeUpdate();
 
@@ -210,6 +211,26 @@ public class CoursesDAO {
             }
         }
         return 0;
+    }
+
+    public List<Course> getCoursesByTeacher(int teacherId) throws SQLException {
+        List<Course> courses = new ArrayList<>();
+        String sql = "SELECT * FROM Courses WHERE CreatedBy = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, teacherId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Course course = new Course();
+                    course.setCourseID(rs.getInt("CourseID"));
+                    course.setTitle(rs.getString("Title"));
+                    course.setDescription(rs.getString("Description"));
+                    course.setHidden(rs.getBoolean("IsHidden"));
+                    course.setSuggested(rs.getBoolean("IsSuggested"));
+                    courses.add(course);
+                }
+            }
+        }
+        return courses;
     }
 
 

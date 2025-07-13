@@ -7,6 +7,7 @@ public class Course {
     private String description;
     private boolean isHidden;
     private boolean isSuggested; // thêm thuộc tính mới
+    private int createdBy; // ID người tạo khóa học
 
     public Course() {
     }
@@ -17,6 +18,15 @@ public class Course {
         this.description = description;
         this.isHidden = isHidden;
         this.isSuggested = isSuggested;
+    }
+
+    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested, int createdBy) {
+        this.courseID = courseID;
+        this.title = title;
+        this.description = description;
+        this.isHidden = isHidden;
+        this.isSuggested = isSuggested;
+        this.createdBy = createdBy;
     }
 
     public Course(int courseID, String title, String description) {
@@ -33,6 +43,7 @@ public class Course {
                 + ", description='" + description + '\''
                 + ", isHidden=" + isHidden
                 + ", isSuggested=" + isSuggested
+                + ", createdBy=" + createdBy
                 + '}';
     }
 
@@ -74,6 +85,14 @@ public class Course {
 
     public void setSuggested(boolean suggested) {
         this.isSuggested = suggested;
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
     }
 
 }

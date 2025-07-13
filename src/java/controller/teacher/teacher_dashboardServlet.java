@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.Course;
+import model.User;
 
 @WebServlet(name = "teacher_dashboard", urlPatterns = {"/teacher_dashboard"})
 public class teacher_dashboardServlet extends HttpServlet {
@@ -15,8 +16,24 @@ public class teacher_dashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // Lấy thông tin user hiện tại
+            HttpSession session = request.getSession();
+            User currentUser = (User) session.getAttribute("authUser");
+            
+            if (currentUser == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            
+            // Kiểm tra quyền giáo viên
+            if (currentUser.getRoleID() != 3) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            
             CoursesDAO dao = new CoursesDAO();
-            List<Course> courses = dao.getAllCourses(); // Lấy từ DB (phần chuẩn để hiển thị)
+            // Chỉ lấy khóa học do giáo viên này tạo
+            List<Course> courses = dao.getCoursesByTeacher(currentUser.getUserID());
             request.setAttribute("courses", courses);
             request.getRequestDispatcher("teacher_dashboard.jsp").forward(request, response);
         } catch (Exception e) {
