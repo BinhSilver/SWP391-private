@@ -98,6 +98,15 @@ document.addEventListener("click", function (e) {
             activeQuizLessonIndex = parseInt(lessonBlock.dataset.lessonIndex);
             questionCount = 0;
             quizQuestionsContainer.innerHTML = "";
+            // Nếu lesson đã có quiz-holder, chuyển các input quiz vào modal để chỉnh sửa
+            let quizHolder = lessonBlock.querySelector('.quiz-holder');
+            if (quizHolder && quizHolder.children.length > 0) {
+                // Di chuyển từng quiz-question-block vào modal
+                Array.from(quizHolder.children).forEach(child => {
+                    quizQuestionsContainer.appendChild(child);
+                });
+                questionCount = quizQuestionsContainer.querySelectorAll('.quiz-question-block').length;
+            }
             console.log("Tạo quiz cho lesson:", activeQuizLessonIndex);
         }
     }
@@ -194,8 +203,35 @@ document.addEventListener('click', function (e) {
 
 // --- QUIZ FORM SUBMIT ---
 quizForm.addEventListener('submit', function (e) {
+    // Mở tất cả các collapse để trình duyệt validate
+    document.querySelectorAll('#quizQuestionsContainer .collapse').forEach(collapse => {
+        collapse.classList.add('show');
+    });
     e.preventDefault();
-    alert("Quiz đã được lưu!");
+    if (activeQuizLessonIndex === null) {
+        alert("Không xác định bài học để lưu quiz!");
+        return;
+    }
+    // Di chuyển các input quiz từ modal vào lesson-block tương ứng (và nằm trong form chính)
+    const lessonPane = document.querySelector(`.tab-pane[data-lesson-index='${activeQuizLessonIndex}']`);
+    if (lessonPane) {
+        let lessonBlock = lessonPane.querySelector('.lesson-block');
+        let quizHolder = lessonBlock.querySelector('.quiz-holder');
+        if (!quizHolder) {
+            quizHolder = document.createElement('div');
+            quizHolder.className = 'quiz-holder';
+            // Không dùng display: none để tránh lỗi focus, chỉ ẩn bằng opacity và height
+            quizHolder.style.opacity = '0';
+            quizHolder.style.height = '0px';
+            quizHolder.style.overflow = 'hidden';
+            lessonBlock.appendChild(quizHolder);
+        }
+        // Di chuyển từng quiz-question-block vào quizHolder
+        Array.from(quizQuestionsContainer.children).forEach(child => {
+            quizHolder.appendChild(child);
+        });
+    }
+    alert("Quiz đã được lưu cho Lesson " + (activeQuizLessonIndex + 1) + "!");
     const quizModal = bootstrap.Modal.getInstance(document.getElementById('quizModal'));
     if (quizModal)
         quizModal.hide();

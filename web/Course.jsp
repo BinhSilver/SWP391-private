@@ -26,40 +26,22 @@
                 <c:if test="${not empty courses}">
                     <div class="course-grid">
                         <c:forEach var="course" items="${courses}">
-                            <div class="course-card">
-                                <h4>${course.title}</h4>
-                                <p>${course.description}</p>
-                                <!-- Thông tin meta cho giáo viên hoặc admin -->
-                                <c:if test="${not empty sessionScope.user and (sessionScope.user.roleID == 3 or sessionScope.user.roleID == 4)}">
-                                    <div class="course-meta small">
-                                        <c:choose>
-                                            <c:when test="${course.hidden}">
-                                                <span class="badge bg-secondary">Đã ẩn</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-success">Hiển thị công khai</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <c:if test="${course.suggested}">
-                                            <span class="badge bg-info text-dark ms-2">Gợi ý trên trang chủ</span>
-                                        </c:if>
-                                    </div>
-                                </c:if>
-
-                                <!-- Nút chức năng dành cho giáo viên và admin -->
-                                <c:if test="${not empty sessionScope.user and (sessionScope.user.roleID == 3 or sessionScope.user.roleID == 4)}">
-                                    <div class="mt-2">
-                                        <a href="<c:url value='/EditCourseServlet?id=${course.courseID}'/>" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-edit"></i> Sửa
-                                        </a>
-                                        <form action="DeleteCourseServlet" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa khóa học này?');">
-                                            <input type="hidden" name="courseId" value="${course.courseID}" />
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-trash"></i> Xóa
-                                            </button>
-                                        </form>
-                                    </div>
-                                </c:if>
+                            <div class="course-card-horizontal">
+                                <div class="course-thumb-wrap">
+                                    <c:choose>
+                                        <c:when test="${empty course.imageUrl}">
+                                            <img class="course-thumb" src="/images/default_course.png" alt="Thumbnail" />
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img class="course-thumb" src="${course.imageUrl}" alt="Thumbnail" />
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <div class="course-title-wrap">
+                                    <a class="course-title-link" href="<c:url value='/CourseDetailServlet'/>?id=${course.courseID}">
+                                        ${course.title}
+                                    </a>
+                                </div>
                             </div>
                         </c:forEach>
                     </div>

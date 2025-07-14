@@ -61,22 +61,31 @@
                     <!-- Hiển thị danh sách khóa học -->
                     <c:forEach var="course" items="${courses}">
                         <div class="course-item" id="course-${course.courseID}">
-                            <div onclick="window.location.href = '<c:url value='/CourseDetailServlet'/>?id=${course.courseID}'" style="cursor: pointer;">
-                                <h4>${course.title}
-                                    <span style="color: #28a745;">
-                                        <c:choose>
-                                            <c:when test="${course.hidden}">Hidden</c:when>
-                                            <c:otherwise>Visible</c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                </h4>
-                                <p>${course.description}</p>
+                            <div class="course-thumb-title" style="display: flex; align-items: center; gap: 1rem; cursor: pointer;" onclick="window.location.href = '<c:url value='/CourseDetailServlet'/>?id=${course.courseID}'">
+                                <c:choose>
+                                    <c:when test="${empty course.imageUrl}">
+                                        <img class="course-thumb" src="/images/default_course.png" alt="Thumbnail" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <img class="course-thumb" src="${course.imageUrl}" alt="Thumbnail" />
+                                    </c:otherwise>
+                                </c:choose>
+                                <div>
+                                    <h4>${course.title}
+                                        <span style="color: #28a745;">
+                                            <c:choose>
+                                                <c:when test="${course.hidden}">Hidden</c:when>
+                                                <c:otherwise>Visible</c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </h4>
+                                    <p>${course.description}</p>
+                                </div>
                             </div>
                             <div class="mt-2 d-flex gap-2">
                                 <a href="<c:url value='/EditCourseServlet'/>?id=${course.courseID}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-
                                 <button onclick="deleteCourse(${course.courseID})" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
