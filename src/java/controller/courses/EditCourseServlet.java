@@ -26,8 +26,8 @@ import service.QuizService;
 @MultipartConfig(maxFileSize = 100 * 1024 * 1024, fileSizeThreshold = 1 * 1024 * 1024)
 public class EditCourseServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "image";
-    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
+    private static final String UPLOAD_DIR = "files";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\web\\files";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

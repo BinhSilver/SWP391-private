@@ -19,9 +19,7 @@ import jakarta.servlet.http.*;
 public class CreateCourseServlet extends HttpServlet {
 
     // Đường dẫn tuyệt đối trên ổ đĩa D
-    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
-
-    private static final String UPLOAD_COURSE_IMAGE_DIR = "files";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWP\\SWP391-private\\web\\files";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,7 +39,11 @@ public class CreateCourseServlet extends HttpServlet {
         System.out.println("=========================");
         try {
             User user = getCurrentUser(request);
-
+            if (user == null) {
+                System.out.println("[ERROR] Không có user đăng nhập, chuyển hướng về trang đăng nhập.");
+                response.sendRedirect("login.jsp");
+                return;
+            }
             // ======== XỬ LÝ ẢNH COURSE (THUMBNAIL) =========
             String imageUrl = null;
             Part imagePart = request.getPart("thumbnailFile");
@@ -70,6 +72,8 @@ public class CreateCourseServlet extends HttpServlet {
 
             // ======== LẤY THÔNG TIN KHÓA HỌC =========
             Course course = getCourseInfoFromRequest(request, user, imageUrl);
+            // Đảm bảo set createdBy đúng
+            course.setCreatedBy(user.getUserID());
             System.out.println("[LOG] Thông tin course: " + course);
             int courseId = saveCourseAndReturnId(course);
 
@@ -103,6 +107,7 @@ public class CreateCourseServlet extends HttpServlet {
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
         course.setImageUrl(imageUrl);
+        // Không set createdBy ở đây nữa, sẽ set ở doPost
         return course;
     }
 
@@ -222,6 +227,7 @@ public class CreateCourseServlet extends HttpServlet {
                 }
             }
         }
+        System.out.println("[DEBUG] Lesson " + lessonIndex + " có " + questionIndexes.size() + " câu hỏi quiz.");
         for (int qIdx : questionIndexes) {
             String base = "lessons[" + lessonIndex + "][questions][" + qIdx + "]";
             String questionText = request.getParameter(base + "[question]");
@@ -230,7 +236,7 @@ public class CreateCourseServlet extends HttpServlet {
             String optionC = request.getParameter(base + "[optionC]");
             String optionD = request.getParameter(base + "[optionD]");
             String answer = request.getParameter(base + "[answer]");
-            System.out.println("[LOG] Quiz lesson " + lessonIndex + " - Q" + qIdx + ": " + questionText + " | A=" + optionA + ", B=" + optionB + ", C=" + optionC + ", D=" + optionD + ", answer=" + answer);
+            System.out.println("[DEBUG] Quiz lesson " + lessonIndex + " - Q" + qIdx + ": " + questionText + " | A=" + optionA + ", B=" + optionB + ", C=" + optionC + ", D=" + optionD + ", answer=" + answer);
             if (questionText == null || answer == null) {
                 continue;
             }
@@ -255,12 +261,11 @@ public class CreateCourseServlet extends HttpServlet {
 
             questions.add(quizQuestion);
         }
-
         if (!questions.isEmpty()) {
-            System.out.println("📥 Đang lưu " + questions.size() + " câu quiz cho lessonId = " + lessonId);
+            System.out.println("[DEBUG] Đang lưu " + questions.size() + " câu quiz cho lessonId = " + lessonId);
             QuizDAO.saveQuestions(lessonId, questions);
         } else {
-            System.out.println("⚠️ Không có câu hỏi nào được lưu cho lessonId = " + lessonId);
+            System.out.println("[DEBUG] Không có câu hỏi nào được lưu cho lessonId = " + lessonId);
         }
     }
 

@@ -60,15 +60,30 @@ public class CoursesDAO {
             stmt.setBoolean(4, c.isSuggested());
             stmt.setString(5, c.getImageUrl());
             stmt.setInt(6, c.getCreatedBy());
-            stmt.executeUpdate();
-
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating course failed, no rows affected.");
+            }
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    int id = rs.getInt(1);
+                    if (id > 0) {
+                        return id;
+                    }
                 }
             }
+            // Nếu không lấy được ID tự sinh, truy vấn lại DB lấy MAX(CourseID)
+            System.err.println("[WARN] addAndReturnID: Không lấy được ID tự sinh, sẽ lấy MAX(CourseID) từ DB!");
+            try (PreparedStatement maxStmt = conn.prepareStatement("SELECT MAX(CourseID) FROM Courses"); ResultSet maxRs = maxStmt.executeQuery()) {
+                if (maxRs.next()) {
+                    int maxId = maxRs.getInt(1);
+                    if (maxId > 0) {
+                        return maxId;
+                    }
+                }
+            }
+            throw new SQLException("Creating course failed, no ID obtained (even after fallback MAX).");
         }
-        return -1;
     }
 
     public void update(Course c) throws SQLException {
