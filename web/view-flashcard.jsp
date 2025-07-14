@@ -11,6 +11,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="<c:url value='/css/flashcard.css'/>" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/nav.css'/>" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>" rel="stylesheet">
     <style>
         .flashcard-viewer {
             background: white;
@@ -320,7 +322,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <jsp:include page="Home/nav.jsp" />
+    <%@ include file="Home/nav.jsp" %>
 
     <!-- Main Content -->
     <div class="container mt-4">
@@ -463,8 +465,12 @@
         </c:if>
     </div>
 
+    <%@ include file="Home/footer.jsp" %>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
         // Flashcard data
         const flashcards = [

@@ -73,8 +73,8 @@
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${not empty user.certificatePath}">
-                                                            <c:set var="cloudinaryUrl" value="https://res.cloudinary.com/dolxyowej/raw/upload/fl_attachment:certificate.pdf/${user.certificatePath}" />
-                                                            <a href="${cloudinaryUrl}"
+                                                            <c:set var="s3Url" value="https://cloudswp.s3.ap-southeast-1.amazonaws.com/${user.certificatePath}" />
+                                                            <a href="${s3Url}"
                                                                class="btn btn-sm btn-outline-primary"
                                                                target="_blank"
                                                                rel="noopener"
