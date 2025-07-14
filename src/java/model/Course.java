@@ -8,16 +8,18 @@ public class Course {
     private boolean isHidden;
     private boolean isSuggested; // thêm thuộc tính mới
     private int createdBy; // ID người tạo khóa học
+    private String imageUrl;
 
     public Course() {
     }
 
-    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested) {
+    public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested, String imageUrl) {
         this.courseID = courseID;
         this.title = title;
         this.description = description;
         this.isHidden = isHidden;
         this.isSuggested = isSuggested;
+        this.imageUrl = imageUrl;
     }
 
     public Course(int courseID, String title, String description, boolean isHidden, boolean isSuggested, int createdBy) {
@@ -44,6 +46,7 @@ public class Course {
                 + ", isHidden=" + isHidden
                 + ", isSuggested=" + isSuggested
                 + ", createdBy=" + createdBy
+                + ", imageUrl='" + imageUrl + '\''
                 + '}';
     }
 
@@ -75,8 +78,8 @@ public class Course {
         return isHidden;
     }
 
-    public void setHidden(boolean isHidden) {
-        this.isHidden = isHidden;
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
     }
 
     public boolean isSuggested() {
@@ -84,7 +87,7 @@ public class Course {
     }
 
     public void setSuggested(boolean suggested) {
-        this.isSuggested = suggested;
+        isSuggested = suggested;
     }
 
     public int getCreatedBy() {
@@ -95,4 +98,11 @@ public class Course {
         this.createdBy = createdBy;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

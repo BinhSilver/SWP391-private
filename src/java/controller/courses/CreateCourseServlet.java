@@ -3,28 +3,25 @@ package controller.courses;
 import Dao.CoursesDAO;
 import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
-import Dao.VocabularyDAO;
-import model.Course;
-import model.Lesson;
-import model.LessonMaterial;
-import model.User;
-import model.Vocabulary;
+import Dao.QuizDAO;
+import model.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import config.CloudinaryUtil;
-import com.cloudinary.Cloudinary;
 
 @MultipartConfig
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
 public class CreateCourseServlet extends HttpServlet {
+
+    // Đường dẫn tuyệt đối trên ổ đĩa D
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\build\\web\\files";
+
+    private static final String UPLOAD_COURSE_IMAGE_DIR = "files";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,43 +37,41 @@ public class CreateCourseServlet extends HttpServlet {
 
         try {
             User user = getCurrentUser(request);
-            Course course = getCourseInfoFromRequest(request, user);
+
+            // ======== XỬ LÝ ẢNH COURSE (THUMBNAIL) =========
+            String imageUrl = null;
+            Part imagePart = request.getPart("thumbnailFile");
+            if (imagePart != null && imagePart.getSize() > 0) {
+                String fileName = getFileName(imagePart);
+
+                File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                String filePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
+                try (InputStream is = imagePart.getInputStream();
+                     FileOutputStream os = new FileOutputStream(filePath)) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, bytesRead);
+                    }
+                }
+
+                // Lưu path tương đối vào DB
+                imageUrl = "files/" + fileName;
+            }
+
+            // ======== LẤY THÔNG TIN KHÓA HỌC =========
+            Course course = getCourseInfoFromRequest(request, user, imageUrl);
             int courseId = saveCourseAndReturnId(course);
+
             int maxLesson = getMaxLessonIndex(request);
 
-            String uploadRoot = "D:\\SWP_NETBEAN\\SWP_HUY 12.7\\SWP391-private\\web\\files";
-            File uploadDir = new File(uploadRoot);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+            handleAllLessons(request, courseId, maxLesson, request);
 
-            String imgVocabDir = "D:\\SWP_NETBEAN\\SWP_HUY 12.7\\SWP391-private\\web\\imgvocab"; // Đường dẫn thực tế
-            File imgVocabRoot = new File(imgVocabDir);
-            if (!imgVocabRoot.exists()) {
-                imgVocabRoot.mkdirs();
-            }
-
-            handleAllLessons(request, courseId, maxLesson, uploadRoot, imgVocabDir);
-
-            // Xử lý quiz (chỉ log tạm thời, bạn cần thêm logic lưu vào database)
-            String quizJson = request.getParameter("quizJson");
-            if (quizJson != null && !quizJson.isEmpty()) {
-                System.out.println("Quiz Data: " + quizJson);
-                // TODO: Thêm logic lưu quiz vào database (bảng riêng nếu có)
-            }
-
-            // Lấy danh sách các khóa học của giáo viên
-            List<Course> teacherCourses = new ArrayList<>();
-            if (user != null) {
-                CoursesDAO dao = new CoursesDAO();
-                teacherCourses = dao.getCoursesByTeacher(user.getUserID());
-            }
-            request.setAttribute("teacherCourses", teacherCourses);
-            request.setAttribute("showModal", true);
-            request.setAttribute("successMessage", "Tạo khóa học thành công!");
-            request.getRequestDispatcher("create_course.jsp").forward(request, response);
-            // Không redirect nữa
-            // response.sendRedirect("CourseDetailServlet?id=" + courseId);
+            response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
@@ -89,7 +84,7 @@ public class CreateCourseServlet extends HttpServlet {
         return (session != null) ? (User) session.getAttribute("authUser") : null;
     }
 
-    private Course getCourseInfoFromRequest(HttpServletRequest request, User user) {
+    private Course getCourseInfoFromRequest(HttpServletRequest request, User user, String imageUrl) {
         String title = request.getParameter("courseTitle");
         String description = request.getParameter("courseDescription");
         boolean isHidden = request.getParameter("isHidden") != null;
@@ -100,12 +95,7 @@ public class CreateCourseServlet extends HttpServlet {
         course.setDescription(description);
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
-        
-        // Lưu ID người tạo khóa học
-        if (user != null) {
-            course.setCreatedBy(user.getUserID());
-        }
-        
+        course.setImageUrl(imageUrl);
         return course;
     }
 
@@ -127,144 +117,149 @@ public class CreateCourseServlet extends HttpServlet {
                     if (idx > maxLesson) {
                         maxLesson = idx;
                     }
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
         }
         return maxLesson;
     }
 
-    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson, String uploadRoot, String imgVocabDir)
+    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson, HttpServletRequest req)
             throws Exception {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
-        VocabularyDAO vocabDao = new VocabularyDAO();
 
         for (int i = 0; i <= maxLesson; i++) {
-            String lessonTitle = request.getParameter("lessons[" + i + "][name]");
+            String title = request.getParameter("lessons[" + i + "][name]");
+            String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
 
             Lesson lesson = new Lesson();
-            lesson.setTitle(lessonTitle);
+            lesson.setTitle(title);
+            lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
 
             int lessonId = lessonsDao.addAndReturnID(lesson);
-            lesson.setLessonID(lessonId);
 
-            // Lưu tài liệu (video, PDF)
-            saveMaterialsForLesson(request, i, lessonId, uploadRoot, materialsDao);
-
-            // Lưu từ vựng text và ảnh
-            saveVocabularyForLesson(request, i, lessonId, imgVocabDir, vocabDao);
+            saveMaterialsForLesson(request, i, lessonId, req, materialsDao);
+            saveQuizForLesson(request, i, lessonId);
         }
     }
 
-    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String uploadRoot, LessonMaterialsDAO materialsDao)
+    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId,
+                                        HttpServletRequest req, LessonMaterialsDAO materialsDao)
             throws Exception {
         String[] fieldTypes = {"vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"};
-        for (Part part : request.getParts()) {
+
+        Collection<Part> parts = request.getParts();
+
+        for (Part part : parts) {
             for (String type : fieldTypes) {
                 String fieldName = "lessons[" + lessonIndex + "][" + type + "][]";
                 if (part.getName().equals(fieldName) && part.getSize() > 0) {
                     String originalName = part.getSubmittedFileName();
-                    if (originalName == null || originalName.isEmpty()) continue;
-
-                    String ext = "";
-                    int dotIdx = originalName.lastIndexOf('.');
-                    if (dotIdx > 0) ext = originalName.substring(dotIdx);
+                    if (originalName == null || originalName.isEmpty()) {
+                        continue;
+                    }
+                    String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
-                    String savePath = uploadRoot + File.separator + savedFileName;
 
-                    // Log thông tin file nhận được
-                    System.out.println("[MaterialUpload] Nhận file: " + originalName + ", size: " + part.getSize() + ", type: " + type);
+                    // Sử dụng ABSOLUTE_UPLOAD_PATH
+                    File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+                    String savePath = ABSOLUTE_UPLOAD_PATH + File.separator + savedFileName;
 
-                    String fileUrl = null;
-                    try {
-                        Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
-                        java.io.InputStream is = part.getInputStream();
-                        byte[] bytes = is.readAllBytes();
-                        java.util.Map<String, Object> options = new java.util.HashMap<>();
-                        options.put("folder", "lesson_materials");
-                        options.put("public_id", "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis());
-                        options.put("overwrite", true);
-                        // Xác định resource_type
-                        if (type.endsWith("Video")) {
-                            options.put("resource_type", "video");
-                        } else if (ext.equalsIgnoreCase(".pdf")) {
-                            options.put("resource_type", "raw");
-                        } else {
-                            options.put("resource_type", "auto");
+                    try (InputStream is = part.getInputStream();
+                         FileOutputStream os = new FileOutputStream(savePath)) {
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = is.read(buffer)) != -1) {
+                            os.write(buffer, 0, bytesRead);
                         }
-                        System.out.println("[MaterialUpload] Đang upload lên Cloudinary với options: " + options);
-                        java.util.Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                        fileUrl = (String) uploadResult.get("secure_url");
-                        System.out.println("[MaterialUpload] Upload Cloudinary thành công: " + fileUrl);
-                    } catch (Exception e) {
-                        System.err.println("[MaterialUpload] Lỗi upload Cloudinary: " + e.getMessage());
-                        e.printStackTrace();
-                        // Fallback: lưu local nếu Cloudinary lỗi
-                        part.write(savePath);
-                        fileUrl = "files/" + savedFileName;
-                        System.out.println("[MaterialUpload] Đã lưu file local: " + fileUrl);
                     }
 
-                    String materialType = "";
-                    if (type.startsWith("vocab")) materialType = "Từ Vựng";
-                    else if (type.startsWith("grammar")) materialType = "Ngữ pháp";
-                    else if (type.startsWith("kanji")) materialType = "Kanji";
-
+                    String materialType = type.startsWith("vocab") ? "Từ Vựng"
+                            : type.startsWith("grammar") ? "Ngữ pháp"
+                            : type.startsWith("kanji") ? "Kanji" : "";
                     String fileType = type.endsWith("Video") ? "video" : "PDF";
 
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
-                    material.setFilePath(fileUrl);
+                    material.setFilePath("files/" + savedFileName);
                     materialsDao.add(material);
-                    System.out.println("[MaterialUpload] Đã lưu LessonMaterial vào DB: lessonId=" + lessonId + ", fileUrl=" + fileUrl);
                 }
             }
         }
     }
 
-    private void saveVocabularyForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String imgVocabDir, VocabularyDAO vocabDao)
-            throws Exception {
+    private void saveQuizForLesson(HttpServletRequest request, int lessonIndex, int lessonId) {
+        List<QuizQuestion> questions = new ArrayList<>();
         Map<String, String[]> paramMap = request.getParameterMap();
+
+        Set<Integer> questionIndexes = new HashSet<>();
+        String questionPrefix = "lessons[" + lessonIndex + "][questions][";
         for (String key : paramMap.keySet()) {
-            if (key.startsWith("lessons[" + lessonIndex + "][vocabText]")) {
-                int vocabIndex = Integer.parseInt(key.substring(key.lastIndexOf('[') + 1, key.lastIndexOf(']')));
-                String vocabText = request.getParameter(key);
-                if (vocabText != null && !vocabText.isEmpty()) {
-                    String[] parts = vocabText.split(":");
-                    if (parts.length == 4) { // Kiểm tra định dạng
-                        Vocabulary vocab = new Vocabulary();
-                        vocab.setWord(parts[0].trim());
-                        vocab.setMeaning(parts[1].trim());
-                        vocab.setReading(parts[2].trim());
-                        vocab.setExample(parts[3].trim());
-                        vocab.setLessonID(lessonId);
-
-                        // Xử lý ảnh nếu có
-                        Part imagePart = request.getPart("lessons[" + lessonIndex + "][vocabImage][" + vocabIndex + "]");
-                        if (imagePart != null && imagePart.getSize() > 0) {
-                            String originalName = imagePart.getSubmittedFileName();
-                            if (originalName != null && !originalName.isEmpty()) {
-                                String ext = "";
-                                int dotIdx = originalName.lastIndexOf('.');
-                                if (dotIdx > 0) ext = originalName.substring(dotIdx);
-                                String savedFileName = vocab.getWord().replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ext;
-                                String savePath = imgVocabDir + File.separator + savedFileName;
-                                imagePart.write(savePath);
-                                vocab.setImagePath(savedFileName); // Đường dẫn tương đối
-                            }
-                        }
-
-                        vocabDao.add(vocab); // Thêm vào bảng Vocabulary
-                    } else {
-                        throw new IllegalArgumentException("Định dạng từ vựng không đúng: " + vocabText + ". Yêu cầu Word:Meaning:Reading:Example");
-                    }
+            if (key.startsWith(questionPrefix) && key.endsWith("][question]")) {
+                String sub = key.substring(questionPrefix.length(), key.length() - "][question]".length());
+                try {
+                    questionIndexes.add(Integer.parseInt(sub));
+                } catch (Exception ignore) {
                 }
             }
         }
+        for (int qIdx : questionIndexes) {
+            String base = "lessons[" + lessonIndex + "][questions][" + qIdx + "]";
+            String questionText = request.getParameter(base + "[question]");
+            String optionA = request.getParameter(base + "[optionA]");
+            String optionB = request.getParameter(base + "[optionB]");
+            String optionC = request.getParameter(base + "[optionC]");
+            String optionD = request.getParameter(base + "[optionD]");
+            String answer = request.getParameter(base + "[answer]");
+            if (questionText == null || answer == null) {
+                continue;
+            }
+            int correct = switch (answer) {
+                case "B" -> 2;
+                case "C" -> 3;
+                case "D" -> 4;
+                default -> 1;
+            };
+
+            List<Answer> answers = List.of(
+                    new Answer(0, 0, optionA, 1, correct == 1 ? 1 : 0),
+                    new Answer(0, 0, optionB, 2, correct == 2 ? 1 : 0),
+                    new Answer(0, 0, optionC, 3, correct == 3 ? 1 : 0),
+                    new Answer(0, 0, optionD, 4, correct == 4 ? 1 : 0)
+            );
+            QuizQuestion quizQuestion = new QuizQuestion();
+            quizQuestion.setQuestion(questionText);
+            quizQuestion.setTimeLimit(60);
+            quizQuestion.setCorrectAnswer(correct);
+            quizQuestion.setAnswers(answers);
+
+            questions.add(quizQuestion);
+        }
+
+        if (!questions.isEmpty()) {
+            System.out.println("📥 Đang lưu " + questions.size() + " câu quiz cho lessonId = " + lessonId);
+            QuizDAO.saveQuestions(lessonId, questions);
+        } else {
+            System.out.println("⚠️ Không có câu hỏi nào được lưu cho lessonId = " + lessonId);
+        }
+    }
+
+    private String getFileName(Part part) {
+        String contentDisp = part.getHeader("content-disposition");
+        for (String s : contentDisp.split(";")) {
+            if (s.trim().startsWith("filename")) {
+                return s.substring(s.indexOf("=") + 2, s.length() - 1);
+            }
+        }
+        return "";
     }
 }

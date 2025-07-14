@@ -1,6 +1,7 @@
 package controller.courses;
 
 import Dao.CoursesDAO;
+import Dao.UserDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,8 +20,10 @@ public class CoursesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userID");
+
         CoursesDAO dao = new CoursesDAO();
-        HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("authUser") : null;
         List<Course> courses = null;
         try {
@@ -50,6 +53,7 @@ public class CoursesServlet extends HttpServlet {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi truy vấn dữ liệu: " + e.getMessage());
         }
+
     }
 
     @Override

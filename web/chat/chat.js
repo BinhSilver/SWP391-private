@@ -12,7 +12,7 @@ console.log("Current User ID parsed:", currentUserId);
 let currentChatUserId = null;
 let currentChatUserName = null;
 
-const ws = new WebSocket("ws://" + location.host + "/SWP_HUY/chat");
+    const ws = new WebSocket("ws://" + location.host + getApiUrl(API_CONFIG.CHAT_WEBSOCKET));
 ws.onopen = function () {
     console.log("WebSocket connected");
 };
@@ -125,7 +125,7 @@ function selectChatUser(userId, username) {
         }
     }, 3500); // 1000ms = 1 giây
 
-    fetch("/SWP_HUY/checkBlock?user1=" + currentUserId + "&user2=" + userId)
+            fetch(getApiUrl(API_CONFIG.CHECK_BLOCK) + "?user1=" + currentUserId + "&user2=" + userId)
             .then(function (res) {
                 return res.json();
             })
@@ -184,7 +184,7 @@ function addMessageToChatBox(msg) {
 
     // Thêm avatar
     const avatarImg = document.createElement("img");
-    avatarImg.src = "/SWP_HUY/assets/avatar/nam.jpg"; // Thay bằng avatar động nếu có
+                avatarImg.src = getResourceUrl(RESOURCE_CONFIG.AVATAR_PATH + "nam.jpg"); // Thay bằng avatar động nếu có
     avatarImg.alt = "Avatar";
     avatarImg.className = "chat-msg-avatar";
     avatarImg.style.width = "32px";
@@ -295,7 +295,7 @@ function sendMessage() {
 }
 
 function loadChatHistory(userId) {
-    fetch("/SWP_HUY/getChatHistory?user1=" + currentUserId + "&user2=" + userId)
+            fetch(getApiUrl(API_CONFIG.GET_CHAT_HISTORY) + "?user1=" + currentUserId + "&user2=" + userId)
             .then(function (res) {
                 if (!res.ok)
                     throw new Error("Không tải được lịch sử trò chuyện");
@@ -366,7 +366,7 @@ function searchUsers(keyword) {
         return;
     }
 
-            fetch("/SWP_HUY/searchUsers?keyword=" + encodeURIComponent(keyword), {
+            fetch(getApiUrl(API_CONFIG.SEARCH_USERS) + "?keyword=" + encodeURIComponent(keyword), {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
@@ -393,7 +393,7 @@ function searchUsers(keyword) {
 }
 
 function fetchInitialUserList() {
-    fetch("/SWP_HUY/chatUsers", {
+            fetch(getApiUrl(API_CONFIG.CHAT_USERS), {
         method: "GET"
     })
             .then(function (response) {
@@ -430,7 +430,7 @@ function updateUserList(users) {
             li.onclick = function () {
                 selectChatUser(user.userID, user.fullName);
             };
-            li.innerHTML = "<img src='/SWP_HUY/assets/avatar/nam.jpg' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
+            li.innerHTML = "<img src='" + getResourceUrl(RESOURCE_CONFIG.AVATAR_PATH + "nam.jpg") + "' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
                     "<strong>" + user.fullName + "</strong>";
             userList.appendChild(li);
         }

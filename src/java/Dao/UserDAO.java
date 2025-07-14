@@ -295,6 +295,7 @@ public class UserDAO {
             user.setCountry(rs.getString("Country"));
             user.setAvatar(rs.getString("Avatar")); // Sử dụng setAvatar thay vì setAvatarUrl
             user.setGender(rs.getString("Gender"));
+            user.setCertificatePath(rs.getString("CertificatePath")); // <--- THÊM DÒNG NÀY
         } catch (SQLException | NullPointerException ignored) {
         }
         return user;

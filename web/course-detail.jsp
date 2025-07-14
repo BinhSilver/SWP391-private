@@ -88,23 +88,20 @@
                                     <div id="collapse-${lesson.lessonID}" class="accordion-collapse collapse"
                                          aria-labelledby="heading-${lesson.lessonID}" data-bs-parent="#accordion-${lesson.lessonID}">
                                         <div class="accordion-body">
-                                            <c:choose>
-                                                <c:when test="${hasAccessedCourse}">
-                                                    <h6 class="mt-3">📖 Từ vựng:</h6>
-                                                    <h6 class="mt-3">🈶 Kanji:</h6>
-                                                    <h6 class="mt-3">🧠 Ngữ pháp:</h6>
-                                                    <h6 class="mt-3">📝 Quiz:</h6>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <p class="text-muted">⚠ Bạn cần bấm nút "Vào học" để xem nội dung bài học này.</p>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <c:if test="${not empty lesson.description}">
+                                                <div class="lesson-description-preview">
+                                                    <span class="fw-bold">Mô tả bài học:</span>
+                                                    <span>${lesson.description}</span>
+                                                </div>
+                                            </c:if>
+
+
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </c:forEach>
-
                     </c:when>
                     <c:otherwise>
                         <div class="alert alert-danger">Không tìm thấy khóa học.</div>

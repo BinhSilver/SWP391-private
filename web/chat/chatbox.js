@@ -123,7 +123,7 @@ window.attachedFile = null;
 // Load chatbot configuration from server
 async function loadChatbotConfig() {
     try {
-        const response = await fetch('/SWP_HUY/chatbot-config');
+        const response = await fetch(getApiUrl(API_CONFIG.CHATBOT_CONFIG));
         chatbotConfig = await response.json();
         console.log('Chatbot config loaded:', chatbotConfig);
     } catch (error) {

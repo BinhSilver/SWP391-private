@@ -27,6 +27,12 @@
         </div>
 </div>
         <!-- Scripts -->
+        <script>
+            // Inject context path vào window object
+            window.contextPath = '${pageContext.request.contextPath}';
+            console.log('Context path loaded:', window.contextPath);
+        </script>
+        <script src="<c:url value='/js/config.js'/>"></script>
         <script src="<c:url value='/js/searchVocabulary.js'/>"></script>
         <script src="https://code.responsivevoice.org/responsivevoice.js?key=YC77U5uD"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
