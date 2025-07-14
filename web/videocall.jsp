@@ -65,7 +65,16 @@
             window.location.href = "/test/LoginJSP/LoginIndex.jsp";
         }
         </script>
-        <script src="${pageContext.request.contextPath}/js/videocall.js"></script>
+        <script>
+    // Inject context path vào window object
+    window.contextPath = '${pageContext.request.contextPath}';
+    console.log('Context path loaded:', window.contextPath);
+</script>
+<script src="${pageContext.request.contextPath}/js/config.js"></script>
+<!-- Các import JS động -->
+<script src="${pageContext.request.contextPath}/js/videocall.js"></script>
+<!-- Nếu không có cherry-blossom.js thì bỏ dòng dưới, nếu có thì sửa lại đường dẫn động -->
+<!-- <script src="${pageContext.request.contextPath}/js/cherry-blossom.js"></script> -->
         
         <!-- Scripts -->
 

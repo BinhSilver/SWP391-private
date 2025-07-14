@@ -57,10 +57,18 @@
             </div>
         </section>
         <!-- Scripts -->
+        <script>
+            // Inject context path vào window object
+            window.contextPath = '${pageContext.request.contextPath}';
+            console.log('Context path loaded:', window.contextPath);
+        </script>
+        <script src="${pageContext.request.contextPath}/js/config.js"></script>
+        <!-- Các import JS động -->
+        <script src="${pageContext.request.contextPath}/chat/chat.js"></script>
+        <!-- Nếu không có cherry-blossom.js thì bỏ dòng dưới, nếu có thì sửa lại đường dẫn động -->
+        <!-- <script src="${pageContext.request.contextPath}/js/cherry-blossom.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-        <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
-        <script src="${pageContext.request.contextPath}/chat/chat.js"></script>
     </body>
 </html>
