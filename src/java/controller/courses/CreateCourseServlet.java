@@ -35,6 +35,10 @@ public class CreateCourseServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
+        // Log toàn bộ parameter map
+        System.out.println("===== PARAMETER MAP =====");
+        request.getParameterMap().forEach((k, v) -> System.out.println(k + " = " + Arrays.toString(v)));
+        System.out.println("=========================");
         try {
             User user = getCurrentUser(request);
 
@@ -43,6 +47,7 @@ public class CreateCourseServlet extends HttpServlet {
             Part imagePart = request.getPart("thumbnailFile");
             if (imagePart != null && imagePart.getSize() > 0) {
                 String fileName = getFileName(imagePart);
+                System.out.println("[LOG] Nhận file thumbnail: " + fileName + ", size: " + imagePart.getSize());
 
                 File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
                 if (!uploadDir.exists()) {
@@ -65,9 +70,11 @@ public class CreateCourseServlet extends HttpServlet {
 
             // ======== LẤY THÔNG TIN KHÓA HỌC =========
             Course course = getCourseInfoFromRequest(request, user, imageUrl);
+            System.out.println("[LOG] Thông tin course: " + course);
             int courseId = saveCourseAndReturnId(course);
 
             int maxLesson = getMaxLessonIndex(request);
+            System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
             handleAllLessons(request, courseId, maxLesson, request);
 
@@ -134,6 +141,8 @@ public class CreateCourseServlet extends HttpServlet {
             String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
 
+            System.out.println("[LOG] Lesson " + i + ": title=" + title + ", description=" + description + ", isHidden=" + isHidden);
+
             Lesson lesson = new Lesson();
             lesson.setTitle(title);
             lesson.setDescription(description);
@@ -162,6 +171,7 @@ public class CreateCourseServlet extends HttpServlet {
                     if (originalName == null || originalName.isEmpty()) {
                         continue;
                     }
+                    System.out.println("[LOG] Lesson " + lessonIndex + " nhận file: " + originalName + " (" + type + ") size: " + part.getSize());
                     String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
 
@@ -220,6 +230,7 @@ public class CreateCourseServlet extends HttpServlet {
             String optionC = request.getParameter(base + "[optionC]");
             String optionD = request.getParameter(base + "[optionD]");
             String answer = request.getParameter(base + "[answer]");
+            System.out.println("[LOG] Quiz lesson " + lessonIndex + " - Q" + qIdx + ": " + questionText + " | A=" + optionA + ", B=" + optionB + ", C=" + optionC + ", D=" + optionD + ", answer=" + answer);
             if (questionText == null || answer == null) {
                 continue;
             }

@@ -229,4 +229,3 @@ if (courseImageInput && thumbnailPreview) {
 
 // --- INITIALIZE ---
 updateLessonIndices();
-updateQuizQuestionIndices();

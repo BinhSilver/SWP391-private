@@ -115,18 +115,6 @@ public class LoginServlet extends HttpServlet {
                 clearRememberMeCookies(response);
             }
 
-            // Phân quyền chuyển hướng
-            if (fullUser.getRoleID() == 3) {
-                // Giáo viên
-                response.sendRedirect(request.getContextPath() + "/teacher_dashboard");
-                return;
-            } else if (fullUser.getRoleID() == 1 && fullUser.isTeacherPending()) {
-                // Đang chờ xác nhận giáo viên
-                request.setAttribute("message", "Tài khoản của bạn đang chờ admin xác nhận giáo viên. Vui lòng kiểm tra email sau khi được duyệt!");
-                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-                return;
-            }
-
             // ✅ Thêm danh sách khóa học đề xuất
             CoursesDAO coursesDAO = new CoursesDAO();
             List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();

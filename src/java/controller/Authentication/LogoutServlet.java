@@ -20,7 +20,7 @@ public class LogoutServlet extends HttpServlet {
             session.invalidate(); // Hủy session để đăng xuất
         }
 
-        // Chuyển hướng về trang login hoặc trang chủ
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        // Chuyển hướng về trang chủ
+        response.sendRedirect(request.getContextPath() + "/HomeServlet");
     }
 }

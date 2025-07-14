@@ -80,7 +80,7 @@
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Mô tả bài học</label>
-                                        <textarea class="form-control" name="lessons[0][desc]" rows="2"></textarea>
+                                        <textarea class="form-control" name="lessons[0][description]" rows="2"></textarea>
                                     </div>
                                     <!-- Vocab -->
                                     <div class="mb-2">
@@ -90,7 +90,7 @@
                                     <!-- Grammar -->
                                     <div class="mb-2">
                                         <label class="form-label">Video Ngữ Pháp</label>
-                                        <input type="file" class="form-control" name="lessons[{{index}}][grammarVideo][]" accept="video/*" multiplFe />
+                                        <input type="file" class="form-control" name="lessons[0][grammarVideo][]" accept="video/*" multiple />
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Tài Liệu Ngữ Pháp</label>
@@ -184,7 +184,7 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Mô tả bài học</label>
-                        <textarea class="form-control" name="lessons[{{index}}][desc]" rows="2"></textarea>
+                        <textarea class="form-control" name="lessons[{{index}}][description]" rows="2"></textarea>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">Video Từ Vựng</label>

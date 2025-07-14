@@ -72,8 +72,8 @@ public class OAuth2CallbackServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("authUser", user);
 
-            // Redirect về trang home hoặc dashboard
-            response.sendRedirect("index.jsp");
+            // Redirect về trang chủ
+            response.sendRedirect("HomeServlet");
 
         } catch (Exception e) {
             e.printStackTrace();
