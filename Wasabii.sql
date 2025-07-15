@@ -366,9 +366,9 @@ VALUES (@LessonID1, N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/cours
        (@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/courseN5/videos/Lesson3_grammar.mp4', 0);
 
 INSERT INTO Vocabulary ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
-VALUES (N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'/images/vocab/mizu.png'),
-       (N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', @LessonID1, N'/images/vocab/taberu.png'),
-       (N'学生', N'học sinh, sinh viên', N'がくせい (gakusei)', N'私は学生です。', @LessonID1, N'/images/vocab/gakusei.png');
+VALUES (N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'mizu.png'),
+       (N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', @LessonID1, N'taberu.png'),
+       (N'学生', N'học sinh, sinh viên', N'がくせい (gakusei)', N'私は学生です。', @LessonID1, N'gakusei.jpeg');
 
 INSERT INTO Quizzes (LessonID, Title)
 VALUES (@LessonID1, N'Quiz Bài 1');
