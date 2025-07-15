@@ -8,25 +8,25 @@ import model.Course;
 
 public class CoursesDAO {
 
- public static ArrayList<Course> searchCourse(String keyword) {
+    public static ArrayList<Course> searchCourse(String keyword) {
         ArrayList<Course> list = new ArrayList<>();
-        String sql = "SELECT * FROM [dbo].[Courses] WHERE dbo.RemoveDiacritics(title) LIKE '%' + dbo.RemoveDiacritics(?) + '%'";
-
-        try (Connection conn = JDBCConnection.getConnection(); 
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, keyword);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Course c = new Course(
-                        rs.getInt("courseID"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getBoolean("isHidden"),
-                        rs.getBoolean("isSuggested"),
-                        rs.getString("imageUrl")
-                );
-                list.add(c);
+        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
+                + "FROM [dbo].[Courses] WHERE Title LIKE ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Course c = new Course(
+                            rs.getInt("CourseID"),
+                            rs.getString("Title"),
+                            rs.getString("Description"),
+                            rs.getBoolean("IsHidden"),
+                            rs.getBoolean("IsSuggested"),
+                            rs.getInt("CreatedBy")
+                    );
+                    c.setImageUrl(rs.getString("imageUrl"));
+                    list.add(c);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,19 +35,61 @@ public class CoursesDAO {
     }
 
     public void add(Course c) throws SQLException {
-        String sql = "INSERT INTO [dbo].[Courses] (Title, Description, IsHidden, IsSuggested, imageUrl) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO [dbo].[Courses] "
+                + "(Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
             stmt.setBoolean(3, c.getHidden());
             stmt.setBoolean(4, c.isSuggested());
             stmt.setString(5, c.getImageUrl());
+            stmt.setInt(6, c.getCreatedBy());
             stmt.executeUpdate();
         }
     }
 
+    public int addAndReturnID(Course c) throws SQLException {
+        String sql = "INSERT INTO [dbo].[Courses] "
+                + "(Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy, CreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, c.getTitle());
+            stmt.setString(2, c.getDescription());
+            stmt.setBoolean(3, c.getHidden());
+            stmt.setBoolean(4, c.isSuggested());
+            stmt.setString(5, c.getImageUrl());
+            stmt.setInt(6, c.getCreatedBy());
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating course failed, no rows affected.");
+            }
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    if (id > 0) {
+                        return id;
+                    }
+                }
+            }
+            // Nếu không lấy được ID tự sinh, truy vấn lại DB lấy MAX(CourseID)
+            System.err.println("[WARN] addAndReturnID: Không lấy được ID tự sinh, sẽ lấy MAX(CourseID) từ DB!");
+            try (PreparedStatement maxStmt = conn.prepareStatement("SELECT MAX(CourseID) FROM Courses"); ResultSet maxRs = maxStmt.executeQuery()) {
+                if (maxRs.next()) {
+                    int maxId = maxRs.getInt(1);
+                    if (maxId > 0) {
+                        return maxId;
+                    }
+                }
+            }
+            throw new SQLException("Creating course failed, no ID obtained (even after fallback MAX).");
+        }
+    }
+
     public void update(Course c) throws SQLException {
-        String sql = "UPDATE [dbo].[Courses] SET Title=?, Description=?, IsHidden=?, IsSuggested=?, imageUrl=? WHERE CourseID=?";
+        String sql = "UPDATE [dbo].[Courses] "
+                + "SET Title=?, Description=?, IsHidden=?, IsSuggested=?, imageUrl=? "
+                + "WHERE CourseID=?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, c.getTitle());
             stmt.setString(2, c.getDescription());
@@ -62,9 +104,7 @@ public class CoursesDAO {
     public void delete(int courseID) throws SQLException {
         try (Connection conn = JDBCConnection.getConnection()) {
             conn.setAutoCommit(false);
-
             try {
-                // Lấy toàn bộ LessonID của khóa học này
                 List<Integer> lessonIds = new ArrayList<>();
                 String lessonSql = "SELECT LessonID FROM Lessons WHERE CourseID = ?";
                 try (PreparedStatement ps = conn.prepareStatement(lessonSql)) {
@@ -76,46 +116,39 @@ public class CoursesDAO {
                     }
                 }
 
-                // Xóa dữ liệu phụ thuộc LessonID
                 for (int lessonId : lessonIds) {
-                    // Xóa LessonAccess
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa LessonMaterials
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa GrammarPoints
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa Kanji
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa LessonVocabulary
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa Feedbacks
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa Progress liên quan LessonID
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    // Xóa Quiz, Question, Answer, QuizResults
+
                     List<Integer> quizIds = new ArrayList<>();
-                    try (PreparedStatement ps = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
+                    try (PreparedStatement ps = conn.prepareStatement(
+                            "SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         try (ResultSet rs = ps.executeQuery()) {
                             while (rs.next()) {
@@ -124,37 +157,30 @@ public class CoursesDAO {
                         }
                     }
                     for (int quizId : quizIds) {
-                        // Xóa Answers
                         try (PreparedStatement ps = conn.prepareStatement(
                                 "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
                             ps.setInt(1, quizId);
                             ps.executeUpdate();
                         }
-                        // Xóa Questions
                         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
                             ps.setInt(1, quizId);
                             ps.executeUpdate();
                         }
-                        // Xóa QuizResults
                         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
                             ps.setInt(1, quizId);
                             ps.executeUpdate();
                         }
                     }
-                    // Xóa Quizzes
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
                 }
 
-                // Xóa Lessons
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
-
-                // Xóa các bảng liên kết CourseID
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
@@ -168,7 +194,6 @@ public class CoursesDAO {
                     ps.executeUpdate();
                 }
 
-                // Xóa Tests liên quan CourseID
                 List<Integer> testIds = new ArrayList<>();
                 try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
@@ -198,7 +223,6 @@ public class CoursesDAO {
                     ps.executeUpdate();
                 }
 
-                // Cuối cùng xóa khóa học
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
@@ -223,13 +247,15 @@ public class CoursesDAO {
     }
 
     public int getCoursesByMonthAndYear(int month, int year) throws SQLException {
-        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] "
+                + "WHERE MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, month);
             stmt.setInt(2, year);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("Count");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Count");
+                }
             }
         }
         return 0;
@@ -237,18 +263,19 @@ public class CoursesDAO {
 
     public List<Course> getAllCourses() throws SQLException {
         List<Course> courses = new ArrayList<>();
-        String sql = "SELECT * FROM [dbo].[Courses]";
+        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy FROM [dbo].[Courses]";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                Course course = new Course(
+                Course c = new Course(
                         rs.getInt("CourseID"),
                         rs.getString("Title"),
                         rs.getString("Description"),
                         rs.getBoolean("IsHidden"),
                         rs.getBoolean("IsSuggested"),
-                        rs.getString("imageUrl")
+                        rs.getInt("CreatedBy")
                 );
-                courses.add(course);
+                c.setImageUrl(rs.getString("imageUrl"));
+                courses.add(c);
             }
         }
         return courses;
@@ -256,17 +283,19 @@ public class CoursesDAO {
 
     public List<Course> getSuggestedCourses() {
         List<Course> list = new ArrayList<>();
-        String sql = "SELECT TOP 4 * FROM Courses WHERE isHidden = 0 AND IsSuggested = 1 ORDER BY NEWID()";
+        String sql = "SELECT TOP 4 CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
+                + "FROM Courses WHERE IsHidden = 0 AND IsSuggested = 1 ORDER BY NEWID()";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Course c = new Course(
-                        rs.getInt("courseID"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getBoolean("isHidden"),
-                        rs.getBoolean("isSuggested"),
-                        rs.getString("imageUrl")
+                        rs.getInt("CourseID"),
+                        rs.getString("Title"),
+                        rs.getString("Description"),
+                        rs.getBoolean("IsHidden"),
+                        rs.getBoolean("IsSuggested"),
+                        rs.getInt("CreatedBy")
                 );
+                c.setImageUrl(rs.getString("imageUrl"));
                 list.add(c);
             }
         } catch (Exception e) {
@@ -275,46 +304,52 @@ public class CoursesDAO {
         return list;
     }
 
+    public List<Course> getCoursesByTeacher(int teacherID) throws SQLException {
+        List<Course> list = new ArrayList<>();
+        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
+                + "FROM Courses WHERE CreatedBy = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, teacherID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Course c = new Course();
+                    c.setCourseID(rs.getInt("CourseID"));
+                    c.setTitle(rs.getString("Title"));
+                    c.setDescription(rs.getString("Description"));
+                    c.setHidden(rs.getBoolean("IsHidden"));
+                    c.setSuggested(rs.getBoolean("IsSuggested"));
+                    c.setImageUrl(rs.getString("imageUrl"));
+                    c.setCreatedBy(rs.getInt("CreatedBy"));
+                    list.add(c);
+                }
+            }
+        }
+        return list;
+    }
+
     public Course getCourseByID(int courseID) {
-        String sql = "SELECT * FROM Courses WHERE courseID = ?";
+        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
+                + "FROM Courses WHERE CourseID = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, courseID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Course(
-                            rs.getInt("courseID"),
-                            rs.getString("title"),
-                            rs.getString("description"),
-                            rs.getBoolean("isHidden"),
-                            rs.getBoolean("isSuggested"),
-                            rs.getString("imageUrl")
+                    Course c = new Course(
+                            rs.getInt("CourseID"),
+                            rs.getString("Title"),
+                            rs.getString("Description"),
+                            rs.getBoolean("IsHidden"),
+                            rs.getBoolean("IsSuggested"),
+                            rs.getInt("CreatedBy")
                     );
+                    c.setImageUrl(rs.getString("imageUrl"));
+                    return c;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public int addAndReturnID(Course course) throws SQLException {
-        String sql = "INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, imageUrl, CreatedAt) "
-                + "VALUES (?, ?, ?, ?, ?, GETDATE())";
-
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, course.getTitle());
-            ps.setString(2, course.getDescription());
-            ps.setBoolean(3, course.getHidden());
-            ps.setBoolean(4, course.isSuggested());
-            ps.setString(5, course.getImageUrl());
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return -1;
     }
 
     public int getTotalEnrollments() throws SQLException {
@@ -328,13 +363,15 @@ public class CoursesDAO {
     }
 
     public int getEnrollmentsByMonthAndYear(int month, int year) throws SQLException {
-        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Enrollment] WHERE MONTH(EnrolledAt) = ? AND YEAR(EnrolledAt) = ?";
+        String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Enrollment] "
+                + "WHERE MONTH(EnrolledAt) = ? AND YEAR(EnrolledAt) = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, month);
             stmt.setInt(2, year);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("Count");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Count");
+                }
             }
         }
         return 0;
@@ -354,31 +391,12 @@ public class CoursesDAO {
         String sql = "SELECT COUNT(*) AS Count FROM [dbo].[Courses] WHERE YEAR(CreatedAt) = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, year);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("Count");
-            }
-        }
-        return 0;
-    }
-
-    public List<Course> getCoursesByTeacher(int teacherId) throws SQLException {
-        List<Course> courses = new ArrayList<>();
-        String sql = "SELECT * FROM Courses WHERE CreatedBy = ?";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, teacherId);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Course course = new Course();
-                    course.setCourseID(rs.getInt("CourseID"));
-                    course.setTitle(rs.getString("Title"));
-                    course.setDescription(rs.getString("Description"));
-                    course.setHidden(rs.getBoolean("IsHidden"));
-                    course.setSuggested(rs.getBoolean("IsSuggested"));
-                    courses.add(course);
+                if (rs.next()) {
+                    return rs.getInt("Count");
                 }
             }
         }
-        return courses;
+        return 0;
     }
 }

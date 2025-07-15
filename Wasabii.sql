@@ -387,48 +387,323 @@ DELETE FROM Vocabulary;
 DELETE FROM LessonMaterials;
 
 -- Sau khi các bảng trên đã xóa, mới xóa Lesson và Course
+DELETE FROM LessonAccess;
 DELETE FROM Lessons;
 DELETE FROM Courses;
 
--- 1. Tạo khóa học mới N5
-INSERT INTO Courses (Title, Description, IsHidden, IsSuggested)
-VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1);
+
+
+-- ==============================
+-- INSERT COURSE
+-- ==============================
+
+INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, imageUrl)
+VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1, N'course_n5_thumbnail.png');
 
 DECLARE @CourseID INT = SCOPE_IDENTITY();
--- 2. Thêm các bài học
-INSERT INTO Lessons (CourseID, Title) VALUES
-(@CourseID, N'Bài 1: Giới thiệu bản thân'),
-(@CourseID, N'Bài 2: Hỏi thăm sức khỏe'),
-(@CourseID, N'Bài 3: Hỏi đường đi');
 
--- Lấy ID từng bài học
-DECLARE @Lesson1ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 1: Giới thiệu bản thân');
-DECLARE @Lesson2ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 2: Hỏi thăm sức khỏe');
-DECLARE @Lesson3ID INT = (SELECT LessonID FROM Lessons WHERE CourseID = @CourseID AND Title = N'Bài 3: Hỏi đường đi');
+-- ==============================
+-- INSERT LESSONS
+-- ==============================
 
--- Bài 1
-INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+INSERT INTO Lessons (CourseID, Title, Description, IsHidden)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/courseN5/vocabN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Kanji', N'PDF', N'Kanji Bài 1', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/courseN5/grammarN5/Lesson1.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/lesson1_grammar.mp4');
+(@CourseID, N'Bài 1: Giới thiệu bản thân', N'Nội dung bài 1', 0),
+(@CourseID, N'Bài 2: Hỏi thăm sức khỏe', N'Nội dung bài 2', 0),
+(@CourseID, N'Bài 3: Hỏi đường đi', N'Nội dung bài 3', 0);
 
--- Bài 2
-INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
-VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/courseN5/vocabN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Kanji', N'PDF', N'Kanji Bài 2', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/courseN5/grammarN5/Lesson2.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/lesson2_grammar.mp4');
+-- Lấy LessonID từng bài học
+DECLARE @LessonID1 INT = (SELECT LessonID FROM Lessons WHERE Title = N'Bài 1: Giới thiệu bản thân');
+DECLARE @LessonID2 INT = (SELECT LessonID FROM Lessons WHERE Title = N'Bài 2: Hỏi thăm sức khỏe');
+DECLARE @LessonID3 INT = (SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi');
 
--- Bài 3
-INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath)
+-- ==============================
+-- INSERT LESSON MATERIALS (Bài 1)
+-- ==============================
+
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath, IsHidden)
+VALUES
+(@LessonID1, N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/courseN5/vocabN5/Lesson1.pdf', 0),
+(@LessonID1, N'Kanji', N'PDF', N'Kanji Bài 1', N'files/courseN5/kanjiN5/Lesson1.pdf', 0),
+(@LessonID1, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/courseN5/grammarN5/Lesson1.pdf', 0),
+(@LessonID1, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/courseN5/videos/Lesson1_grammar.mp4', 0);
+
+-- ==============================
+-- INSERT LESSON MATERIALS (Bài 2)
+-- ==============================
+
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath, IsHidden)
+VALUES
+(@LessonID2, N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/courseN5/vocabN5/Lesson2.pdf', 0),
+(@LessonID2, N'Kanji', N'PDF', N'Kanji Bài 2', N'files/courseN5/kanjiN5/Lesson2.pdf', 0),
+(@LessonID2, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/courseN5/grammarN5/Lesson2.pdf', 0),
+(@LessonID2, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/courseN5/videos/Lesson2_grammar.mp4', 0);
+
+ALTER TABLE Users
+ADD IsTeacherPending BIT DEFAULT 0,
+    CertificatePath NVARCHAR(500);
+-- ==============================
+-- INSERT LESSON MATERIALS (Bài 3)
+-- ==============================
+
+INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath, IsHidden)
+VALUES
+(@LessonID3, N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/courseN5/vocabN5/Lesson3.pdf', 0),
+(@LessonID3, N'Kanji', N'PDF', N'Kanji Bài 3', N'files/courseN5/kanjiN5/Lesson3.pdf', 0),
+(@LessonID3, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf', 0),
+(@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/courseN5/videos/Lesson3_grammar.mp4', 0);
+
+      ALTER TABLE Courses ADD CreatedBy INT NULL;
+ALTER TABLE Courses ADD CONSTRAINT FK_Courses_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES Users(UserID);
+
+-- ==============================
+-- INSERT VOCABULARY (cho Bài 1)
+-- ==============================
+
+INSERT INTO Vocabulary ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
+VALUES
+(N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'/images/vocab/mizu.png'),
+(N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', @LessonID1, N'/images/vocab/taberu.png'),
+(N'学生', N'học sinh, sinh viên', N'がくせい (gakusei)', N'私は学生です。', @LessonID1, N'/images/vocab/gakusei.png');
+
+-- ==============================
+-- INSERT QUIZ (cho Bài 1)
+-- ==============================
+
+INSERT INTO Quizzes (LessonID, Title)
+VALUES (@LessonID1, N'Quiz Bài 1');
+
+DECLARE @QuizID INT = SCOPE_IDENTITY();
+
+-- ==============================
+-- INSERT QUESTIONS
+-- ==============================
+
+INSERT INTO Questions (QuizID, QuestionText, TimeLimit)
 VALUES 
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/courseN5/vocabN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Kanji', N'PDF', N'Kanji Bài 3', NULL),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf'),
-((SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: Hỏi đường đi'), N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson3_grammar.mp4');
+(@QuizID, N'Từ 「水」 có nghĩa là gì?', 30),
+(@QuizID, N'Từ 「食べる」 đọc là gì?', 30);
+
+DECLARE @Q1 INT = (SELECT QuestionID FROM Questions WHERE QuestionText = N'Từ 「水」 có nghĩa là gì?');
+DECLARE @Q2 INT = (SELECT QuestionID FROM Questions WHERE QuestionText = N'Từ 「食べる」 đọc là gì?');
+
+-- ==============================
+-- INSERT ANSWERS (cho câu hỏi 1)
+-- ==============================
+
+INSERT INTO Answers (QuestionID, AnswerText, IsCorrect, AnswerNumber)
+VALUES
+(@Q1, N'nước', 1, 1),
+(@Q1, N'lửa', 0, 2),
+(@Q1, N'cơm', 0, 3),
+(@Q1, N'cá', 0, 4);
+
+-- ==============================
+-- INSERT ANSWERS (cho câu hỏi 2)
+-- ==============================
+
+INSERT INTO Answers (QuestionID, AnswerText, IsCorrect, AnswerNumber)
+VALUES
+(@Q2, N'たべる (taberu)', 1, 1),
+(@Q2, N'のむ (nomu)', 0, 2),
+(@Q2, N'いく (iku)', 0, 3),
+(@Q2, N'みる (miru)', 0, 4);
+
+-- ==============================
+-- INSERT QUIZ RESULT (nếu muốn test)
+-- ==============================
+
+INSERT INTO QuizResults (UserID, QuizID, Score)
+VALUES (1, @QuizID, 100);
+
+-- ==============================
+-- ENROLLMENT (nếu muốn test user học khoá này)
+-- ==============================
+
+INSERT INTO Enrollment (UserID, CourseID)
+VALUES (1, @CourseID);
+
+-- x? lí d?u kí t? ghép ( ðo?n này nh? ch?y riêng hàm này ) 
+CREATE OR ALTER FUNCTION dbo.RemoveDiacritics(@input NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @result NVARCHAR(MAX) = LOWER(@input);
+
+    -- B? d?u thanh ti?ng Vi?t
+    SET @result = REPLACE(@result, N'á', 'a');
+    SET @result = REPLACE(@result, N'à', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'ã', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'â', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'?', 'a');
+    SET @result = REPLACE(@result, N'ð', 'd');
+    SET @result = REPLACE(@result, N'é', 'e');
+    SET @result = REPLACE(@result, N'è', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'ê', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'?', 'e');
+    SET @result = REPLACE(@result, N'í', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'?', 'i');
+    SET @result = REPLACE(@result, N'ó', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'ô', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'õ', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'?', 'o');
+    SET @result = REPLACE(@result, N'ú', 'u');
+    SET @result = REPLACE(@result, N'ù', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'ý', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+    SET @result = REPLACE(@result, N'?', 'u');
+
+    -- Tách các k? t? ghép ti?ng Vi?t
+    SET @result = REPLACE(@result, N'kh', 'k h');
+    SET @result = REPLACE(@result, N'gi', 'g i');
+    SET @result = REPLACE(@result, N'ng', 'n g');
+    SET @result = REPLACE(@result, N'nh', 'n h');
+    SET @result = REPLACE(@result, N'ph', 'p h');
+    SET @result = REPLACE(@result, N'th', 't h');
+    SET @result = REPLACE(@result, N'ch', 'c h');
+    SET @result = REPLACE(@result, N'tr', 't r');
+    SET @result = REPLACE(@result, N'gh', 'g h');
+    SET @result = REPLACE(@result, N'qu', 'q u'); -- Thêm qu
+
+    RETURN @result;
+END;
+-- ðo?n này th? chayj h?t ph?n dý?i v? ch?y l? nó thi?u declare
+-- 1. Thêm 50 ngý?i dùng
+DECLARE @StartDate DATETIME = '2025-01-01';
+DECLARE @EndDate DATETIME = '2025-06-22';
+DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
+DECLARE @UserCount INT = 50;
+DECLARE @Counter INT = 1;
+DECLARE @RoleID INT;
+DECLARE @Email NVARCHAR(255);
+DECLARE @FullName NVARCHAR(100);
+DECLARE @CreatedAt DATETIME;
+
+-- T?m lýu danh sách ngý?i dùng ð? dùng cho Enrollment
+CREATE TABLE #TempUsers (UserID INT, CreatedAt DATETIME);
+
+WHILE @Counter <= @UserCount
+BEGIN
+    -- Phân b? RoleID theo t? l?: Admin (1), Free (4), Premium (3), Teacher (1)
+    SET @RoleID = CASE 
+        WHEN @Counter <= 5 THEN 4 -- 5 Admin
+        WHEN @Counter <= 25 THEN 1 -- 20 Free
+        WHEN @Counter <= 40 THEN 2 -- 15 Premium
+        ELSE 3 -- 5 Teacher
+    END;
+
+    -- T?o email và tên gi? l?p
+    SET @Email = 'user' + CAST(@Counter AS NVARCHAR(10)) + '@example.com';
+    SET @FullName = N'Ngý?i Dùng ' + CAST(@Counter AS NVARCHAR(10));
+
+    -- Tính CreatedAt tr?i ð?u t? 01/01/2025 ð?n 06/22/2025
+    SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @UserCount, @StartDate);
+
+    -- Thêm ngý?i dùng
+    INSERT INTO Users (
+        RoleID, Email, PasswordHash, FullName, CreatedAt, 
+        BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Gender
+    )
+    VALUES (
+        @RoleID, 
+        @Email, 
+        'hashed_password', -- Gi? l?p m?t kh?u
+        @FullName, 
+        @CreatedAt,
+        '2000-01-01', -- Ngày sinh gi? l?p
+        '0123456789', -- S? ði?n tho?i gi? l?p
+        N'N5', 
+        N'Ð?a ch? gi? l?p', 
+        N'Vi?t Nam', 
+        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'N?' END
+    );
+
+    -- Lýu UserID và CreatedAt vào b?ng t?m
+    INSERT INTO #TempUsers (UserID, CreatedAt)
+    VALUES (SCOPE_IDENTITY(), @CreatedAt);
+
+    SET @Counter = @Counter + 1;
+END;
+
+-- 2. Thêm 30 b?n ghi Enrollment
+DECLARE @EnrollmentCount INT = 30;
+SET @Counter = 1;
+DECLARE @UserID INT;
+DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'Khóa h?c Giao ti?p N5');
+DECLARE @EnrolledAt DATETIME;
+
+-- Cursor ð? l?y ng?u nhiên 30 ngý?i dùng t? b?ng t?m
+DECLARE user_cursor CURSOR FOR 
+SELECT TOP 30 UserID, CreatedAt 
+FROM #TempUsers 
+ORDER BY NEWID(); -- Randomize
+
+OPEN user_cursor;
+FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+
+WHILE @Counter <= @EnrollmentCount
+BEGIN
+    -- Tính EnrolledAt tr?i ð?u t? 01/01/2025 ð?n 06/22/2025
+    SET @EnrolledAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @EnrollmentCount, @StartDate);
+
+    -- Thêm b?n ghi Enrollment
+    INSERT INTO Enrollment (UserID, CourseID, EnrolledAt)
+    VALUES (@UserID, @CourseID, @EnrolledAt);
+
+    FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+    SET @Counter = @Counter + 1;
+END;
+
+CLOSE user_cursor;
+DEALLOCATE user_cursor;
+
+-- Xóa b?ng t?m
+DROP TABLE #TempUsers;
+
+
+
+ALTER TABLE Courses
+ADD imageUrl VARCHAR(255);
 
 -- xử lý dấu ký tự ghép ( đoạn này nhớ chạy riêng hàm này ) 
 CREATE OR ALTER FUNCTION dbo.RemoveDiacritics(@input NVARCHAR(MAX))
@@ -616,7 +891,7 @@ DEALLOCATE user_cursor;
 DROP TABLE #TempUsers;
 
 
-INSERT INTO [Wasabii_Huy].[dbo].[Vocabulary] 
+INSERT INTO [Wasabii].[dbo].[Vocabulary] 
 ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
 VALUES
 ( N'水', N'nước', N'みず (mizu)', N'水を飲みます。', 1, N'/images/vocab/mizu.png'),
@@ -630,68 +905,6 @@ VALUES
 ( N'天気', N'thời tiết', N'てんき (tenki)', N'今日の天気はいいです。', 2, N'/images/vocab/tenki.png'),
 ( N'友達', N'bạn bè', N'ともだち (tomodachi)', N'友達と話します。', 2, N'/images/vocab/tomodachi.png');
 
--- Cập nhật bảng Flashcards
-ALTER TABLE Flashcards 
-ADD 
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    IsPublic BIT DEFAULT 0,
-    Description NVARCHAR(500),
-    CoverImage NVARCHAR(500);
-
-
--- Cập nhật bảng FlashcardItems
-ALTER TABLE FlashcardItems 
-ADD 
-    FrontContent NVARCHAR(500),
-    BackContent NVARCHAR(500),
-    FrontImage NVARCHAR(500),
-    BackImage NVARCHAR(500),
-    OrderIndex INT DEFAULT 0;
-
-
--- Thêm dữ liệu test cho flashcard
--- Đảm bảo có user với ID = 1 (hoặc thay đổi UserID phù hợp)
-
--- Thêm flashcard test
-INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage)
-VALUES 
-(1, N'Flashcard Từ Vựng N5', GETDATE(), GETDATE(), 1, N'Bộ flashcard từ vựng N5 cơ bản', NULL),
-(1, N'Flashcard Kanji N5', GETDATE(), GETDATE(), 0, N'Bộ flashcard kanji N5', NULL);
-
--- Lấy FlashcardID vừa tạo
-DECLARE @FlashcardID1 INT = (SELECT FlashcardID FROM Flashcards WHERE Title = N'Flashcard Từ Vựng N5');
-DECLARE @FlashcardID2 INT = (SELECT FlashcardID FROM Flashcards WHERE Title = N'Flashcard Kanji N5');
-
--- Thêm flashcard items cho flashcard 1
-INSERT INTO FlashcardItems (FlashcardID, FrontContent, BackContent, Note, OrderIndex)
-VALUES 
-(@FlashcardID1, N'こんにちは', N'Xin chào', N'Chào hỏi cơ bản', 1),
-(@FlashcardID1, N'ありがとう', N'Cảm ơn', N'Lời cảm ơn', 2),
-(@FlashcardID1, N'さようなら', N'Tạm biệt', N'Lời chào tạm biệt', 3);
-
--- Thêm flashcard items cho flashcard 2
-INSERT INTO FlashcardItems (FlashcardID, FrontContent, BackContent, Note, OrderIndex)
-VALUES 
-(@FlashcardID2, N'人', N'Người', N'Kanji chỉ người', 1),
-(@FlashcardID2, N'水', N'Nước', N'Kanji chỉ nước', 2),
-(@FlashcardID2, N'火', N'Lửa', N'Kanji chỉ lửa', 3); 
-
-INSERT INTO [Wasabii].[dbo].[Vocabulary] (
-    [Word],
-    [Meaning],
-    [Reading],
-    [Example],
-    [LessonID],
-    [imagePath]
-)
-VALUES
-(N'猫',        N'Con mèo',      N'ねこ',         N'私は猫が好きです。',              1, N'imgvocab\Doraemon_character.png'),
-(N'学校',      N'Trường học',   N'がっこう',     N'彼は学校へ行きます。',            1, N'imgvocab\Doraemon_character.png'),
-(N'食べる',    N'Ăn',           N'たべる',       N'私は寿司を食べたいです。',        1, N'imgvocab\Doraemon_character.png'),
-(N'友達',      N'Bạn bè',       N'ともだち',     N'彼女は友達と遊びます。',          1, N'imgvocab\Doraemon_character.png'),
-(N'先生',      N'Giáo viên',    N'せんせい',     N'先生は日本語を教えます。',        1, N'imgvocab\Doraemon_character.png');
-
   ALTER TABLE Users
 ADD IsTeacherPending BIT DEFAULT 0,
     CertificatePath NVARCHAR(500);
@@ -699,8 +912,7 @@ ADD IsTeacherPending BIT DEFAULT 0,
       ALTER TABLE Courses ADD CreatedBy INT NULL;
 ALTER TABLE Courses ADD CONSTRAINT FK_Courses_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES Users(UserID);
 
-
-
-
 ALTER TABLE Courses
 ADD imageUrl NVARCHAR(MAX) NULL;
+ALTER TABLE Lessons ADD OrderIndex INT DEFAULT 0;
+

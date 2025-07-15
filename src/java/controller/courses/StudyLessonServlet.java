@@ -47,6 +47,10 @@ public class StudyLessonServlet extends HttpServlet {
 
         Lesson lesson = LessonsDAO.getLessonById(lessonId);
         List<LessonMaterial> materials = LessonMaterialsDAO.getByLessonId(lessonId);
+        System.out.println("=== DEBUG: Danh sách materials ===");
+        for (LessonMaterial m : materials) {
+            System.out.println("Material: " + m.getMaterialType() + " | " + m.getFileType() + " | " + m.getFilePath());
+        }
         List<QuizQuestion> quiz = QuizDAO.getQuestionsWithAnswersByLessonId(lessonId);
 
         // Lấy từ vựng dựa trên LessonID

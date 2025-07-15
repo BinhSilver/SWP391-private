@@ -43,6 +43,7 @@ public class CourseDetailServlet extends HttpServlet {
         LessonAccessDAO accessDAO = new LessonAccessDAO();
 
         // 3. Lấy thông tin khóa học
+        System.out.println("[Debug]"+courseID);
         Course course = courseDAO.getCourseByID(courseID);
         if (course == null) {
             request.setAttribute("error", "Không tìm thấy khóa học.");
