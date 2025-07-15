@@ -913,3 +913,6 @@ ADD IsTeacherPending BIT DEFAULT 0,
 ALTER TABLE Courses ADD CONSTRAINT FK_Courses_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES Users(UserID);
 
 ALTER TABLE Lessons ADD OrderIndex INT DEFAULT 0;
+
+
+ALTER TABLE Lessons ADD OrderIndex INT DEFAULT 0;
