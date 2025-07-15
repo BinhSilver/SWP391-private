@@ -83,6 +83,13 @@ CREATE TABLE Courses (
     imageUrl NVARCHAR(MAX) NULL
 );
 
+CREATE TABLE Enrollment (
+    EnrollmentID INT PRIMARY KEY IDENTITY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    EnrolledAt DATETIME DEFAULT GETDATE()
+);
+
 CREATE TABLE Lessons (
     LessonID INT PRIMARY KEY IDENTITY,
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
@@ -182,10 +189,27 @@ CREATE TABLE Tests (
     Title NVARCHAR(255)
 );
 
-CREATE TABLE TestResults (
-    ResultID INT PRIMARY KEY IDENTITY,
+CREATE TABLE Questions (
+    QuestionID INT PRIMARY KEY IDENTITY,
+    QuizID INT NULL FOREIGN KEY REFERENCES Quizzes(QuizID),
+    TestID INT NULL FOREIGN KEY REFERENCES Tests(TestID),
+    QuestionText NVARCHAR(MAX),
+    TimeLimit INT DEFAULT 30
+);
+
+CREATE TABLE Answers (
+    AnswerID INT PRIMARY KEY IDENTITY,
+    QuestionID INT FOREIGN KEY REFERENCES Questions(QuestionID),
+    AnswerText NVARCHAR(MAX),
+    IsCorrect BIT,
+	AnswerNumber INT CHECK (AnswerNumber BETWEEN 1 AND 4)
+
+);
+
+CREATE TABLE QuizResults (
+    ResultID INT PRIMARY KEY IDENTITY,             -- Tự tăng
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    TestID INT FOREIGN KEY REFERENCES Tests(TestID),
+    QuizID INT FOREIGN KEY REFERENCES Quizzes(QuizID),
     Score INT,
     TakenAt DATETIME DEFAULT GETDATE()
 );
@@ -368,6 +392,7 @@ VALUES (@Q1, N'nước', 1, 1),
 
 INSERT INTO QuizResults (UserID, QuizID, Score)
 VALUES (1, @QuizID, 100);
+
 
 INSERT INTO Enrollment (UserID, CourseID)
 VALUES (1, @CourseID);
