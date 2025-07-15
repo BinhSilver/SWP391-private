@@ -46,17 +46,30 @@ CREATE TABLE Users (
     CertificatePath NVARCHAR(500)
 );
 
+-- Bảng Payments (chuẩn hóa, bổ sung các trường mới)
 CREATE TABLE Payments (
     PaymentID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     PlanID INT NOT NULL FOREIGN KEY REFERENCES PremiumPlans(PlanID),
     Amount FLOAT NOT NULL,
+    PaymentDate DATETIME NULL,
+    TransactionNo NVARCHAR(100) NULL,
     OrderInfo NVARCHAR(255),
+    ResponseCode NVARCHAR(20) NULL,
     TransactionStatus NVARCHAR(50),
     OrderCode BIGINT,
     CheckoutUrl NVARCHAR(500),
     Status NVARCHAR(50),
     CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+-- Bảng UserPremium: quản lý thời gian premium của user
+CREATE TABLE UserPremium (
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    PlanID INT NOT NULL FOREIGN KEY REFERENCES PremiumPlans(PlanID),
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    PRIMARY KEY (UserID, PlanID, StartDate)
 );
 
 CREATE TABLE Courses (
@@ -162,34 +175,11 @@ CREATE TABLE Quizzes (
     Title NVARCHAR(255)
 );
 
+-- Bảng Test tổng hợp
 CREATE TABLE Tests (
     TestID INT PRIMARY KEY IDENTITY,
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
     Title NVARCHAR(255)
-);
-
-CREATE TABLE Questions (
-    QuestionID INT PRIMARY KEY IDENTITY,
-    QuizID INT NULL FOREIGN KEY REFERENCES Quizzes(QuizID),
-    TestID INT NULL FOREIGN KEY REFERENCES Tests(TestID),
-    QuestionText NVARCHAR(MAX),
-    TimeLimit INT DEFAULT 30
-);
-
-CREATE TABLE Answers (
-    AnswerID INT PRIMARY KEY IDENTITY,
-    QuestionID INT FOREIGN KEY REFERENCES Questions(QuestionID),
-    AnswerText NVARCHAR(MAX),
-    IsCorrect BIT,
-    AnswerNumber INT CHECK (AnswerNumber BETWEEN 1 AND 4)
-);
-
-CREATE TABLE QuizResults (
-    ResultID INT PRIMARY KEY IDENTITY,
-    UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    QuizID INT FOREIGN KEY REFERENCES Quizzes(QuizID),
-    Score INT,
-    TakenAt DATETIME DEFAULT GETDATE()
 );
 
 CREATE TABLE TestResults (
@@ -200,59 +190,7 @@ CREATE TABLE TestResults (
     TakenAt DATETIME DEFAULT GETDATE()
 );
 
-CREATE TABLE Enrollment (
-    EnrollmentID INT PRIMARY KEY IDENTITY,
-    UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
-    EnrolledAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Progress (
-    ProgressID INT PRIMARY KEY IDENTITY,
-    UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
-    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
-    CompletionPercent INT CHECK (CompletionPercent BETWEEN 0 AND 100),
-    LastAccessed DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE CourseRatings (
-    RatingID INT PRIMARY KEY IDENTITY,
-    UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
-    Rating INT CHECK (Rating BETWEEN 1 AND 5),
-    Comment NVARCHAR(MAX),
-    RatedAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE Feedbacks (
-    FeedbackID INT PRIMARY KEY IDENTITY,
-    UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
-    Content NVARCHAR(MAX),
-    CreatedAt DATETIME DEFAULT GETDATE()
-);
-
-CREATE TABLE FeedbackVotes (
-    VoteID INT PRIMARY KEY IDENTITY,
-    FeedbackID INT FOREIGN KEY REFERENCES Feedbacks(FeedbackID),
-    UserID INT FOREIGN KEY REFERENCES Users(UserID)
-);
-
-CREATE TABLE LessonAccess (
-    AccessID INT IDENTITY PRIMARY KEY,
-    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
-    LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
-    AccessedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)
-);
-
-CREATE TABLE LessonVocabulary (
-    LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
-    VocabID INT NOT NULL FOREIGN KEY REFERENCES Vocabulary(VocabID),
-    PRIMARY KEY (LessonID, VocabID)
-);
-
+-- Quản lý phòng học, chat, gọi video
 CREATE TABLE Rooms (
     RoomID INT PRIMARY KEY IDENTITY,
     HostUserID INT FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE,
@@ -308,6 +246,53 @@ CREATE TABLE VideoCalls (
     ReceiverID INT FOREIGN KEY REFERENCES Users(UserID),
     CallStart DATETIME,
     CallEnd DATETIME
+);
+
+-- Các bảng phụ trợ khác
+CREATE TABLE LessonAccess (
+    AccessID INT IDENTITY PRIMARY KEY,
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
+    AccessedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT UC_User_Lesson UNIQUE (UserID, LessonID)
+);
+
+CREATE TABLE LessonVocabulary (
+    LessonID INT NOT NULL FOREIGN KEY REFERENCES Lessons(LessonID),
+    VocabID INT NOT NULL FOREIGN KEY REFERENCES Vocabulary(VocabID),
+    PRIMARY KEY (LessonID, VocabID)
+);
+
+CREATE TABLE Feedbacks (
+    FeedbackID INT PRIMARY KEY IDENTITY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
+    Content NVARCHAR(MAX),
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE FeedbackVotes (
+    VoteID INT PRIMARY KEY IDENTITY,
+    FeedbackID INT FOREIGN KEY REFERENCES Feedbacks(FeedbackID),
+    UserID INT FOREIGN KEY REFERENCES Users(UserID)
+);
+
+CREATE TABLE CourseRatings (
+    RatingID INT PRIMARY KEY IDENTITY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
+    Comment NVARCHAR(MAX),
+    RatedAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Progress (
+    ProgressID INT PRIMARY KEY IDENTITY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
+    CompletionPercent INT CHECK (CompletionPercent BETWEEN 0 AND 100),
+    LastAccessed DATETIME DEFAULT GETDATE()
 );
 
 -- =========================
@@ -476,3 +461,95 @@ BEGIN
 END;
 GO
 
+-- Đoạn này thử chạy hết phần dưới về chạy lẻ nó thiếu declare
+-- 1. Thêm 50 người dùng
+DECLARE @StartDate DATETIME = '2025-01-01';
+DECLARE @EndDate DATETIME = '2025-06-22';
+DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
+DECLARE @UserCount INT = 50;
+DECLARE @Counter INT = 1;
+DECLARE @RoleID INT;
+DECLARE @Email NVARCHAR(255);
+DECLARE @FullName NVARCHAR(100);
+DECLARE @CreatedAt DATETIME;
+
+-- Tạm lưu danh sách người dùng để dùng cho Enrollment
+CREATE TABLE #TempUsers (UserID INT, CreatedAt DATETIME);
+
+WHILE @Counter <= @UserCount
+BEGIN
+    -- Phân bố RoleID theo tỷ lệ: Admin (1), Free (4), Premium (3), Teacher (1)
+    SET @RoleID = CASE 
+        WHEN @Counter <= 5 THEN 4 -- 5 Admin
+        WHEN @Counter <= 25 THEN 1 -- 20 Free
+        WHEN @Counter <= 40 THEN 2 -- 15 Premium
+        ELSE 3 -- 5 Teacher
+    END;
+
+    -- Tạo email và tên giả lập
+    SET @Email = 'user' + CAST(@Counter AS NVARCHAR(10)) + '@example.com';
+    SET @FullName = N'Người Dùng ' + CAST(@Counter AS NVARCHAR(10));
+
+    -- Tính CreatedAt trải đều từ 01/01/2025 đến 06/22/2025
+    SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @UserCount, @StartDate);
+
+    -- Thêm người dùng
+    INSERT INTO Users (
+        RoleID, Email, PasswordHash, FullName, CreatedAt, 
+        BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Gender
+    )
+    VALUES (
+        @RoleID, 
+        @Email, 
+        'hashed_password', -- Giả lập mật khẩu
+        @FullName, 
+        @CreatedAt,
+        '2000-01-01', -- Ngày sinh giả lập
+        '0123456789', -- Số điện thoại giả lập
+        N'N5', 
+        N'Địa chỉ giả lập', 
+        N'Việt Nam', 
+        CASE WHEN @Counter % 2 = 0 THEN N'Nam' ELSE N'Nữ' END
+    );
+
+    -- Lưu UserID và CreatedAt vào bảng tạm
+    INSERT INTO #TempUsers (UserID, CreatedAt)
+    VALUES (SCOPE_IDENTITY(), @CreatedAt);
+
+    SET @Counter = @Counter + 1;
+END;
+
+-- 2. Thêm 30 bản ghi Enrollment
+DECLARE @EnrollmentCount INT = 30;
+SET @Counter = 1;
+DECLARE @UserID INT;
+DECLARE @CourseID INT = (SELECT CourseID FROM Courses WHERE Title = N'Khóa học Giao tiếp N5');
+DECLARE @EnrolledAt DATETIME;
+
+-- Cursor để lấy ngẫu nhiên 30 người dùng từ bảng tạm
+DECLARE user_cursor CURSOR FOR 
+SELECT TOP 30 UserID, CreatedAt 
+FROM #TempUsers 
+ORDER BY NEWID(); -- Randomize
+
+OPEN user_cursor;
+FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+
+WHILE @Counter <= @EnrollmentCount
+BEGIN
+    -- Tính EnrolledAt trải đều từ 01/01/2025 đến 06/22/2025
+    SET @EnrolledAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @EnrollmentCount, @StartDate);
+
+    -- Thêm bản ghi Enrollment
+    INSERT INTO Enrollment (UserID, CourseID, EnrolledAt)
+    VALUES (@UserID, @CourseID, @EnrolledAt);
+
+    FETCH NEXT FROM user_cursor INTO @UserID, @CreatedAt;
+    SET @Counter = @Counter + 1;
+END;
+
+CLOSE user_cursor;
+DEALLOCATE user_cursor;
+
+-- Xóa bảng tạm
+DROP TABLE #TempUsers;
