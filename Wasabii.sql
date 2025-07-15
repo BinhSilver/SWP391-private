@@ -46,6 +46,19 @@ CREATE TABLE Users (
     CertificatePath NVARCHAR(500)
 );
 
+CREATE TABLE Payments (
+    PaymentID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    PlanID INT NOT NULL FOREIGN KEY REFERENCES PremiumPlans(PlanID),
+    Amount FLOAT NOT NULL,
+    OrderInfo NVARCHAR(255),
+    TransactionStatus NVARCHAR(50),
+    OrderCode BIGINT,
+    CheckoutUrl NVARCHAR(500),
+    Status NVARCHAR(50),
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
 CREATE TABLE Courses (
     CourseID INT PRIMARY KEY IDENTITY,
     Title NVARCHAR(255),
@@ -306,14 +319,19 @@ INSERT INTO PremiumPlans (PlanName, Price, DurationInMonths, Description)
 VALUES (N'Gói Tháng', 25000, 1, N'Sử dụng Premium trong 1 tháng'),
        (N'Gói Năm', 250000, 12, N'Sử dụng Premium trong 12 tháng');
 
+-- Thêm users
 INSERT INTO Users (RoleID, Email, PasswordHash, GoogleID, FullName, BirthDate, PhoneNumber, JapaneseLevel, Address, Country, Avatar, Gender)
 VALUES (1, 'nguyenphamthanhbinh02@gmail.com', '123456789', NULL, N'Người Dùng', '2000-01-01', '0123456789', N'N5', N'Địa chỉ user', N'Việt Nam', NULL, N'Nam'),
        (4, 'huyphw2@gmail.com', '12345678', NULL, N'Huy Phan', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam'),
        (4, 'admin@gmail.com', '123456789', NULL, N'TBinh', '1990-01-01', '0987654321', N'N1', N'Địa chỉ admin', N'Việt Nam', NULL, N'Nam'),
        (3, 'teacher@gmail.com', '123', NULL, N'Tanaka Sensei', '2004-07-04', '0911053612', 'N4', N'Địa chỉ teacher', N'Việt Nam', NULL, N'Nữ');
 
-INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, imageUrl)
-VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1, N'course_n5_thumbnail.png');
+-- Lấy UserID của giáo viên
+DECLARE @TeacherID INT = (SELECT UserID FROM Users WHERE Email = 'teacher@gmail.com');
+
+-- Tạo khóa học với CreatedBy là giáo viên
+INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedBy, imageUrl)
+VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1, @TeacherID, N'course_n5_thumbnail.png');
 DECLARE @CourseID INT = SCOPE_IDENTITY();
 
 INSERT INTO Lessons (CourseID, Title, Description, IsHidden)

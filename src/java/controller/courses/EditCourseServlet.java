@@ -42,11 +42,21 @@ public class EditCourseServlet extends HttpServlet {
         }
         int courseId = Integer.parseInt(courseIdStr);
 
+        // Kiểm tra quyền edit: chỉ giáo viên tạo khóa học hoặc admin mới được sửa
+        HttpSession session = request.getSession(false);
+        model.User currentUser = (session != null) ? (model.User) session.getAttribute("authUser") : null;
         CoursesDAO cDao = new CoursesDAO();
+        Course course = cDao.getCourseByID(courseId);
+        if (currentUser == null || course == null || (currentUser.getRoleID() != 4 && course.getCreatedBy() != currentUser.getUserID())) {
+            request.setAttribute("error", "Bạn không có quyền chỉnh sửa khóa học này!");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         LessonsDAO lDao = new LessonsDAO();
         LessonMaterialsDAO mDao = new LessonMaterialsDAO();
 
-        Course course = cDao.getCourseByID(courseId);
+        course = cDao.getCourseByID(courseId);
         if (course == null) {
             request.setAttribute("error", "Không tìm thấy khóa học với ID " + courseId);
             request.getRequestDispatcher("error.jsp").forward(request, response);
