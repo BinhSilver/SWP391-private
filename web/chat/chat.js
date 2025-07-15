@@ -123,7 +123,7 @@ function selectChatUser(userId, username) {
         if (currentChatUserId) {
             loadChatHistory(currentChatUserId);
         }
-    }, 3500); // 1000ms = 1 giây
+    }, 2500); // 1000ms = 1 giây
 
             fetch(getApiUrl(API_CONFIG.CHECK_BLOCK) + "?user1=" + currentUserId + "&user2=" + userId)
             .then(function (res) {
