@@ -19,7 +19,7 @@ import model.Course;
 import model.User;
 import service.PasswordService;
 import jakarta.servlet.http.Part;
-import config.CloudinaryUtil;
+import config.S3Util;
 import com.cloudinary.Cloudinary;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
@@ -169,34 +169,23 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
                 try {
-                    Cloudinary cloudinary = CloudinaryUtil.getCloudinary();
-                    
                     // Đọc file từ Part
                     java.io.InputStream is = certificatePart.getInputStream();
-                    byte[] bytes = is.readAllBytes();
-                    
-                    // Lấy tên file gốc
+                    long size = certificatePart.getSize();
                     String originalFileName = certificatePart.getSubmittedFileName();
-                    String publicId = "certificate_" + System.currentTimeMillis();
+                    String key = "certificates/certificate_" + System.currentTimeMillis();
                     if (originalFileName != null && originalFileName.toLowerCase().endsWith(".pdf")) {
-                        publicId += ".pdf";
+                        key += ".pdf";
                     }
-                    // Cấu hình upload cho PDF
-                    java.util.Map<String, Object> options = new java.util.HashMap<>();
-                    options.put("folder", "certificates");
-                    options.put("public_id", publicId);
-                    options.put("resource_type", "raw"); // Cho file PDF
-                    options.put("overwrite", true);
-                    
-                    // Upload lên Cloudinary
-                    java.util.Map uploadResult = cloudinary.uploader().upload(bytes, options);
-                    certificatePath = (String) uploadResult.get("public_id"); // Lưu đúng public_id thay vì secure_url
-                    
-                    System.out.println("[CertificateUpload] Upload thành công: " + certificatePath);
+                    String contentType = certificatePart.getContentType();
+                    // Upload lên S3
+                    String s3Url = config.S3Util.uploadFile(is, size, key, contentType);
+                    certificatePath = key; // Lưu key S3 vào DB
+                    System.out.println("[CertificateUpload] Upload thành công S3: " + s3Url);
                 } catch (Exception e) {
-                    System.err.println("[CertificateUpload] Lỗi upload chứng chỉ: " + e.getMessage());
+                    System.err.println("[CertificateUpload] Lỗi upload chứng chỉ S3: " + e.getMessage());
                     e.printStackTrace();
-                    // Fallback: lưu local nếu upload Cloudinary thất bại
+                    // Fallback: lưu local nếu upload S3 thất bại
                     String fileName = System.currentTimeMillis() + "_" + certificatePart.getSubmittedFileName();
                     String uploadPath = getServletContext().getRealPath("/certificates/");
                     java.io.File uploadDir = new java.io.File(uploadPath);

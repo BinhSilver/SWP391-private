@@ -11,6 +11,8 @@
 src/java/DB/db.properties
 src/java/resources/
 src/java/DB/JDBCConnection.java
+lib/
+nbproject/
 
 # Ignore build artifacts and IDE files
 *.class
@@ -40,7 +42,6 @@ target/
 .gradle/
 build/
 dist/
-nbproject/
 nbbuild/
 nbdist/
 .netbeans/
@@ -52,3 +53,6 @@ build.xml
 !web/js/
 !web/js/*
 
+# Cho phép folder config và tất cả file bên trong
+!src/java/config/
+!src/java/config/**
