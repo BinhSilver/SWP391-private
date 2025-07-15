@@ -6,13 +6,17 @@
 !web/
 !Wasabii.sql
 !.gitignore
+!nbproject/
+!nbproject/**
+
+# Nhưng vẫn ignore nbproject/private và mọi file bên trong
+nbproject/private/
 
 # But still ignore specific files within allowed directories
 src/java/DB/db.properties
 src/java/resources/
 src/java/DB/JDBCConnection.java
 lib/
-nbproject/
 
 # Ignore build artifacts and IDE files
 *.class
