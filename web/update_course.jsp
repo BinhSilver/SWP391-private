@@ -32,7 +32,7 @@
                     <h5 class="fw-bold text-primary mb-3">Thông tin chung</h5>
                     <div class="mb-3">
                         <label class="form-label">Tên khóa học <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="courseTitle" value="${course.title}" required/>
+                        <input type="text" class="form-control" id="courseTitle" name="courseTitle" value="${course.title}" required/>
                     </div>
 
                     <div class="mb-3">
