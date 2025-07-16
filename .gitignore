@@ -4,10 +4,14 @@
 # Allow specific directories and files
 !src/
 !web/
+!web/**
 !Wasabii.sql
 !.gitignore
 !nbproject/
 !nbproject/**
+!src/java/
+!src/java/**
+
 
 # Nhưng vẫn ignore nbproject/private và mọi file bên trong
 nbproject/private/

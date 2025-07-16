@@ -1538,3 +1538,21 @@ body {
         justify-content: flex-start;
     }
 }
+
+/* Nút/badge hoàn thành màu xanh lá cây nhạt */
+.complete-button.completed,
+.btn-secondary[disabled],
+.lesson-completed-badge, .sidebar-completed-badge {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(40,167,69,0.08);
+    font-weight: 600;
+}
+.complete-button.completed i,
+.btn-secondary[disabled] i,
+.lesson-completed-badge i, .sidebar-completed-badge i {
+    color: #155724 !important;
+}
+
+/* Nếu có các class khác cho trạng thái hoàn thành, có thể thêm vào selector trên */
