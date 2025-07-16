@@ -1,10 +1,15 @@
 // feedback.js
-function updateFeedback() {
-    const form = document.getElementById('editFeedbackForm');
+function updateFeedback(feedbackId) {
+    const form = document.getElementById('editFeedbackForm-' + feedbackId);
+    if (!form) {
+        console.error('[updateFeedback] Không tìm thấy form với id:', 'editFeedbackForm-' + feedbackId);
+        return;
+    }
     const data = new FormData(form);
     console.log('[updateFeedback] data:', Object.fromEntries(data.entries()));
     fetch(window.contextPath + '/course/feedback', {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(data),
     }).then(res => {
         console.log('[updateFeedback] response status:', res.status);
@@ -15,12 +20,16 @@ function updateFeedback() {
     });
 }
 
-function deleteFeedback() {
-    const form = document.getElementById('editFeedbackForm');
-    const feedbackId = form.elements['feedbackId'].value;
+function deleteFeedback(feedbackId) {
+    const form = document.getElementById('editFeedbackForm-' + feedbackId);
+    if (!form) {
+        console.error('[deleteFeedback] Không tìm thấy form với id:', 'editFeedbackForm-' + feedbackId);
+        return;
+    }
+    const feedbackIdVal = form.elements['feedbackId'].value;
     const userId = form.elements['userId'].value;
-    console.log('[deleteFeedback] feedbackId:', feedbackId, 'userId:', userId);
-    fetch(window.contextPath + `/course/feedback?feedbackId=${feedbackId}&userId=${userId}`, {
+    console.log('[deleteFeedback] feedbackId:', feedbackIdVal, 'userId:', userId);
+    fetch(window.contextPath + `/course/feedback?feedbackId=${feedbackIdVal}&userId=${userId}`, {
         method: 'DELETE',
     }).then(res => {
         console.log('[deleteFeedback] response status:', res.status);

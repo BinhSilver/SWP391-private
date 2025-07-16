@@ -10,6 +10,10 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.net.URLDecoder;
 
 @WebServlet("/course/feedback")
 public class FeedbackServlet extends HttpServlet {
@@ -60,10 +64,18 @@ public class FeedbackServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int feedbackId = Integer.parseInt(req.getParameter("feedbackId"));
-        int userId = Integer.parseInt(req.getParameter("userId"));
-        String content = req.getParameter("content");
-        int rating = Integer.parseInt(req.getParameter("rating"));
+        // Đọc body thủ công cho PUT
+        String body = new BufferedReader(new InputStreamReader(req.getInputStream()))
+            .lines().collect(java.util.stream.Collectors.joining("&"));
+        java.util.Map<String, String> params = new java.util.HashMap<>();
+        for (String pair : body.split("&")) {
+            String[] kv = pair.split("=");
+            if (kv.length == 2) params.put(java.net.URLDecoder.decode(kv[0], "UTF-8"), java.net.URLDecoder.decode(kv[1], "UTF-8"));
+        }
+        int feedbackId = Integer.parseInt(params.get("feedbackId"));
+        int userId = Integer.parseInt(params.get("userId"));
+        String content = params.get("content");
+        int rating = Integer.parseInt(params.get("rating"));
         try (Connection conn = JDBCConnection.getConnection()) {
             FeedbackDAO feedbackDAO = new FeedbackDAO(conn);
             Feedback feedback = new Feedback();

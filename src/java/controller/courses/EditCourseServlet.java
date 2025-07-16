@@ -4,11 +4,13 @@ import Dao.CoursesDAO;
 import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
 import Dao.QuizDAO;
+import Dao.VocabularyDAO;
 import model.Course;
 import model.Lesson;
 import model.LessonMaterial;
 import model.QuizQuestion;
 import model.Answer;
+import model.Vocabulary;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -26,8 +28,8 @@ import service.QuizService;
 @MultipartConfig(maxFileSize = 100 * 1024 * 1024, fileSizeThreshold = 1 * 1024 * 1024)
 public class EditCourseServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "files";
-    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWR\\SWP391-private\\web\\files";
+    private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWP\\SWP391-private\\web\\files";
+    private static final String VOCAB_IMAGE_PATH = "/imgvocab";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,7 +44,7 @@ public class EditCourseServlet extends HttpServlet {
         }
         int courseId = Integer.parseInt(courseIdStr);
 
-        // Kiểm tra quyền edit: chỉ giáo viên tạo khóa học hoặc admin mới được sửa
+        // Kiểm tra quyền chỉnh sửa
         HttpSession session = request.getSession(false);
         model.User currentUser = (session != null) ? (model.User) session.getAttribute("authUser") : null;
         CoursesDAO cDao = new CoursesDAO();
@@ -55,21 +57,22 @@ public class EditCourseServlet extends HttpServlet {
 
         LessonsDAO lDao = new LessonsDAO();
         LessonMaterialsDAO mDao = new LessonMaterialsDAO();
+        VocabularyDAO vDao = new VocabularyDAO();
 
-        course = cDao.getCourseByID(courseId);
-        if (course == null) {
-            request.setAttribute("error", "Không tìm thấy khóa học với ID " + courseId);
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
-        }
         List<Lesson> lessons = lDao.getLessonsByCourseID(courseId);
         Map<Integer, List<LessonMaterial>> materialsMap = mDao.getAllMaterialsGroupedByLesson(courseId);
         Map<Integer, List<QuizQuestion>> quizMap = new HashMap<>();
+        Map<Integer, List<Vocabulary>> vocabularyMap = new HashMap<>();
         for (Lesson lesson : lessons) {
             quizMap.put(lesson.getLessonID(), QuizDAO.getQuestionsWithAnswersByLessonId(lesson.getLessonID()));
+            try {
+                vocabularyMap.put(lesson.getLessonID(), vDao.getVocabularyByLessonId(lesson.getLessonID()));
+            } catch (SQLException ex) {
+                System.getLogger(EditCourseServlet.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            }
         }
 
-        // Create JSON data for JavaScript
+        // Tạo JSON cho JavaScript
         Gson gson = new Gson();
         Map<String, Object> courseDataForJs = new HashMap<>();
         List<Map<String, Object>> lessonsForJs = new ArrayList<>();
@@ -92,14 +95,10 @@ public class EditCourseServlet extends HttpServlet {
                     String optionA = "", optionB = "", optionC = "", optionD = "";
                     for (Answer answer : question.getAnswers()) {
                         switch (answer.getAnswerNumber()) {
-                            case 1 ->
-                                optionA = answer.getAnswerText();
-                            case 2 ->
-                                optionB = answer.getAnswerText();
-                            case 3 ->
-                                optionC = answer.getAnswerText();
-                            case 4 ->
-                                optionD = answer.getAnswerText();
+                            case 1 -> optionA = answer.getAnswerText();
+                            case 2 -> optionB = answer.getAnswerText();
+                            case 3 -> optionC = answer.getAnswerText();
+                            case 4 -> optionD = answer.getAnswerText();
                         }
                     }
                     quizData.put("optionA", optionA);
@@ -108,14 +107,10 @@ public class EditCourseServlet extends HttpServlet {
                     quizData.put("optionD", optionD);
 
                     String correctAnswer = switch (question.getCorrectAnswer()) {
-                        case 1 ->
-                            "A";
-                        case 2 ->
-                            "B";
-                        case 3 ->
-                            "C";
-                        default ->
-                            "D";
+                        case 1 -> "A";
+                        case 2 -> "B";
+                        case 3 -> "C";
+                        default -> "D";
                     };
                     quizData.put("answer", correctAnswer);
 
@@ -134,6 +129,7 @@ public class EditCourseServlet extends HttpServlet {
         request.setAttribute("lessons", lessons);
         request.setAttribute("materialsMap", materialsMap);
         request.setAttribute("quizMap", quizMap);
+        request.setAttribute("vocabularyMap", vocabularyMap);
         request.setAttribute("quizDataJson", quizDataJson);
 
         request.getRequestDispatcher("update_course.jsp").forward(request, response);
@@ -165,20 +161,15 @@ public class EditCourseServlet extends HttpServlet {
             Part imagePart = request.getPart("thumbnailFile");
             if (imagePart != null && imagePart.getSize() > 0) {
                 String fileName = getFileName(imagePart);
-
+                if (!isValidImage(fileName)) {
+                    throw new IllegalArgumentException("Thumbnail phải là file ảnh (jpg, jpeg, png, gif).");
+                }
                 File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
-
                 String filePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
-                try (InputStream is = imagePart.getInputStream(); FileOutputStream os = new FileOutputStream(filePath)) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        os.write(buffer, 0, bytesRead);
-                    }
-                }
+                saveFile(imagePart, filePath);
                 imageUrl = "files/" + fileName;
             } else {
                 CoursesDAO cDao = new CoursesDAO();
@@ -201,6 +192,7 @@ public class EditCourseServlet extends HttpServlet {
 
             LessonsDAO lDao = new LessonsDAO();
             LessonMaterialsDAO mDao = new LessonMaterialsDAO();
+            VocabularyDAO vDao = new VocabularyDAO();
 
             Set<Integer> lessonIndexes = new HashSet<>();
             for (String param : request.getParameterMap().keySet()) {
@@ -249,6 +241,7 @@ public class EditCourseServlet extends HttpServlet {
 
                 try {
                     processMaterialsForLesson(request, lessonId, idx, mDao, request.getParts());
+                    processVocabularyForLesson(request, lessonId, idx, vDao, request.getParts());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -269,20 +262,38 @@ public class EditCourseServlet extends HttpServlet {
                 return;
             }
 
-//            for (Integer oldLessonId : oldLessonIds) {
-//                if (!keptLessonIds.contains(oldLessonId)) {
-//                    try {
-//                        QuizDAO.deleteQuestionsByLessonId(oldLessonId);
-//                        List<LessonMaterial> oldMats = mDao.getMaterialsByLessonID(oldLessonId);
-//                        for (LessonMaterial mat : oldMats) {
-//                            mDao.delete(mat.getMaterialID());
-//                        }
-//                        lDao.delete(oldLessonId);
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
+            // Xóa các lesson không còn trong danh sách
+            for (Integer oldLessonId : oldLessonIds) {
+                if (!keptLessonIds.contains(oldLessonId)) {
+                    try {
+                        QuizDAO.deleteQuestionsByLessonId(oldLessonId);
+                        List<LessonMaterial> oldMats = mDao.getMaterialsByLessonID(oldLessonId);
+                        for (LessonMaterial mat : oldMats) {
+                            mDao.delete(mat.getMaterialID());
+                            String realPath = ABSOLUTE_UPLOAD_PATH + File.separator + mat.getFilePath().substring("files/".length());
+                            File f = new File(realPath);
+                            if (f.exists()) {
+                                f.delete();
+                            }
+                        }
+                        List<Vocabulary> oldVocabs = vDao.getVocabularyByLessonId(oldLessonId);
+                        for (Vocabulary vocab : oldVocabs) {
+                            vDao.delete(vocab.getVocabID());
+                            if (vocab.getImagePath() != null && !vocab.getImagePath().isEmpty()) {
+                                String realPath = getServletContext().getRealPath(VOCAB_IMAGE_PATH) + File.separator + vocab.getImagePath();
+                                File f = new File(realPath);
+                                if (f.exists()) {
+                                    f.delete();
+                                }
+                            }
+                        }
+                        lDao.delete(oldLessonId);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -291,39 +302,34 @@ public class EditCourseServlet extends HttpServlet {
         }
     }
 
-    private void processMaterialsForLesson(HttpServletRequest request, int lessonId, int idx, LessonMaterialsDAO mDao, Collection<Part> parts) {
-        String[] types = {"vocabDoc", "vocabVideo", "grammarDoc", "grammarVideo", "kanjiDoc", "kanjiVideo"};
+    private void processMaterialsForLesson(HttpServletRequest request, int lessonId, int idx, LessonMaterialsDAO mDao, Collection<Part> parts) throws Exception {
+        String[] types = {"vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"};
         for (String type : types) {
             for (Part part : parts) {
                 if (part.getName().equals("lessons[" + idx + "][" + type + "][]") && part.getSize() > 0) {
                     String fileName = getFileName(part);
-                    String uploadPath = request.getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) {
-                        uploadDir.mkdirs();
+                    if (fileName == null || fileName.isEmpty()) {
+                        continue;
                     }
-                    try (InputStream is = part.getInputStream(); FileOutputStream os = new FileOutputStream(uploadPath + File.separator + fileName)) {
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        while ((bytesRead = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, bytesRead);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    // Kiểm tra định dạng tệp
+                    if (type.endsWith("Video") && !isValidVideo(fileName)) {
+                        throw new IllegalArgumentException("File video không hợp lệ: " + fileName + ". Chỉ chấp nhận mp4, avi, mov.");
                     }
+                    if (type.endsWith("Doc") && !isValidPDF(fileName)) {
+                        throw new IllegalArgumentException("File tài liệu không hợp lệ: " + fileName + ". Chỉ chấp nhận PDF.");
+                    }
+
+                    String savePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
+                    saveFile(part, savePath);
 
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
-                    material.setMaterialType(type);
+                    material.setMaterialType(type.startsWith("vocab") ? "Từ Vựng" : type.startsWith("grammar") ? "Ngữ pháp" : "Kanji");
                     material.setFileType(type.endsWith("Video") ? "Video" : "PDF");
                     material.setTitle(fileName);
-                    material.setFilePath(UPLOAD_DIR + "/" + fileName);
+                    material.setFilePath("files/" + fileName);
                     material.setIsHidden(false);
-                    try {
-                        mDao.add(material);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    mDao.add(material);
                 }
             }
         }
@@ -343,7 +349,133 @@ public class EditCourseServlet extends HttpServlet {
                     }
                     mDao.delete(matId);
                     if (mat != null && mat.getFilePath() != null) {
-                        String realPath = request.getServletContext().getRealPath("") + File.separator + mat.getFilePath();
+                        String realPath = ABSOLUTE_UPLOAD_PATH + File.separator + mat.getFilePath().substring("files/".length());
+                        File f = new File(realPath);
+                        if (f.exists()) {
+                            f.delete();
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void processVocabularyForLesson(HttpServletRequest request, int lessonId, int lessonIndex, VocabularyDAO vDao, Collection<Part> parts) throws Exception {
+        // Xử lý từ vựng hiện có (cập nhật)
+        Map<String, String[]> paramMap = request.getParameterMap();
+        for (String key : paramMap.keySet()) {
+            if (key.startsWith("lessons[" + lessonIndex + "][existingVocabulary][")) {
+                Matcher m = Pattern.compile("lessons\\[" + lessonIndex + "\\]\\[existingVocabulary\\]\\[(\\d+)\\]\\[(\\w+)\\]").matcher(key);
+                if (m.find()) {
+                    int vocabId = Integer.parseInt(m.group(1));
+                    String field = m.group(2);
+                    Vocabulary vocab = null;
+                    List<Vocabulary> existingVocabs = vDao.getVocabularyByLessonId(lessonId);
+                    for (Vocabulary v : existingVocabs) {
+                        if (v.getVocabID() == vocabId) {
+                            vocab = v;
+                            break;
+                        }
+                    }
+                    if (vocab == null) {
+                        continue;
+                    }
+
+                    switch (field) {
+                        case "word" -> vocab.setWord(request.getParameter(key));
+                        case "meaning" -> vocab.setMeaning(request.getParameter(key));
+                        case "reading" -> vocab.setReading(request.getParameter(key));
+                        case "example" -> vocab.setExample(request.getParameter(key));
+                    }
+
+                    // Xử lý hình ảnh mới cho từ vựng hiện có
+                    Part imagePart = request.getPart("lessons[" + lessonIndex + "][existingVocabulary][" + vocabId + "][image]");
+                    if (imagePart != null && imagePart.getSize() > 0) {
+                        String originalName = imagePart.getSubmittedFileName();
+                        if (originalName != null && !originalName.isEmpty()) {
+                            if (!isValidImage(originalName)) {
+                                throw new IllegalArgumentException("Hình ảnh từ vựng không hợp lệ: " + originalName + ". Chỉ chấp nhận jpg, jpeg, png, gif.");
+                            }
+                            // Xóa hình ảnh cũ nếu có
+                            if (vocab.getImagePath() != null && !vocab.getImagePath().isEmpty()) {
+                                String oldImagePath = getServletContext().getRealPath(VOCAB_IMAGE_PATH) + File.separator + vocab.getImagePath();
+                                File oldImage = new File(oldImagePath);
+                                if (oldImage.exists()) {
+                                    oldImage.delete();
+                                }
+                            }
+                            // Lưu hình ảnh mới
+                            String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
+                            String savedFileName = vocab.getWord().replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ext;
+                            String savePath = getServletContext().getRealPath(VOCAB_IMAGE_PATH) + File.separator + savedFileName;
+                            saveFile(imagePart, savePath);
+                            vocab.setImagePath(savedFileName); // Chỉ lưu tên file
+                        }
+                    }
+
+                    vDao.update(vocab);
+                }
+            }
+        }
+
+        // Xử lý từ vựng mới
+        for (String key : paramMap.keySet()) {
+            if (key.startsWith("lessons[" + lessonIndex + "][vocabText]")) {
+                int vocabIndex = Integer.parseInt(key.substring(key.lastIndexOf('[') + 1, key.lastIndexOf(']')));
+                String vocabText = request.getParameter(key);
+                if (vocabText != null && !vocabText.isEmpty()) {
+                    String[] vocabParts = vocabText.split(":");
+                    if (vocabParts.length == 4) {
+                        Vocabulary vocab = new Vocabulary();
+                        vocab.setWord(vocabParts[0].trim());
+                        vocab.setMeaning(vocabParts[1].trim());
+                        vocab.setReading(vocabParts[2].trim());
+                        vocab.setExample(vocabParts[3].trim());
+                        vocab.setLessonID(lessonId);
+
+                        // Xử lý hình ảnh từ vựng mới
+                        Part imagePart = request.getPart("lessons[" + lessonIndex + "][vocabImage][" + vocabIndex + "]");
+                        if (imagePart != null && imagePart.getSize() > 0) {
+                            String originalName = imagePart.getSubmittedFileName();
+                            if (originalName != null && !originalName.isEmpty()) {
+                                if (!isValidImage(originalName)) {
+                                    throw new IllegalArgumentException("Hình ảnh từ vựng không hợp lệ: " + originalName + ". Chỉ chấp nhận jpg, jpeg, png, gif.");
+                                }
+                                String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
+                                String savedFileName = vocab.getWord().replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ext;
+                                String savePath = getServletContext().getRealPath(VOCAB_IMAGE_PATH) + File.separator + savedFileName;
+                                saveFile(imagePart, savePath);
+                                vocab.setImagePath(savedFileName); // Chỉ lưu tên file
+                            }
+                        }
+
+                        vDao.add(vocab);
+                    } else {
+                        throw new IllegalArgumentException("Định dạng từ vựng không đúng: " + vocabText + ". Yêu cầu Word:Meaning:Reading:Example");
+                    }
+                }
+            }
+        }
+
+        // Xử lý xóa từ vựng
+        String[] deleteVocabArr = request.getParameterValues("lessons[" + lessonIndex + "][deleteVocabulary][]");
+        if (deleteVocabArr != null) {
+            for (String vocabIdStr : deleteVocabArr) {
+                try {
+                    int vocabId = Integer.parseInt(vocabIdStr);
+                    List<Vocabulary> vocabs = vDao.getVocabularyByLessonId(lessonId);
+                    Vocabulary vocabToDelete = null;
+                    for (Vocabulary v : vocabs) {
+                        if (v.getVocabID() == vocabId) {
+                            vocabToDelete = v;
+                            break;
+                        }
+                    }
+                    vDao.delete(vocabId);
+                    if (vocabToDelete != null && vocabToDelete.getImagePath() != null) {
+                        String realPath = getServletContext().getRealPath(VOCAB_IMAGE_PATH) + File.separator + vocabToDelete.getImagePath();
                         File f = new File(realPath);
                         if (f.exists()) {
                             f.delete();
@@ -364,5 +496,32 @@ public class EditCourseServlet extends HttpServlet {
             }
         }
         return "";
+    }
+
+    private void saveFile(Part part, String savePath) throws IOException {
+        try (InputStream is = part.getInputStream();
+             FileOutputStream os = new FileOutputStream(savePath)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+
+    private boolean isValidImage(String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".jpg") || lowerCaseFileName.endsWith(".jpeg") ||
+               lowerCaseFileName.endsWith(".png") || lowerCaseFileName.endsWith(".gif");
+    }
+
+    private boolean isValidVideo(String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".mp4") || lowerCaseFileName.endsWith(".avi") ||
+               lowerCaseFileName.endsWith(".mov");
+    }
+
+    private boolean isValidPDF(String fileName) {
+        return fileName.toLowerCase().endsWith(".pdf");
     }
 }

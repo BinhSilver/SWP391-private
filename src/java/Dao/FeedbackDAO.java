@@ -69,6 +69,7 @@ public class FeedbackDAO {
     }
 
     public void updateFeedback(Feedback feedback) throws SQLException {
+        // Chỉ update nội dung và rating, KHÔNG động chạm gì đến bảng vote
         String sql = "UPDATE Feedbacks SET Content = ?, Rating = ? WHERE FeedbackID = ? AND UserID = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, feedback.getContent());
@@ -79,6 +80,12 @@ public class FeedbackDAO {
     }
 
     public void deleteFeedback(int feedbackId, int userId) throws SQLException {
+        // Xóa vote trước
+        String sqlVote = "DELETE FROM FeedbackVotes WHERE FeedbackID = ?";
+        PreparedStatement psVote = conn.prepareStatement(sqlVote);
+        psVote.setInt(1, feedbackId);
+        psVote.executeUpdate();
+        // Xóa feedback
         String sql = "DELETE FROM Feedbacks WHERE FeedbackID = ? AND UserID = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setInt(1, feedbackId);
