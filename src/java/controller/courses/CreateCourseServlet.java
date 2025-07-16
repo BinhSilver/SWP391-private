@@ -4,6 +4,7 @@ import Dao.CoursesDAO;
 import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
 import Dao.QuizDAO;
+import Dao.VocabularyDAO;
 import model.*;
 
 import java.io.*;
@@ -18,8 +19,10 @@ import jakarta.servlet.http.*;
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
 public class CreateCourseServlet extends HttpServlet {
 
-    // Đường dẫn tuyệt đối trên ổ đĩa D
+    // Đường dẫn tuyệt đối cho tài liệu và thumbnail
     private static final String ABSOLUTE_UPLOAD_PATH = "D:\\SUM25_FPT\\SWP\\SWP391-private\\web\\files";
+    // Đường dẫn tương đối trong thư mục webapp cho hình ảnh từ vựng
+    private static final String VOCAB_IMAGE_PATH = "/imgvocab";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,6 +40,7 @@ public class CreateCourseServlet extends HttpServlet {
         System.out.println("===== PARAMETER MAP =====");
         request.getParameterMap().forEach((k, v) -> System.out.println(k + " = " + Arrays.toString(v)));
         System.out.println("=========================");
+
         try {
             User user = getCurrentUser(request);
             if (user == null) {
@@ -44,35 +48,31 @@ public class CreateCourseServlet extends HttpServlet {
                 response.sendRedirect("login.jsp");
                 return;
             }
-            // ======== XỬ LÝ ẢNH COURSE (THUMBNAIL) =========
+
+            // Tạo thư mục lưu trữ nếu chưa tồn tại
+            String uploadDirPath = ABSOLUTE_UPLOAD_PATH;
+            String vocabImageDirPath = getServletContext().getRealPath(VOCAB_IMAGE_PATH);
+            File uploadDir = new File(uploadDirPath);
+            File vocabImageDir = new File(vocabImageDirPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+            if (!vocabImageDir.exists()) vocabImageDir.mkdirs();
+
+            // Xử lý ảnh thumbnail khóa học
             String imageUrl = null;
             Part imagePart = request.getPart("thumbnailFile");
             if (imagePart != null && imagePart.getSize() > 0) {
                 String fileName = getFileName(imagePart);
+                if (!isValidImage(fileName)) {
+                    throw new IllegalArgumentException("Thumbnail phải là file ảnh (jpg, jpeg, png, gif).");
+                }
                 System.out.println("[LOG] Nhận file thumbnail: " + fileName + ", size: " + imagePart.getSize());
-
-                File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-
-                String filePath = ABSOLUTE_UPLOAD_PATH + File.separator + fileName;
-                try (InputStream is = imagePart.getInputStream();
-                     FileOutputStream os = new FileOutputStream(filePath)) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        os.write(buffer, 0, bytesRead);
-                    }
-                }
-
-                // Lưu path tương đối vào DB
-                imageUrl = "files/" + fileName;
+                String filePath = uploadDirPath + File.separator + fileName;
+                saveFile(imagePart, filePath);
+                imageUrl = "files/" + fileName; // Lưu đường dẫn tương đối trong database
             }
 
-            // ======== LẤY THÔNG TIN KHÓA HỌC =========
+            // Lấy thông tin khóa học
             Course course = getCourseInfoFromRequest(request, user, imageUrl);
-            // Đảm bảo set createdBy đúng
             course.setCreatedBy(user.getUserID());
             System.out.println("[LOG] Thông tin course: " + course);
             int courseId = saveCourseAndReturnId(course);
@@ -80,7 +80,7 @@ public class CreateCourseServlet extends HttpServlet {
             int maxLesson = getMaxLessonIndex(request);
             System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
-            handleAllLessons(request, courseId, maxLesson, request);
+            handleAllLessons(request, courseId, maxLesson, uploadDirPath, vocabImageDirPath);
 
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
@@ -107,7 +107,6 @@ public class CreateCourseServlet extends HttpServlet {
         course.setHidden(isHidden);
         course.setSuggested(isSuggested);
         course.setImageUrl(imageUrl);
-        // Không set createdBy ở đây nữa, sẽ set ở doPost
         return course;
     }
 
@@ -136,10 +135,11 @@ public class CreateCourseServlet extends HttpServlet {
         return maxLesson;
     }
 
-    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson, HttpServletRequest req)
+    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson, String uploadDirPath, String vocabImageDirPath)
             throws Exception {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
+        VocabularyDAO vocabDao = new VocabularyDAO();
 
         for (int i = 0; i <= maxLesson; i++) {
             String title = request.getParameter("lessons[" + i + "][name]");
@@ -156,16 +156,15 @@ public class CreateCourseServlet extends HttpServlet {
 
             int lessonId = lessonsDao.addAndReturnID(lesson);
 
-            saveMaterialsForLesson(request, i, lessonId, req, materialsDao);
+            saveMaterialsForLesson(request, i, lessonId, uploadDirPath, materialsDao);
+            saveVocabularyForLesson(request, i, lessonId, vocabImageDirPath, vocabDao);
             saveQuizForLesson(request, i, lessonId);
         }
     }
 
-    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId,
-                                        HttpServletRequest req, LessonMaterialsDAO materialsDao)
+    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String uploadDirPath, LessonMaterialsDAO materialsDao)
             throws Exception {
         String[] fieldTypes = {"vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"};
-
         Collection<Part> parts = request.getParts();
 
         for (Part part : parts) {
@@ -176,25 +175,20 @@ public class CreateCourseServlet extends HttpServlet {
                     if (originalName == null || originalName.isEmpty()) {
                         continue;
                     }
+                    // Kiểm tra định dạng tệp
+                    if (type.endsWith("Video") && !isValidVideo(originalName)) {
+                        throw new IllegalArgumentException("File video không hợp lệ: " + originalName + ". Chỉ chấp nhận mp4, avi, mov.");
+                    }
+                    if (type.endsWith("Doc") && !isValidPDF(originalName)) {
+                        throw new IllegalArgumentException("File tài liệu không hợp lệ: " + originalName + ". Chỉ chấp nhận PDF.");
+                    }
+
                     System.out.println("[LOG] Lesson " + lessonIndex + " nhận file: " + originalName + " (" + type + ") size: " + part.getSize());
                     String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
+                    String savePath = uploadDirPath + File.separator + savedFileName;
 
-                    // Sử dụng ABSOLUTE_UPLOAD_PATH
-                    File uploadDir = new File(ABSOLUTE_UPLOAD_PATH);
-                    if (!uploadDir.exists()) {
-                        uploadDir.mkdirs();
-                    }
-                    String savePath = ABSOLUTE_UPLOAD_PATH + File.separator + savedFileName;
-
-                    try (InputStream is = part.getInputStream();
-                         FileOutputStream os = new FileOutputStream(savePath)) {
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        while ((bytesRead = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, bytesRead);
-                        }
-                    }
+                    saveFile(part, savePath);
 
                     String materialType = type.startsWith("vocab") ? "Từ Vựng"
                             : type.startsWith("grammar") ? "Ngữ pháp"
@@ -205,8 +199,51 @@ public class CreateCourseServlet extends HttpServlet {
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
-                    material.setFilePath("files/" + savedFileName);
+                    material.setFilePath("files/" + savedFileName); // Lưu đường dẫn tương đối trong database
                     materialsDao.add(material);
+                }
+            }
+        }
+    }
+
+    private void saveVocabularyForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String imgVocabDir, VocabularyDAO vocabDao)
+            throws Exception {
+        Map<String, String[]> paramMap = request.getParameterMap();
+        for (String key : paramMap.keySet()) {
+            if (key.startsWith("lessons[" + lessonIndex + "][vocabText]")) {
+                int vocabIndex = Integer.parseInt(key.substring(key.lastIndexOf('[') + 1, key.lastIndexOf(']')));
+                String vocabText = request.getParameter(key);
+                if (vocabText != null && !vocabText.isEmpty()) {
+                    String[] parts = vocabText.split(":");
+                    if (parts.length == 4) {
+                        Vocabulary vocab = new Vocabulary();
+                        vocab.setWord(parts[0].trim());
+                        vocab.setMeaning(parts[1].trim());
+                        vocab.setReading(parts[2].trim());
+                        vocab.setExample(parts[3].trim());
+                        vocab.setLessonID(lessonId);
+
+                        // Xử lý ảnh từ vựng
+                        Part imagePart = request.getPart("lessons[" + lessonIndex + "][vocabImage][" + vocabIndex + "]");
+                        if (imagePart != null && imagePart.getSize() > 0) {
+                            String originalName = imagePart.getSubmittedFileName();
+                            if (originalName != null && !originalName.isEmpty()) {
+                                if (!isValidImage(originalName)) {
+                                    throw new IllegalArgumentException("Hình ảnh từ vựng không hợp lệ: " + originalName + ". Chỉ chấp nhận jpg, jpeg, png, gif.");
+                                }
+                                String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
+                                String savedFileName = vocab.getWord().replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ext;
+                                String savePath = imgVocabDir + File.separator + savedFileName;
+                                saveFile(imagePart, savePath);
+                                // Chỉ lưu tên file vào database
+                                vocab.setImagePath(savedFileName);
+                            }
+                        }
+
+                        vocabDao.add(vocab);
+                    } else {
+                        throw new IllegalArgumentException("Định dạng từ vựng không đúng: " + vocabText + ". Yêu cầu Word:Meaning:Reading:Example");
+                    }
                 }
             }
         }
@@ -277,5 +314,32 @@ public class CreateCourseServlet extends HttpServlet {
             }
         }
         return "";
+    }
+
+    private void saveFile(Part part, String savePath) throws IOException {
+        try (InputStream is = part.getInputStream();
+             FileOutputStream os = new FileOutputStream(savePath)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+
+    private boolean isValidImage(String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".jpg") || lowerCaseFileName.endsWith(".jpeg") ||
+               lowerCaseFileName.endsWith(".png") || lowerCaseFileName.endsWith(".gif");
+    }
+
+    private boolean isValidVideo(String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".mp4") || lowerCaseFileName.endsWith(".avi") ||
+               lowerCaseFileName.endsWith(".mov");
+    }
+
+    private boolean isValidPDF(String fileName) {
+        return fileName.toLowerCase().endsWith(".pdf");
     }
 }
