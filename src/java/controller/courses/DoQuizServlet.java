@@ -16,26 +16,54 @@ public class DoQuizServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String lessonIdRaw = request.getParameter("lessonId");
         if (lessonIdRaw == null) {
             response.sendRedirect("HomeServlet");
             return;
         }
 
-        int lessonId = Integer.parseInt(lessonIdRaw);
+        int lessonId;
+        try {
+            lessonId = Integer.parseInt(lessonIdRaw);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("HomeServlet");
+            return;
+        }
 
         List<QuizQuestion> questions = QuizService.loadQuizWithAnswers(lessonId);
+
+        if (questions == null || questions.isEmpty()) {
+            // Có thể redirect hoặc báo lỗi hiển thị thông báo
+            request.setAttribute("errorMsg", "Bài học này chưa có quiz.");
+            request.getRequestDispatcher("do-quiz.jsp").forward(request, response);
+            return;
+        }
+
+        int courseId = QuizService.getCourseIdByLessonId(lessonId);
+
         request.setAttribute("questions", questions);
         request.setAttribute("lessonId", lessonId);
+        request.setAttribute("courseId", courseId);
         request.getRequestDispatcher("do-quiz.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String lessonIdRaw = request.getParameter("lessonId");
+        if (lessonIdRaw == null) {
+            response.sendRedirect("HomeServlet");
+            return;
+        }
 
-        int lessonId = Integer.parseInt(request.getParameter("lessonId"));
+        int lessonId;
+        try {
+            lessonId = Integer.parseInt(lessonIdRaw);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("HomeServlet");
+            return;
+        }
+
         List<QuizQuestion> questions = QuizService.loadQuizWithAnswers(lessonId);
 
         int score = 0;
@@ -49,9 +77,18 @@ public class DoQuizServlet extends HttpServlet {
             }
         }
 
+        // Lấy courseId từ form hoặc từ service
+        String courseIdParam = request.getParameter("courseId");
+        int courseId = (courseIdParam != null && !courseIdParam.isEmpty())
+                ? Integer.parseInt(courseIdParam)
+                : QuizService.getCourseIdByLessonId(lessonId);
+
         request.setAttribute("total", questions.size());
         request.setAttribute("score", score);
         request.setAttribute("lessonId", lessonId);
+        request.setAttribute("courseId", courseId);
+        request.setAttribute("questions", questions); 
+
         request.getRequestDispatcher("quiz-result.jsp").forward(request, response);
     }
 }

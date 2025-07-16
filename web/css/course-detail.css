@@ -126,6 +126,40 @@ body {
     padding: 1rem 1.25rem;
 }
 
+/* ===== Mô tả bài học (preview) ===== */
+.lesson-description-preview {
+    background: #f5fafd;
+    border-left: 4px solid #e94f64;
+    padding: 14px 18px;
+    border-radius: 7px;
+    font-size: 1.04rem;
+    color: #333;
+    margin-bottom: 0;
+    margin-top: 8px;
+}
+
+/* ===== Phần trăm hoàn thành bài học ===== */
+.lesson-progress {
+    margin-top: 14px;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+.lesson-progress .progress {
+    height: 18px;
+    background-color: #e9ecef;
+    border-radius: 12px;
+    box-shadow: none;
+    margin-top: 6px;
+}
+.lesson-progress .progress-bar {
+    font-weight: 600;
+    font-size: 0.95rem;
+    background-color: #1fbe6f !important; /* xanh lá nổi bật */
+    color: #fff;
+    border-radius: 12px;
+    transition: width 0.4s;
+}
+
 /* ===== Thông tin khóa học ===== */
 .course-card {
     background-color: #ffffff;

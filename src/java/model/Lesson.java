@@ -1,18 +1,18 @@
 package model;
 
 public class Lesson {
+
     private int lessonID;
     private int courseID;
     private String title;
     private boolean isHidden;
-
-    // ✅ Thêm thuộc tính mô tả
     private String description;
+    private int orderIndex;
 
-    // ✅ Constructor mặc định
-    public Lesson() {}
+    public Lesson() {
+    }
 
-    // ✅ Constructor đầy đủ có cả mô tả
+    // ✅ Constructor 5 tham số (không có orderIndex) để code cũ dùng
     public Lesson(int lessonID, int courseID, String title, boolean isHidden, String description) {
         this.lessonID = lessonID;
         this.courseID = courseID;
@@ -21,12 +21,14 @@ public class Lesson {
         this.description = description;
     }
 
-    // ✅ Constructor cũ (nếu bạn vẫn dùng ở chỗ khác)
-    public Lesson(int lessonID, int courseID, String title, boolean isHidden) {
+    // ✅ Constructor 6 tham số (có orderIndex)
+    public Lesson(int lessonID, int courseID, String title, boolean isHidden, String description, int orderIndex) {
         this.lessonID = lessonID;
         this.courseID = courseID;
         this.title = title;
         this.isHidden = isHidden;
+        this.description = description;
+        this.orderIndex = orderIndex;
     }
 
     public int getLessonID() {
@@ -61,12 +63,19 @@ public class Lesson {
         this.isHidden = isHidden;
     }
 
-    // ✅ Getter/Setter cho mô tả
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
     }
 }

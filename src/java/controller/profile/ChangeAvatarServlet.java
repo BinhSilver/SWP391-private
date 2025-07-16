@@ -2,6 +2,8 @@ package controller.profile;
 
 import Dao.UserDAO;
 import model.User;
+import config.S3Util;
+import com.cloudinary.Cloudinary;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -9,8 +11,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.HashMap;
 
 @WebServlet("/changeAvatar")
 @MultipartConfig(
@@ -47,10 +50,25 @@ public class ChangeAvatarServlet extends HttpServlet {
                 return;
             }
 
-            // Lưu avatar vào DB
-            InputStream avatarStream = filePart.getInputStream();
+            // Upload ảnh lên S3
+            java.io.InputStream is = filePart.getInputStream();
+            long size = filePart.getSize();
+            String originalFileName = filePart.getSubmittedFileName();
+            String key = "avatars/user_" + user.getUserID();
+            if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                key += ".jpg";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                key += ".png";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".gif")) {
+                key += ".gif";
+            }
+            String contentType = filePart.getContentType();
+            String avatarUrl = config.S3Util.uploadFile(is, size, key, contentType);
+
+            // Cập nhật URL avatar trong database
             UserDAO dao = new UserDAO();
-            dao.updateAvatarBlob(user.getUserID(), avatarStream);
+            dao.updateAvatar(user.getUserID(), avatarUrl);
+
             // Cập nhật lại avatar cho user trong session
             user = dao.getUserById(user.getUserID());
             session.setAttribute("authUser", user);

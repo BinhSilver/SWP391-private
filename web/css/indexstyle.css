@@ -87,6 +87,7 @@ body {
 
 .nav-links a:hover {
     color: #e94f64;
+    
 }
 
 .auth-links {
@@ -236,7 +237,7 @@ body {
     left: 100%;
 }
 
-@keyframes streak {
+/*@keyframes streak {
     0% {
         transform: translate(-100vw, -100vh) rotate(45deg);
         opacity: 1;
@@ -248,7 +249,7 @@ body {
         transform: translate(100vw, 100vh) rotate(45deg);
         opacity: 0;
     }
-}
+}*/
 
 /* Featured Courses */
 .featured-courses {
@@ -425,4 +426,45 @@ body {
     font-size: 0.75rem;
     font-weight: 700;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.search-container {
+    position: relative; /* Đặt search-container làm tham chiếu cho định vị tuyệt đối */
+}
+
+#searchResults {
+    position: absolute;
+    top: 100%; /* Đặt ngay dưới thanh tìm kiếm */
+    left: 0;
+    right: 0;
+    width: 100%; /* Khớp chiều rộng với thanh tìm kiếm */
+    max-height: 300px; /* Giới hạn chiều cao */
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung vượt quá */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Đảm bảo hiển thị trên các phần tử khác */
+}
+
+#searchResults .list-group {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+#searchResults .list-group-item {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+#searchResults .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#searchResults .list-group-item:hover {
+    background-color: #f8f9fa;
 }

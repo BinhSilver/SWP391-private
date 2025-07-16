@@ -25,10 +25,12 @@ public class User {
     private String japaneseLevel;
     private String address;
     private String country;
-    private byte[] avatar;
+    private String avatar;
     private String gender;
+    private boolean isTeacherPending;
+    private String certificatePath;
 
-    public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, byte[] avatar, String gender) {
+    public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, String avatar, String gender) {
         this.userID = userID;
         this.roleID = roleID;
         this.email = email;
@@ -63,7 +65,7 @@ public class User {
     public User(int userID, int roleID, String email, String passwordHash, String googleID,
             String fullName, Date createdAt, boolean isActive, boolean isLocked,
             Date birthDate, String phoneNumber, String japaneseLevel, String address,
-            String country, byte[] avatar) {
+            String country, String avatar) {
         this.userID = userID;
         this.roleID = roleID;
         this.email = email;
@@ -130,17 +132,47 @@ public class User {
         this.country = country;
     }
 
-    public byte[] getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(byte[] avatar) {
+    public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public boolean isTeacherPending() {
+        return isTeacherPending;
+    }
+    public void setTeacherPending(boolean isTeacherPending) {
+        this.isTeacherPending = isTeacherPending;
+    }
+    public String getCertificatePath() {
+        return certificatePath;
+    }
+    public void setCertificatePath(String certificatePath) {
+        this.certificatePath = certificatePath;
     }
 
     @Override
     public String toString() {
-        return "User{" + "userID=" + userID + ", roleID=" + roleID + ", email=" + email + ", passwordHash=" + passwordHash + ", googleID=" + googleID + ", fullName=" + fullName + ", createdAt=" + createdAt + ", isActive=" + isActive + ", isLocked=" + isLocked + ", birthDate=" + birthDate + ", phoneNumber=" + phoneNumber + ", japaneseLevel=" + japaneseLevel + ", address=" + address + ", country=" + country + ", avatar=" + java.util.Arrays.toString(avatar) + ", gender=" + gender + '}';
+        return "User{" +
+                "userID=" + userID +
+                ", roleID=" + roleID +
+                ", email='" + email + '\'' +
+                ", isTeacherPending=" + isTeacherPending +
+                ", certificatePath='" + certificatePath + '\'' +
+                ", fullName=" + fullName +
+                ", createdAt=" + createdAt +
+                ", isActive=" + isActive +
+                ", isLocked=" + isLocked +
+                ", birthDate=" + birthDate +
+                ", phoneNumber=" + phoneNumber +
+                ", japaneseLevel=" + japaneseLevel +
+                ", address=" + address +
+                ", country=" + country +
+                ", avatar=" + avatar +
+                ", gender=" + gender +
+                '}';
     }
 
   

@@ -9,6 +9,16 @@ import java.util.Date;
 import model.User;
 import Dao.UserDAO;
 import jakarta.servlet.annotation.MultipartConfig;
+// import java.util.HashMap;
+// import java.util.Map;
+// import com.cloudinary.Cloudinary;
+// import config.CloudinaryUtil;
+// import java.io.File;
+// import java.io.FileOutputStream;
+import java.io.InputStream;
+import com.cloudinary.Cloudinary;
+import java.util.Map;
+import config.S3Util;
 
 @WebServlet("/editprofile")
 @MultipartConfig
@@ -62,18 +72,36 @@ public class EditProfileServlet extends HttpServlet {
 
             Part filePart = request.getPart("avatar");
             if (filePart != null && filePart.getSize() > 0) {
-                byte[] avatarBytes = filePart.getInputStream().readAllBytes();
-                currentUser.setAvatar(avatarBytes);
+                try {
+                    java.io.InputStream is = filePart.getInputStream();
+                    long size = filePart.getSize();
+                    String originalFileName = filePart.getSubmittedFileName();
+                    String key = "avatars/user_" + currentUser.getUserID();
+                    if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                        key += ".jpg";
+                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                        key += ".png";
+                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".gif")) {
+                        key += ".gif";
+                    }
+                    String contentType = filePart.getContentType();
+                    String avatarUrl = config.S3Util.uploadFile(is, size, key, contentType);
+                    currentUser.setAvatar(avatarUrl);
+                    System.out.println("[AvatarUpload] Upload thành công S3: " + avatarUrl);
+                } catch (Exception e) {
+                    System.err.println("[AvatarUpload] Lỗi upload avatar S3: " + e.getMessage());
+                }
             }
 
             UserDAO dao = new UserDAO();
             boolean success = dao.updateProfile(currentUser);
 
             if (success) {
-                session.setAttribute("authUser", currentUser); // Cập nhật session
-                // Điều hướng về trang xem hồ sơ (profile-view.jsp)
-                request.getRequestDispatcher("/Profile/profile-view.jsp").forward(request, response);
-
+                // Cập nhật session với thông tin mới
+                session.setAttribute("authUser", currentUser);
+                
+                // Redirect về ProfileServlet để load đầy đủ thông tin bao gồm cả Premium
+                response.sendRedirect(request.getContextPath() + "/profile");
             } else {
                 // Nếu cập nhật thất bại, chuyển về trang chỉnh sửa và hiển thị lỗi
                 request.setAttribute("error", "Cập nhật không thành công.");

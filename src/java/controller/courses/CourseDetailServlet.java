@@ -5,6 +5,7 @@ import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
 import Dao.QuizDAO;
 import Dao.LessonAccessDAO;
+import Dao.ProgressDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -12,9 +13,12 @@ import model.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(name = "CourseDetailServlet", urlPatterns = {"/CourseDetailServlet"})
 public class CourseDetailServlet extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(CourseDetailServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,14 +44,31 @@ public class CourseDetailServlet extends HttpServlet {
         LessonsDAO lessonDAO = new LessonsDAO();
         LessonMaterialsDAO materialDAO = new LessonMaterialsDAO();
         QuizDAO quizDAO = new QuizDAO();
-        LessonAccessDAO accessDAO = new LessonAccessDAO();  // NEW
+        LessonAccessDAO accessDAO = new LessonAccessDAO();
+        ProgressDAO progressDAO = new ProgressDAO();
 
         // 3. Lấy thông tin khóa học
+        LOGGER.log(Level.INFO, "Loading course details for ID: {0}", courseID);
         Course course = courseDAO.getCourseByID(courseID);
         if (course == null) {
             request.setAttribute("error", "Không tìm thấy khóa học.");
             request.getRequestDispatcher("course-detail.jsp").forward(request, response);
             return;
+        }
+
+        // 7. Lấy user từ session
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("authUser");
+        request.setAttribute("currentUser", currentUser);
+
+        // Kiểm tra quyền truy cập khóa học
+        if (currentUser != null && currentUser.getRoleID() == 3) {
+            // Nếu là giáo viên, chỉ cho phép xem khóa học do mình tạo
+            if (course.getCreatedBy() != currentUser.getUserID()) {
+                request.setAttribute("error", "Bạn không có quyền truy cập khóa học này.");
+                request.getRequestDispatcher("course-detail.jsp").forward(request, response);
+                return;
+            }
         }
 
         // 4. Lấy danh sách bài học
@@ -63,19 +84,48 @@ public class CourseDetailServlet extends HttpServlet {
             quizMap.put(lesson.getLessonID(), quizQuestions);
         }
 
-        // 7. Lấy user từ session
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("authUser");
-        request.setAttribute("currentUser", currentUser);
-
         // 8. Lấy danh sách bài học đã "vào học" từ DB (persistent)
         Set<Integer> accessedLessons = new HashSet<>();
+        boolean hasAccessedCourse = false;
         if (currentUser != null) {
             accessedLessons = accessDAO.getAccessedLessons(currentUser.getUserID());
+            hasAccessedCourse = accessDAO.hasUserAccessedCourse(currentUser.getUserID(), courseID);
+            
+            // 9. Get progress information
+            Map<Integer, Integer> lessonCompletionMap = progressDAO.getLessonCompletionMap(currentUser.getUserID(), courseID);
+            List<Integer> completedLessons = progressDAO.getCompletedLessons(currentUser.getUserID(), courseID);
+            int overallProgress = progressDAO.getCourseCompletionPercentage(currentUser.getUserID(), courseID);
+            
+            // Create a map of lesson unlock status
+            Map<Integer, Boolean> lessonUnlockStatus = new HashMap<>();
+            for (Lesson lesson : lessons) {
+                boolean isUnlocked = progressDAO.isLessonUnlocked(
+                        currentUser.getUserID(), courseID, lesson.getLessonID(), lessons);
+                lessonUnlockStatus.put(lesson.getLessonID(), isUnlocked);
+            }
+            
+            request.setAttribute("lessonCompletionMap", lessonCompletionMap);
+            request.setAttribute("completedLessons", completedLessons);
+            request.setAttribute("overallProgress", overallProgress);
+            request.setAttribute("completed", overallProgress == 100 ? 1 : 0); // Thêm dòng này để JSP nhận biết đã hoàn thành
+            request.setAttribute("lessonUnlockStatus", lessonUnlockStatus);
+            
+            LOGGER.log(Level.INFO, "User {0} progress for course {1}: {2}%", 
+                    new Object[]{currentUser.getUserID(), courseID, overallProgress});
         }
         request.setAttribute("accessedLessons", accessedLessons);
+        request.setAttribute("hasAccessedCourse", hasAccessedCourse);
 
-        // 9. Đẩy dữ liệu về trang JSP
+        // 11. Lấy danh sách feedback cho khóa học
+        try (java.sql.Connection conn = DB.JDBCConnection.getConnection()) {
+            Dao.FeedbackDAO feedbackDAO = new Dao.FeedbackDAO(conn);
+            List<model.Feedback> feedbacks = feedbackDAO.getFeedbacksByCourseId(courseID);
+            request.setAttribute("feedbacks", feedbacks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 10. Đẩy dữ liệu về trang JSP
         request.setAttribute("course", course);
         request.setAttribute("lessons", lessons);
         request.setAttribute("lessonMaterialsMap", lessonMaterialsMap);

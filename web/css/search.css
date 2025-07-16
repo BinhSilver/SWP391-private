@@ -1,0 +1,163 @@
+.search-page .search-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.search-page .section-title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #e94f64;
+    border-left: 4px solid #e94f64;
+    padding-left: 12px;
+}
+
+.search-page .search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.search-page #searchInput {
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 1200px;
+    height: 50px;
+    font-size: 1.5rem;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.search-page .search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #fff;
+    border: 1px solid #e94f64;
+    border-radius: 5px;
+    max-height: 600px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.search-page .search-result {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: default;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    height: 200px;
+    margin-bottom: 3px;
+    box-sizing: border-box;
+}
+#search-resultt {
+margin-left: 5px;
+}
+
+.search-page .search-result:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.search-page .search-result img {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* Điều chỉnh đặc biệt cho "Không tìm thấy kết quả" */
+.search-page .search-result.text-left {
+    display: block !important; /* Override flex với độ ưu tiên cao */
+    text-align: left !important; /* Căn lề trái với độ ưu tiên cao */
+    height: auto !important; /* Loại bỏ chiều cao cố định */
+    padding: 15px !important; /* Điều chỉnh padding */
+    width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+    box-sizing: border-box;
+}
+
+/* Ẩn các phần tử không cần thiết khi là thông báo */
+.search-page .search-result.text-left img,
+.search-page .search-result.text-left .vocab-details {
+    display: none !important;
+}
+
+.search-page .vocab-details {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-page .vocab-details div {
+    margin: 2px 0;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.search-page .vocab-details .label {
+    font-weight: 600;
+    color: #666;
+}
+
+.search-page .vocab-details .value {
+    color: #333;
+}
+
+.search-page .play-btn {
+    background-color: #ff8a80;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5px;
+}
+
+.search-page .play-btn:hover {
+    background-color: #ff6e60;
+}
+
+.search-page .play-btn i {
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .search-page .search-container {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .search-page #searchInput {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .search-page .search-dropdown {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .search-page .search-result {
+        width: 100%;
+        max-width: 100%;
+    }
+}

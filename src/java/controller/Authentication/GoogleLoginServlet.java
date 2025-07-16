@@ -31,4 +31,3 @@ public class GoogleLoginServlet extends HttpServlet {
         response.sendRedirect(url);
     }
 }
-

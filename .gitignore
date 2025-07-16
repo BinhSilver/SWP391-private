@@ -1,55 +1,66 @@
-# NetBeans IDE
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.netbeans/
-*.orig
-src/DB/db.properties
+# Ignore everything by default
+*
 
-# Cache files
+# Allow specific directories and files
+!src/
+!web/
+!web/**
+!Wasabii.sql
+!.gitignore
+!nbproject/
+!nbproject/**
+!src/java/
+!src/java/**
+
+
+# Nhưng vẫn ignore nbproject/private và mọi file bên trong
+nbproject/private/
+
+# But still ignore specific files within allowed directories
+src/java/DB/db.properties
+src/java/resources/
+src/java/DB/JDBCConnection.java
+lib/
+
+# Ignore build artifacts and IDE files
 *.class
 *.log
 *.ctxt
 *.jar
 *.war
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# IDE settings (optional)
+*.orig
 *.iml
 *.ipr
 *.iws
-
-# Maven/Gradle (nếu dùng thêm)
-target/
-.gradle/
-build/
-
-# Ant output folders (thường là 'build/' và 'dist/')
-build/
-dist/
-
-# Backup and temporary files
 *~
 *.bak
 *.swp
 *.tmp
 *.swo
-
-# Java-specific
 hs_err_pid*
 replay_pid*
 
-# VS Code (nếu dùng song song)
-.vscode/
+# OS-specific files
+.DS_Store
+Thumbs.db
 
-# Ignore JDBCConnection.java
-src/java/DB/JDBCConnection.java
+# IDE directories
+.vscode/
+target/
+.gradle/
+build/
+dist/
+nbbuild/
+nbdist/
+.netbeans/
 
 # Ignore build.xml
 build.xml
 
+# Allow specific files within web directory
+!web/js/
+!web/js/*
+
+# Cho phép folder config và tất cả file bên trong
+!src/java/config/
+!src/java/config/**
