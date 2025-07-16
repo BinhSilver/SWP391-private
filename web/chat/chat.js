@@ -430,7 +430,7 @@ function updateUserList(users) {
             li.onclick = function () {
                 selectChatUser(user.userID, user.fullName);
             };
-            li.innerHTML = "<img src='" + getResourceUrl(RESOURCE_CONFIG.AVATAR_PATH + "nam.jpg") + "' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
+            li.innerHTML = "<img src='" + window.contextPath + "/avatar?userId=" + user.userID + "&v=" + (user.avatar ? user.avatar.hashCode ? user.avatar.hashCode() : Date.now() : Date.now()) + "' alt='Avatar' style='width: 48px; height: 48px; border-radius: 50%;'>" +
                     "<strong>" + user.fullName + "</strong>";
             userList.appendChild(li);
         }

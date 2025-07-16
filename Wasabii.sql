@@ -292,14 +292,15 @@ CREATE TABLE Feedbacks (
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
     Content NVARCHAR(MAX),
-    CreatedAt DATETIME DEFAULT GETDATE()
+    CreatedAt DATETIME DEFAULT GETDATE(),
+	Rating INT CHECK (Rating BETWEEN 1 AND 5) NOT NULL DEFAULT 5
 );
 
 CREATE TABLE FeedbackVotes (
     VoteID INT PRIMARY KEY IDENTITY,
     FeedbackID INT FOREIGN KEY REFERENCES Feedbacks(FeedbackID),
-    UserID INT FOREIGN KEY REFERENCES Users(UserID)
-	VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+	VoteType INT CHECK (VoteType IN (1, -1)) -- 1: like, -1: dislike
 );
 
 CREATE TABLE CourseRatings (
@@ -311,10 +312,6 @@ CREATE TABLE CourseRatings (
     RatedAt DATETIME DEFAULT GETDATE()
 );
 
-ALTER TABLE Feedbacks ADD CourseID INT FOREIGN KEY REFERENCES Courses(CourseID), IsDeleted BIT DEFAULT 0;
-ALTER TABLE Feedbacks DROP COLUMN LessonID; -- Nếu feedback chỉ cho khóa học
-ALTER TABLE FeedbackVotes ADD VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
-
 CREATE TABLE Progress (
     ProgressID INT PRIMARY KEY IDENTITY,
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
@@ -323,6 +320,7 @@ CREATE TABLE Progress (
     CompletionPercent INT CHECK (CompletionPercent BETWEEN 0 AND 100),
     LastAccessed DATETIME DEFAULT GETDATE()
 );
+
 
 -- =========================
 -- 3. SEED DATA
