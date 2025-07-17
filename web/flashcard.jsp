@@ -82,12 +82,6 @@
             </div>
         </c:if>
 
-        <!-- Debug info -->
-        <div class="alert alert-info">
-            <p>Debug: userFlashcards size = ${userFlashcards.size()}</p>
-            <p>Debug: courseFlashcards size = ${courseFlashcards.size()}</p>
-        </div>
-
         <!-- My Flashcards Section -->
         <div class="row mb-5">
             <div class="col-12">

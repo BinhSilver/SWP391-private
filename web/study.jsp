@@ -393,7 +393,7 @@
                                 <div class="file-viewer position-relative">
                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
                                     <video controls preload="metadata">
-                                        <source src="${pageContext.request.contextPath}/${m.filePath}" type="video/mp4">
+                                        <source src="files/lesson8_grammarVideo_1752740459670.mp4" type="video/mp4">
                                         Trình duyệt của bạn không hỗ trợ video.
                                     </video>
                                 </div>

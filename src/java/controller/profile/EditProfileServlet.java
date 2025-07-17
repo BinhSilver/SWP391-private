@@ -16,7 +16,6 @@ import jakarta.servlet.annotation.MultipartConfig;
 // import java.io.File;
 // import java.io.FileOutputStream;
 import java.io.InputStream;
-import com.cloudinary.Cloudinary;
 import java.util.Map;
 import config.S3Util;
 
