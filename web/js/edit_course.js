@@ -139,6 +139,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateQuizQuestionIndices();
     }
 
+    // --- QUIZ QUESTION TEMPLATE (đồng bộ với update_course.jsp) ---
+    // Sử dụng template từ update_course.jsp, đảm bảo các trường input, select, collapse, delete button đều có
     // --- ADD QUESTION BLOCK ---
     function addQuestionBlock(index, questionData = {}) {
         let html = quizQuestionTemplate.innerHTML
@@ -151,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
         wrapper.innerHTML = html.trim();
         const block = wrapper.firstElementChild;
 
+        // Populate data if available
         if (questionData.question) {
             block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][question]"]`).value = questionData.question || '';
             block.querySelector(`[name="lessons[${activeQuizLessonIndex}][questions][${index}][optionA]"]`).value = questionData.optionA || '';
@@ -175,20 +178,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (h6) {
                 h6.textContent = `Câu hỏi ${idx + 1}`;
             }
-
             let toggleBtn = block.querySelector('.quiz-collapse-toggle');
             if (toggleBtn) {
                 toggleBtn.dataset.bsTarget = `#questionCollapse-${activeQuizLessonIndex}-${idx}`;
                 toggleBtn.setAttribute('aria-controls', `questionCollapse-${activeQuizLessonIndex}-${idx}`);
             }
-
             let collapse = block.querySelector('.collapse');
             if (collapse) {
                 collapse.id = `questionCollapse-${activeQuizLessonIndex}-${idx}`;
             }
-
             block.querySelectorAll('[name^="lessons["]').forEach(input => {
-                input.name = input.name.replace(/lessons\[\d+]\[questions]\[\d+]/, `lessons[${activeQuizLessonIndex}][questions][${idx}]`);
+                input.name = input.name.replace(/lessons\[\d+\]\[questions\]\[\d+\]/, `lessons[${activeQuizLessonIndex}][questions][${idx}]`);
             });
         });
     }
@@ -464,17 +464,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- ATTACH QUIZ BUTTONS ---
     function attachQuizButtons() {
-        document.querySelectorAll('.btn-toggle-quiz').forEach((btn, idx) => {
-            if (!window.lessonIndexToIdMap[idx]) {
-                btn.classList.add("disabled");
-                btn.title = "Hãy lưu bài học trước khi tạo quiz";
-                btn.onclick = null;
-            } else {
-                btn.classList.remove("disabled");
-                btn.title = "";
-                btn.onclick = function () {
-                    showQuizModalForLesson(idx);
-                };
+        document.querySelectorAll('.btn-toggle-quiz').forEach((btn) => {
+            const lessonIndex = btn.getAttribute('data-lesson-index');
+            if (lessonIndex !== null) {
+                const idx = parseInt(lessonIndex);
+                if (!window.lessonIndexToIdMap || !window.lessonIndexToIdMap[idx]) {
+                    btn.classList.add("disabled");
+                    btn.title = "Hãy lưu bài học trước khi tạo quiz";
+                    btn.onclick = null;
+                } else {
+                    btn.classList.remove("disabled");
+                    btn.title = "";
+                    btn.onclick = function () {
+                        showQuizModalForLesson(idx);
+                    };
+                }
             }
         });
     }
@@ -482,7 +486,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- INITIALIZE ---
     updateLessonIndices();
     attachQuizButtons();
-    window.reattachQuizButtons = attachQuizButtons;
 
     // --- SAVE LESSON ---
     document.addEventListener("click", function (e) {

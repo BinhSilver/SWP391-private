@@ -458,7 +458,7 @@
                                             <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                             <div class="file-viewer position-relative">
                                                 <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu ngữ pháp"></iframe>
+                                                <iframe src="${m.filePath}" title="Tài liệu ngữ pháp"></iframe>
                                             </div>
                                         </div>
                                     </c:if>
@@ -510,7 +510,7 @@
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                                 <div class="file-viewer position-relative">
                                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                    <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu từ vựng"></iframe>
+                                                    <iframe src="${m.filePath}" title="Tài liệu từ vựng"></iframe>
                                                 </div>
                                             </div>
                                         </c:if>
@@ -530,7 +530,7 @@
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                                 <div class="file-viewer position-relative">
                                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                    <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu Kanji"></iframe>
+                                                    <iframe src="${m.filePath}" title="Tài liệu Kanji"></iframe>
                                                 </div>
                                             </div>
                                         </c:if>

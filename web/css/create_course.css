@@ -165,7 +165,11 @@ form select:focus {
 .modal-content {
   border-radius: 1rem;
   border: none;
-  overflow: hidden;
+  /* overflow: hidden; */ /* Đã comment để không chặn thanh cuộn */
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 90vh;
 }
 
 .modal-header {
@@ -181,6 +185,11 @@ form select:focus {
 
 .modal-body {
   padding-top: 0;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto;
+  max-height: 60vh;
 }
 
 /* === THUMBNAIL PREVIEW === */
