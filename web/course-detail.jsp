@@ -326,10 +326,13 @@
                                         </c:if>
                                         
                                         <c:if test="${not empty lessonMaterialsMap[lesson.lessonID]}">
-                                            <p>
-                                                <i class="fas fa-file-alt"></i> 
-                                                ${fn:length(lessonMaterialsMap[lesson.lessonID])} tài liệu
-                                            </p>
+                                            <ul class="list-group list-group-flush mb-2">
+                                                <c:forEach var="mat" items="${lessonMaterialsMap[lesson.lessonID]}">
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                                                        <a href="${mat.filePath}" target="_blank">${mat.title}</a>
+                                                    </li>
+                                                </c:forEach>
+                                            </ul>
                                         </c:if>
                                         
                                         <c:if test="${not empty quizMap[lesson.lessonID]}">

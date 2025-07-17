@@ -89,6 +89,7 @@
                                 <div class="tab-pane fade <c:if test='${loop.first}'>show active</c:if>'" id="lesson-${loop.index}" role="tabpanel" data-lesson-index="${loop.index}">
                                     <div class="lesson-block border p-3 rounded mb-3" data-lesson-index="${loop.index}">
                                         <input type="hidden" name="lessons[${loop.index}][id]" value="${lesson.lessonID}" />
+                                        <input type="hidden" name="lessonIndex_${lesson.lessonID}" value="${loop.index}" />
                                         <input type="hidden" name="lessons[${loop.index}][orderIndex]" value="${loop.index}" class="lesson-order-index" />
 
                                         <h6 class="fw-semibold mb-3">Lesson ${loop.index + 1}</h6>
@@ -168,7 +169,7 @@
                                                     <c:forEach var="mat" items="${materials}">
                                                         <c:if test="${mat.materialType == type}">
                                                             <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                                                                <a href="<c:url value='/${mat.filePath}'/>" target="_blank">${mat.title}</a>
+                                                                <a href="${mat.filePath}" target="_blank">${mat.title}</a>
                                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-delete-file"
                                                                         data-material-id="${mat.materialID}" data-lesson-index="${loop.index}">
                                                                     <i class="fa-solid fa-times"></i>
@@ -238,6 +239,7 @@
         <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
             <div class="lesson-block border p-3 rounded mb-3" data-lesson-index="{{index}}">
                 <input type="hidden" name="lessons[{{index}}][id]" value="" />
+                <input type="hidden" name="lessonIndex_${lesson.lessonID}" value="{{index}}" />
                 <input type="hidden" name="lessons[{{index}}][orderIndex]" value="{{index}}" class="lesson-order-index" />
 
                 <h6 class="fw-semibold mb-3">Lesson {{indexLabel}}</h6>
