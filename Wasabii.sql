@@ -165,7 +165,12 @@ CREATE TABLE GrammarPoints (
 CREATE TABLE Flashcards (
     FlashcardID INT PRIMARY KEY IDENTITY,
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    Title NVARCHAR(100)
+    Title NVARCHAR(100),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+    IsPublic BIT DEFAULT 0,
+    Description NVARCHAR(500),
+    CoverImage NVARCHAR(500)
 );
 
 CREATE TABLE FlashcardItems (
@@ -173,8 +178,15 @@ CREATE TABLE FlashcardItems (
     FlashcardID INT FOREIGN KEY REFERENCES Flashcards(FlashcardID),
     VocabID INT NULL FOREIGN KEY REFERENCES Vocabulary(VocabID),
     UserVocabID INT NULL FOREIGN KEY REFERENCES UserVocabulary(UserVocabID),
-    Note NVARCHAR(255)
+    Note NVARCHAR(255),
+    FrontContent NVARCHAR(500),
+    BackContent NVARCHAR(500),
+    FrontImage NVARCHAR(500),
+    BackImage NVARCHAR(500),
+    OrderIndex INT DEFAULT 0
 );
+
+
 
 CREATE TABLE Quizzes (
     QuizID INT PRIMARY KEY IDENTITY,
