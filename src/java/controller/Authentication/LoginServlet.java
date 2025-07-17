@@ -20,7 +20,6 @@ import model.User;
 import service.PasswordService;
 import jakarta.servlet.http.Part;
 import config.S3Util;
-import com.cloudinary.Cloudinary;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 @MultipartConfig
@@ -92,7 +91,12 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.getUserByEmail(email);
 
-        if (user != null && checkPassword(password, user.getPasswordHash())) {           
+        if (user != null && checkPassword(password, user.getPasswordHash())) {  
+            if (!user.isActive()) {  // Sử dụng phương thức getter isActive() nếu trường là boolean
+                request.setAttribute("message", "Tài khoản đã bị khóa, vui lòng liên hệ admin để mở khóa");
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                return;
+            }         
             User fullUser = null;
             try {
                 fullUser = dao.getUserById(user.getUserID());
