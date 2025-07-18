@@ -334,3 +334,233 @@ h4.text-dark {
     color: #aaa;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* ==== CSS chuyển từ course-detail.jsp ==== */
+iframe.pdf-frame {
+    width: 100%;
+    height: 1900px;
+    border: none;
+    border-radius: 12px;
+    display: block;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    background-color: #e94f64; /* Thay đổi màu từ xanh sang hồng */
+}
+
+.btn-continue {
+    background-color: #e94f64;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-continue:hover {
+    background-color: #d43e55;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(233, 79, 100, 0.25);
+    text-decoration: none;
+}
+
+.btn-back {
+    background-color: #f28faa;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-back:hover {
+    background-color: #e17a95;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(242, 143, 170, 0.25);
+    text-decoration: none;
+}
+
+.btn-back i, .btn-continue i {
+    margin-right: 8px;
+}
+
+.course-title {
+    color: #e94f64 !important;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    letter-spacing: -0.5px;
+}
+
+.course-title:hover {
+    color: #d43e55 !important;
+    text-shadow: 0 0 1px rgba(233, 79, 100, 0.3);
+}
+
+/* === Lesson List UI Enhancement === */
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 32px;
+}
+
+.lesson-item {
+    position: relative;
+    border: 1.5px solid #f3c2cc;
+    border-radius: 14px;
+    margin-bottom: 0;
+    padding: 22px 28px 18px 28px;
+    background: linear-gradient(120deg, #fff 80%, #fbe9ed 100%);
+    box-shadow: 0 2px 16px 0 rgba(233, 79, 100, 0.07), 0 1.5px 6px 0 rgba(0,0,0,0.03);
+    transition: box-shadow 0.3s, border-color 0.3s, transform 0.2s;
+    overflow: hidden;
+}
+.lesson-item:hover {
+    box-shadow: 0 6px 24px 0 rgba(233, 79, 100, 0.18), 0 2px 8px 0 rgba(0,0,0,0.06);
+    border-color: #e94f64;
+    transform: translateY(-2px) scale(1.01);
+    background: linear-gradient(120deg, #fff 60%, #ffe3ea 100%);
+}
+
+.lesson-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.lesson-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbe9ed 60%, #e94f64 100%);
+    color: #e94f64;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 2px 8px rgba(233, 79, 100, 0.10);
+}
+.lesson-title {
+    margin: 0;
+    font-size: 1.13rem;
+    font-weight: 600;
+    color: #e94f64;
+    letter-spacing: -0.5px;
+}
+.lesson-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.status-badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.93em;
+    font-weight: 600;
+    margin-left: 0;
+    box-shadow: 0 1px 4px rgba(233, 79, 100, 0.07);
+    border: 1.5px solid #f3c2cc;
+}
+.status-completed {
+    background: linear-gradient(90deg, #e0ffe7 60%, #b6f5c6 100%);
+    color: #1e7e34;
+    border-color: #b6f5c6;
+}
+.status-in-progress {
+    background: linear-gradient(90deg, #fffbe7 60%, #ffe9a7 100%);
+    color: #856404;
+    border-color: #ffe9a7;
+}
+.status-locked {
+    background: linear-gradient(90deg, #ffeaea 60%, #ffd6d6 100%);
+    color: #e94f64;
+    border-color: #ffd6d6;
+}
+.lesson-content {
+    margin-top: 10px;
+    padding-left: 46px;
+    color: #444;
+    font-size: 1.01rem;
+}
+.lesson-description {
+    margin-bottom: 8px;
+    color: #6c757d;
+    font-style: italic;
+}
+.lesson-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.locked-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(233, 79, 100, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    z-index: 2;
+    pointer-events: all;
+}
+.locked-message {
+    background: #fff6f7;
+    padding: 12px 22px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(233, 79, 100, 0.10);
+    color: #e94f64;
+    font-weight: 500;
+    font-size: 1.01rem;
+}
+.locked-icon {
+    color: #e94f64;
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+.lesson-list ul.list-group {
+    background: transparent;
+    border: none;
+    margin-bottom: 0;
+}
+.lesson-list .list-group-item {
+    background: #fbe9ed;
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    color: #e94f64;
+    font-weight: 500;
+    font-size: 0.98rem;
+    padding: 7px 16px;
+    transition: background 0.2s, color 0.2s;
+}
+.lesson-list .list-group-item a {
+    color: #e94f64;
+    text-decoration: underline dotted;
+}
+.lesson-list .list-group-item a:hover {
+    color: #d43e55;
+    text-decoration: underline solid;
+}

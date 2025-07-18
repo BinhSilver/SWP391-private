@@ -73,13 +73,10 @@
         <script src="${pageContext.request.contextPath}/js/config.js"></script>
         <!-- Các import JS động -->
         <script src="${pageContext.request.contextPath}/js/videocall.js"></script>
-        <!-- Nếu không có cherry-blossom.js thì bỏ dòng dưới, nếu có thì sửa lại đường dẫn động -->
-        <!-- <script src="${pageContext.request.contextPath}/js/cherry-blossom.js"></script> -->
 
         <!-- Scripts -->
 
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-        <script src="<c:url value='/Script/cherry-blossom.js'/>"></script>
     </body>
 </html>
