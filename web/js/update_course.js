@@ -125,21 +125,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function addQuestion() {
         const currentLessonIndex = currentLessonQuizIndexInput.value;
+        if (currentLessonIndex === '' || currentLessonIndex === undefined || isNaN(currentLessonIndex)) {
+            alert("Không xác định bài học.");
+            return;
+        }
         const newIndex = quizQuestionIndexCounter++;
         let templateHtml = document.getElementById('quizQuestionTemplate').innerHTML;
         templateHtml = templateHtml
                 .replace(/{{lessonIndex}}/g, currentLessonIndex)
                 .replace(/{{questionIndex}}/g, newIndex)
                 .replace(/{{questionLabel}}/g, newIndex + 1)
-                .replace(/{{index}}/g, newIndex)  // Thêm dòng này để thay thế {{index}} trong template
+                .replace(/{{index}}/g, newIndex)
                 + `<input type="hidden" class="quiz-time-limit" name="lessons[${currentLessonIndex}][questions][${newIndex}][timeLimit]" value="${document.getElementById('quizTimeLimitInput')?.value || 60}" />`;
-
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = templateHtml;
         const newQuestionBlock = tempDiv.firstElementChild;
         newQuestionBlock.setAttribute('data-question-index', newIndex);
-
-        // Đảm bảo có input timeLimit ẩn
         let timeInput = newQuestionBlock.querySelector('.quiz-time-limit');
         if (!timeInput) {
             timeInput = document.createElement('input');
@@ -149,9 +150,48 @@ document.addEventListener('DOMContentLoaded', function () {
             timeInput.value = document.getElementById('quizTimeLimitInput')?.value || 60;
             newQuestionBlock.appendChild(timeInput);
         }
-
         quizQuestionsContainer.appendChild(newQuestionBlock);
         updateQuestionIndices();
+    }
+
+    function addQuestionBlock(index, questionData = {}) {
+        let html = document.getElementById('quizQuestionTemplate').innerHTML
+            .replace(/{{lessonIndex}}/g, currentLessonQuizIndexInput.value)
+            .replace(/{{questionIndex}}/g, index)
+            .replace(/{{questionLabel}}/g, index + 1)
+            .replace(/{{index}}/g, `${currentLessonQuizIndexInput.value}-${index}`);
+
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = html.trim();
+        const block = wrapper.firstElementChild;
+
+        // Đảm bảo id collapse và các thuộc tính toggle là duy nhất
+        const collapse = block.querySelector('.collapse');
+        const toggleBtn = block.querySelector('.quiz-collapse-toggle');
+        const collapseId = `questionCollapse-${currentLessonQuizIndexInput.value}-${index}`;
+        if (collapse) {
+            collapse.id = collapseId;
+        }
+        if (toggleBtn) {
+            toggleBtn.setAttribute('data-bs-target', `#${collapseId}`);
+            toggleBtn.setAttribute('aria-controls', collapseId);
+        }
+        // Khởi tạo lại Bootstrap Collapse cho phần tử mới
+        if (collapse) {
+            new bootstrap.Collapse(collapse, { toggle: false });
+        }
+
+        // Populate data if available
+        if (questionData) {
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][question]"]`).value = questionData.question || '';
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][optionA]"]`).value = questionData.optionA || '';
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][optionB]"]`).value = questionData.optionB || '';
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][optionC]"]`).value = questionData.optionC || '';
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][optionD]"]`).value = questionData.optionD || '';
+            block.querySelector(`[name="lessons[${currentLessonQuizIndexInput.value}][questions][${index}][answer]"]`).value = questionData.answer || '';
+        }
+
+        quizQuestionsContainer.appendChild(block);
     }
 
     // --- SET QUIZ TIME FOR ALL QUESTIONS ---
@@ -220,84 +260,36 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target.classList.contains('btn-toggle-quiz') || event.target.closest('.btn-toggle-quiz')) {
             const quizButton = event.target.closest('.btn-toggle-quiz');
             const lessonIndex = parseInt(quizButton.getAttribute('data-lesson-index'));
+            // Đảm bảo luôn set lại currentLessonQuizIndexInput.value đúng lesson
             currentLessonQuizIndexInput.value = lessonIndex;
-
             quizQuestionsContainer.innerHTML = '';
-
-                    // Lấy dữ liệu quiz cũ nếu có
-        const lessonData = typeof allCourseData !== 'undefined' && allCourseData && allCourseData.lessons ? allCourseData.lessons[lessonIndex] : null;
-        console.log('[DEBUG] Loading quiz for lesson', lessonIndex, 'lessonData:', lessonData);
-        console.log('[DEBUG] allCourseData structure:', allCourseData);
-        
-        let quizCount = 0;
-        if (lessonData && lessonData.quizzes && Array.isArray(lessonData.quizzes) && lessonData.quizzes.length > 0) {
-            quizCount = lessonData.quizzes.length;
-            console.log('[DEBUG] Found', quizCount, 'questions for lesson', lessonIndex);
-            console.log('[DEBUG] Quiz details:', lessonData.quizzes);
-            
-            // Clear container first
-            quizQuestionsContainer.innerHTML = '';
-            
-                        lessonData.quizzes.forEach((question, qIndex) => {
-                console.log(`[DEBUG] Rendering question ${qIndex + 1}:`, question);
-                
-                let templateHtml = document.getElementById('quizQuestionTemplate').innerHTML;
-                templateHtml = templateHtml
-                        .replace(/{{lessonIndex}}/g, lessonIndex)
-                        .replace(/{{questionIndex}}/g, qIndex)
-                        .replace(/{{questionLabel}}/g, qIndex + 1)
-                        .replace(/{{index}}/g, qIndex)  // Thêm dòng này để thay thế {{index}} trong template
-                        + `<input type="hidden" class="quiz-time-limit" name="lessons[${lessonIndex}][questions][${qIndex}][timeLimit]" value="${question.timeLimit || 60}" />`;
-
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = templateHtml;
-                const newQuestionBlock = tempDiv.firstElementChild;
-                newQuestionBlock.setAttribute('data-question-index', qIndex);
-                
-                // Debug: kiểm tra template đã được thay thế đúng chưa
-                console.log(`[DEBUG] Template for question ${qIndex + 1} rendered successfully`);
-
-                    const idInput = newQuestionBlock.querySelector('input[name*="[id]"]');
-                    const questionTextarea = newQuestionBlock.querySelector('textarea[name*="[question]"]');
-                    const optionAInput = newQuestionBlock.querySelector('input[name*="[optionA]"]');
-                    const optionBInput = newQuestionBlock.querySelector('input[name*="[optionB]"]');
-                    const optionCInput = newQuestionBlock.querySelector('input[name*="[optionC]"]');
-                    const optionDInput = newQuestionBlock.querySelector('input[name*="[optionD]"]');
-                    const answerSelect = newQuestionBlock.querySelector('select[name*="[answer]"]');
-                    
-                    if (idInput) idInput.value = question.id || "";
-                    if (questionTextarea) questionTextarea.value = question.question || "";
-                    if (optionAInput) optionAInput.value = question.optionA || "";
-                    if (optionBInput) optionBInput.value = question.optionB || "";
-                    if (optionCInput) optionCInput.value = question.optionC || "";
-                    if (optionDInput) optionDInput.value = question.optionD || "";
-                    if (answerSelect) answerSelect.value = question.answer || "";
-
-                                    quizQuestionsContainer.appendChild(newQuestionBlock);
-                console.log(`[DEBUG] Added question ${qIndex + 1} to container`);
-
-                // Open first question by default
-                if (qIndex === 0) {
-                    const collapseDiv = newQuestionBlock.querySelector('.collapse');
-                    if (collapseDiv) {
-                        new bootstrap.Collapse(collapseDiv, {toggle: true});
-                    }
-                }
-            });
-            
-            const actualQuizCount = quizQuestionsContainer.querySelectorAll('.quiz-question-block').length;
-            console.log(`[DEBUG] Expected ${quizCount} questions, actually rendered ${actualQuizCount} questions`);
-            quizQuestionIndexCounter = quizCount;
+            // Lấy dữ liệu quiz cũ nếu có
+            const lessonData = typeof allCourseData !== 'undefined' && allCourseData && allCourseData.lessons ? allCourseData.lessons[lessonIndex] : null;
+            let quizCount = 0;
+            if (lessonData && lessonData.quizzes && Array.isArray(lessonData.quizzes) && lessonData.quizzes.length > 0) {
+                quizCount = lessonData.quizzes.length;
+                quizQuestionsContainer.innerHTML = '';
+                lessonData.quizzes.forEach((question, qIndex) => {
+                    let templateHtml = document.getElementById('quizQuestionTemplate').innerHTML;
+                    templateHtml = templateHtml
+                            .replace(/{{lessonIndex}}/g, lessonIndex)
+                            .replace(/{{questionIndex}}/g, qIndex)
+                            .replace(/{{questionLabel}}/g, qIndex + 1)
+                            .replace(/{{index}}/g, qIndex)
+                            + `<input type="hidden" class="quiz-time-limit" name="lessons[${lessonIndex}][questions][${qIndex}][timeLimit]" value="${question.timeLimit || 60}" />`;
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = templateHtml;
+                    const newQuestionBlock = tempDiv.firstElementChild;
+                    newQuestionBlock.setAttribute('data-question-index', qIndex);
+                    quizQuestionsContainer.appendChild(newQuestionBlock);
+                });
+                quizQuestionIndexCounter = quizCount;
             } else {
-                console.log('[DEBUG] No quiz data found for lesson', lessonIndex, ', adding empty question');
                 addQuestion();
                 quizQuestionIndexCounter = 1;
             }
             updateQuestionIndices();
-
-            // Đổi tiêu đề modal thành 'Sửa Quiz'
             document.getElementById('quizModalLabel').textContent = 'Sửa Quiz';
-
             const modalInstance = bootstrap.Modal.getOrCreateInstance(quizModal);
             modalInstance.show();
         }

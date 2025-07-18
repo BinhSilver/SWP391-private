@@ -92,10 +92,6 @@
                                         </div>
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label">Video Từ Vựng</label>
-                                        <input type="file" class="form-control" name="lessons[0][vocabVideo][]" accept="video/*" multiple />
-                                    </div>
-                                    <div class="mb-2">
                                         <label class="form-label">Tài Liệu Từ Vựng (PDF)</label>
                                         <input type="file" class="form-control" name="lessons[0][vocabDoc][]" accept="application/pdf" multiple />
                                     </div>
@@ -107,11 +103,6 @@
                                     <div class="mb-2">
                                         <label class="form-label">Tài Liệu Ngữ Pháp</label>
                                         <input type="file" class="form-control" name="lessons[0][grammarDoc][]" accept="application/pdf" multiple />
-                                    </div>
-                                    <!-- Kanji -->
-                                    <div class="mb-2">
-                                        <label class="form-label">Video Kanji</label>
-                                        <input type="file" class="form-control" name="lessons[0][kanjiVideo][]" accept="video/*" multiple />
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Tài Liệu Kanji</label>

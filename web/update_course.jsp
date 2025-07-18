@@ -159,15 +159,13 @@
 
                                                 <!-- Tài liệu / Video -->
                                                 <c:set var="materials" value="${materialsMap[lesson.lessonID]}" />
-                                                <c:forEach var="type" items="${['vocabVideo', 'vocabDoc', 'grammarVideo', 'grammarDoc', 'kanjiVideo', 'kanjiDoc']}">
+                                                <c:forEach var="type" items="${['vocabDoc', 'grammarVideo', 'grammarDoc', 'kanjiDoc']}">
                                                     <div class="mb-2">
                                                         <label class="form-label">
                                                             <c:choose>
-                                                                <c:when test="${type == 'vocabVideo'}">Video Từ Vựng</c:when>
                                                                 <c:when test="${type == 'vocabDoc'}">Tài liệu Từ Vựng (PDF)</c:when>
                                                                 <c:when test="${type == 'grammarVideo'}">Video Ngữ Pháp</c:when>
                                                                 <c:when test="${type == 'grammarDoc'}">Tài liệu Ngữ Pháp (PDF)</c:when>
-                                                                <c:when test="${type == 'kanjiVideo'}">Video Kanji</c:when>
                                                                 <c:when test="${type == 'kanjiDoc'}">Tài liệu Kanji (PDF)</c:when>
                                                             </c:choose>
                                                         </label>
@@ -334,17 +332,57 @@
             <div class="quiz-question-block mb-4 p-3 border rounded">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="mb-0">Câu hỏi {{questionLabel}}</h6>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-link p-0 text-decoration-none quiz-collapse-toggle" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{index}}" aria-expanded="true"
-                                aria-controls="questionCollapse-{{index}}">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm btn-delete-question">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                    <button class="btn btn-link p-0 text-decoration-none quiz-collapse-toggle" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{lessonIndex}}-{{questionIndex}}" aria-expanded="false"
+                            aria-controls="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                 </div>
+                <div class="collapse" id="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung câu hỏi</label>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][question]" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Lựa chọn A</label>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionA]" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Lựa chọn B</label>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionB]" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Lựa chọn C</label>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionC]" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Lựa chọn D</label>
+                            <input type="text" class="form-control"
+                                   name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionD]" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Đáp án đúng</label>
+                        <select class="form-select"
+                                name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][answer]" required>
+                            <option value="">-- Chọn đáp án --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-question"><i
+                            class="fas fa-trash"></i> Xoá Câu Hỏi</button>
+                </div>
+            </div>
         </template>
 
         <!-- QUIZ MODAL -->
@@ -392,13 +430,12 @@
     <!-- QUIZ QUESTION TEMPLATE -->
     <template id="quizQuestionTemplate">
         <div class="quiz-question-block mb-4 p-3 border rounded">
-            <input type="hidden" name="questions[{{index}}][id]" value="" />
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0">Câu hỏi {{questionLabel}}</h6>
                 <div class="d-flex gap-2">
                     <button class="btn btn-link p-0 text-decoration-none quiz-collapse-toggle" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{index}}" aria-expanded="true"
-                            aria-controls="questionCollapse-{{index}}">
+                            data-bs-toggle="collapse" data-bs-target="#questionCollapse-{{lessonIndex}}-{{questionIndex}}" aria-expanded="false"
+                            aria-controls="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <button type="button" class="btn btn-outline-danger btn-sm btn-delete-question">
@@ -406,34 +443,40 @@
                     </button>
                 </div>
             </div>
-            <div class="collapse show" id="questionCollapse-{{index}}">
+            <div class="collapse" id="questionCollapse-{{lessonIndex}}-{{questionIndex}}">
                 <div class="mb-3">
                     <label class="form-label">Nội dung câu hỏi</label>
-                    <textarea class="form-control" name="questions[{{index}}][question]" rows="2" required></textarea>
+                    <input type="text" class="form-control"
+                           name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][question]" required>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Lựa chọn A</label>
-                        <input type="text" class="form-control" name="questions[{{index}}][optionA]" required>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionA]" required>
                     </div>
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Lựa chọn B</label>
-                        <input type="text" class="form-control" name="questions[{{index}}][optionB]" required>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionB]" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Lựa chọn C</label>
-                        <input type="text" class="form-control" name="questions[{{index}}][optionC]" required>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionC]" required>
                     </div>
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Lựa chọn D</label>
-                        <input type="text" class="form-control" name="questions[{{index}}][optionD]" required>
+                        <input type="text" class="form-control"
+                               name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][optionD]" required>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Đáp án đúng</label>
-                    <select class="form-select" name="questions[{{index}}][answer]" required>
+                    <select class="form-select"
+                            name="lessons[{{lessonIndex}}][questions][{{questionIndex}}][answer]" required>
                         <option value="">-- Chọn đáp án --</option>
                         <option value="A">A</option>
                         <option value="B">B</option>

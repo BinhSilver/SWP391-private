@@ -23,11 +23,12 @@ public class QuizService {
     public void processQuizForLesson(HttpServletRequest request, int lessonId, int idx) {
         Set<Integer> questionIndexes = new HashSet<>();
         for (String param : request.getParameterMap().keySet()) {
-            Matcher m = Pattern.compile("lessons\\[" + idx + "]\\[questions]\\[(\\d+)]\\[question]").matcher(param);
+            Matcher m = Pattern.compile("lessons\\[" + idx + "]\\[questions\\]\\[(\\d+)\\]\\[question\\]").matcher(param);
             if (m.find()) {
                 questionIndexes.add(Integer.parseInt(m.group(1)));
             }
         }
+        System.out.println("[QuizService] lessonIdx=" + idx + ", lessonId=" + lessonId + ", found questionIndexes=" + questionIndexes);
         List<QuizQuestion> questions = new ArrayList<>();
         for (Integer qIdx : questionIndexes) {
             String qText = request.getParameter("lessons[" + idx + "][questions][" + qIdx + "][question]");
@@ -36,6 +37,7 @@ public class QuizService {
             String optionC = request.getParameter("lessons[" + idx + "][questions][" + qIdx + "][optionC]");
             String optionD = request.getParameter("lessons[" + idx + "][questions][" + qIdx + "][optionD]");
             String answer = request.getParameter("lessons[" + idx + "][questions][" + qIdx + "][answer]");
+            System.out.println("[QuizService] Parse Q" + qIdx + ": " + qText + " | A=" + optionA + ", B=" + optionB + ", C=" + optionC + ", D=" + optionD + ", answer=" + answer);
             int correctAnswer = "A".equals(answer) ? 1 : "B".equals(answer) ? 2 : "C".equals(answer) ? 3 : 4;
 
             List<Answer> answers = Arrays.asList(
@@ -51,6 +53,7 @@ public class QuizService {
             q.setTimeLimit(60);
             questions.add(q);
         }
+        System.out.println("[QuizService] Parsed QuizQuestion list for lessonIdx=" + idx + ": " + questions);
         if (!questions.isEmpty()) {
             QuizDAO.deleteQuestionsByLessonId(lessonId);
             QuizDAO.saveQuestions(lessonId, questions);
