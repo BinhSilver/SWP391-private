@@ -136,80 +136,72 @@
                                                             </button>
                                                         </div>
                                                     </c:forEach>
-
-                                                    <div class="d-flex gap-2 mt-2">
-                                                        <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
-                                                        <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="${loop.index}">
-                                                            Sửa Quiz
-                                                        </button>
-                                                        <button type="button" class="btn btn-outline-danger btn-delete-lesson">Xoá Lesson</button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Thêm từ vựng mới -->
-                                                <div class="mb-2 vocab-entry-container" data-lesson-index="${loop.index}">
-                                                    <label class="form-label">Từ vựng mới (Word:Meaning:Reading:Example)</label>
-                                                    <div class="input-group mb-2">
-                                                        <input type="text" class="form-control vocab-text" name="lessons[${loop.index}][vocabText][0]" placeholder="Word:Meaning:Reading:Example" />
-                                                        <input type="file" class="form-control vocab-image" name="lessons[${loop.index}][vocabImage][0]" accept="image/*" />
-                                                        <button type="button" class="btn btn-outline-success btn-add-vocab ms-2">+</button>
-                                                        <button type="button" class="btn btn-outline-danger btn-remove-vocab ms-1">-</button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Tài liệu / Video -->
-                                                <c:set var="materials" value="${materialsMap[lesson.lessonID]}" />
-                                                <c:forEach var="type" items="${['vocabDoc', 'grammarVideo', 'grammarDoc', 'kanjiDoc']}">
-                                                    <div class="mb-2">
-                                                        <label class="form-label">
-                                                            <c:choose>
-                                                                <c:when test="${type == 'vocabDoc'}">Tài liệu Từ Vựng (PDF)</c:when>
-                                                                <c:when test="${type == 'grammarVideo'}">Video Ngữ Pháp</c:when>
-                                                                <c:when test="${type == 'grammarDoc'}">Tài liệu Ngữ Pháp (PDF)</c:when>
-                                                                <c:when test="${type == 'kanjiDoc'}">Tài liệu Kanji (PDF)</c:when>
-                                                            </c:choose>
-                                                        </label>
-                                                        <ul class="list-group list-group-flush mb-2">
-                                                            <c:forEach var="mat" items="${materials}">
-                                                                <c:if test="${mat.materialType == type}">
-                                                                    <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                                                                        <a href="${mat.filePath}" target="_blank">${mat.title}</a>
-                                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-file"
-                                                                                data-material-id="${mat.materialID}" data-lesson-index="${loop.index}">
-                                                                            <i class="fa-solid fa-times"></i>
-                                                                        </button>
-                                                                        <input type="hidden" name="lessons[${loop.index}][existingMaterials][${mat.materialID}][id]" value="${mat.materialID}" />
-                                                                    </li>
-                                                                </c:if>
-                                                            </c:forEach>
-                                                        </ul>
-                                                        <input type="file" class="form-control" name="lessons[${loop.index}][${type}][]"
-                                                               <c:if test="${type.endsWith('Doc')}">accept="application/pdf"</c:if>
-                                                               <c:if test="${type.endsWith('Video')}">accept="video/*"</c:if>
-                                                                   multiple/>
-                                                        </div>
-                                                </c:forEach>
-
-                                                <div class="d-flex gap-2 mt-2">
-                                                    <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
-                                                    <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="${loop.index}">
-                                                        Tạo Quiz
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-primary btn-generate-vocabulary" data-bs-toggle="modal" data-bs-target="#vocabularyModal" data-lesson-index="${loop.index}">
-                                                        Tạo Vocabulary bằng AI
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-danger btn-delete-lesson">Xoá Lesson</button>
                                                 </div>
                                             </div>
+
+                                            <!-- Thêm từ vựng mới -->
+                                            <div class="mb-2 vocab-entry-container" data-lesson-index="${loop.index}">
+                                                <label class="form-label">Từ vựng mới (Word:Meaning:Reading:Example)</label>
+                                                <div class="input-group mb-2">
+                                                    <input type="text" class="form-control vocab-text" name="lessons[${loop.index}][vocabText][0]" placeholder="Word:Meaning:Reading:Example" />
+                                                    <input type="file" class="form-control vocab-image" name="lessons[${loop.index}][vocabImage][0]" accept="image/*" />
+                                                </div>
+                                            </div>
+
+                                            <!-- Tài liệu / Video -->
+                                            <c:set var="materials" value="${materialsMap[lesson.lessonID]}" />
+                                            <c:forEach var="type" items="${['vocabDoc', 'grammarVideo', 'grammarDoc', 'kanjiDoc']}">
+                                                <div class="mb-2">
+                                                    <label class="form-label">
+                                                        <c:choose>
+                                                            <c:when test="${type == 'vocabDoc'}">Tài liệu Từ Vựng (PDF)</c:when>
+                                                            <c:when test="${type == 'grammarVideo'}">Video Ngữ Pháp</c:when>
+                                                            <c:when test="${type == 'grammarDoc'}">Tài liệu Ngữ Pháp (PDF)</c:when>
+                                                            <c:when test="${type == 'kanjiDoc'}">Tài liệu Kanji (PDF)</c:when>
+                                                        </c:choose>
+                                                    </label>
+                                                    <ul class="list-group list-group-flush mb-2">
+                                                        <c:forEach var="mat" items="${materials}">
+                                                            <c:if test="${mat.materialType == type}">
+                                                                <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                                                                    <a href="${mat.filePath}" target="_blank">${mat.title}</a>
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete-file"
+                                                                            data-material-id="${mat.materialID}" data-lesson-index="${loop.index}">
+                                                                        <i class="fa-solid fa-times"></i>
+                                                                    </button>
+                                                                    <input type="hidden" name="lessons[${loop.index}][existingMaterials][${mat.materialID}][id]" value="${mat.materialID}" />
+                                                                </li>
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </ul>
+                                                    <input type="file" class="form-control" name="lessons[${loop.index}][${type}][]"
+                                                           <c:if test="${type.endsWith('Doc')}">accept="application/pdf"</c:if>
+                                                           <c:if test="${type.endsWith('Video')}">accept="video/*"</c:if>
+                                                               multiple/>
+                                                </div>
+                                            </c:forEach>
+
+                                            <!-- Nhóm nút dưới cùng -->
+                                            <div class="d-flex gap-2 mt-2">
+                                                <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
+                                                <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="${loop.index}">
+                                                    Sửa Quiz
+                                                </button>
+                                                <button type="button" class="btn btn-outline-primary btn-generate-vocabulary" data-bs-toggle="modal" data-bs-target="#vocabularyModal" data-lesson-index="${loop.index}">
+                                                    Tạo Vocabulary bằng AI
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger btn-delete-lesson">Xoá Lesson</button>
+                                            </div>
                                         </div>
-                                    </c:forEach>
-                                </div>
+                                    </div>
+                                </c:forEach>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-danger btn-lg">Cập Nhật Khóa Học</button>
-                        </div>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-danger btn-lg">Cập Nhật Khóa Học</button>
+                    </div>
                 </form>
             </section>
         </div>
@@ -500,7 +492,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
-
     <!-- Course data -->
     <script>
         console.log('Raw quizDataJson:', '${quizDataJson}');
@@ -544,7 +535,6 @@
             };
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<c:url value='/js/edit_course.js'/>"></script>
     <script src="<c:url value='/chat/chatbox.js'/>"></script>
     <script src="<c:url value='/js/edit_course.js'/>"></script>
