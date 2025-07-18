@@ -22,7 +22,7 @@
                 font-family: 'JetBrains Mono', monospace;
                 background: #f0f0f0;
                 text-align: center;
-    
+
             }
             .video-call-container {
                 max-width: 600px;
@@ -57,25 +57,25 @@
 
         <!-- Khởi tạo biến JavaScript từ session -->
         <script>
-        var userEmail = "${sessionScope.authUser.email}";
-        var userPassword = "${sessionScope.authUser.passwordHash}";
-        if (!userPassword) {
-            console.error("Password not found in session. Please ensure login sets it.");
-            alert("Không thể tải token do thiếu thông tin xác thực. Vui lòng đăng nhập lại.");
-            window.location.href = "/test/LoginJSP/LoginIndex.jsp";
-        }
+            var userEmail = "${sessionScope.authUser.email}";
+            var userPassword = "${sessionScope.authUser.passwordHash}";
+            if (!userPassword) {
+                console.error("Password not found in session. Please ensure login sets it.");
+                alert("Không thể tải token do thiếu thông tin xác thực. Vui lòng đăng nhập lại.");
+                window.location.href = "/test/LoginJSP/LoginIndex.jsp";
+            }
         </script>
         <script>
-    // Inject context path vào window object
-    window.contextPath = '${pageContext.request.contextPath}';
-    console.log('Context path loaded:', window.contextPath);
-</script>
-<script src="${pageContext.request.contextPath}/js/config.js"></script>
-<!-- Các import JS động -->
-<script src="${pageContext.request.contextPath}/js/videocall.js"></script>
-<!-- Nếu không có cherry-blossom.js thì bỏ dòng dưới, nếu có thì sửa lại đường dẫn động -->
-<!-- <script src="${pageContext.request.contextPath}/js/cherry-blossom.js"></script> -->
-        
+            // Inject context path vào window object
+            window.contextPath = '${pageContext.request.contextPath}';
+            console.log('Context path loaded:', window.contextPath);
+        </script>
+        <script src="${pageContext.request.contextPath}/js/config.js"></script>
+        <!-- Các import JS động -->
+        <script src="${pageContext.request.contextPath}/js/videocall.js"></script>
+        <!-- Nếu không có cherry-blossom.js thì bỏ dòng dưới, nếu có thì sửa lại đường dẫn động -->
+        <!-- <script src="${pageContext.request.contextPath}/js/cherry-blossom.js"></script> -->
+
         <!-- Scripts -->
 
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
