@@ -15,11 +15,11 @@ import java.sql.SQLException;
 
 @WebServlet(name = "DeleteCourseServlet", urlPatterns = {"/DeleteCourseServlet"})
 public class DeleteCourseServlet extends HttpServlet {
-    
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         User currentUser = (session != null) ? (User) session.getAttribute("authUser") : null;
         
@@ -33,7 +33,7 @@ public class DeleteCourseServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu tham số courseId");
             return;
         }
-        
+
         try {
             int courseId = Integer.parseInt(courseIdParam);
             

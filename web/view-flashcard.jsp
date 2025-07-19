@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -98,12 +99,14 @@
             backface-visibility: hidden;
             border-radius: 15px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            justify-content: space-between;
+            padding: 1.5rem;
             font-size: 1.5rem;
             font-weight: 600;
             color: white;
+            overflow: auto;
         }
         
         .flashcard-front {
@@ -116,10 +119,49 @@
         }
         
         .flashcard-image {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 80%;
+            max-height: 60%;
             border-radius: 10px;
-            object-fit: cover;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        
+        .flashcard-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .flip-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .flip-button:hover {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.1);
+        }
+        
+        .text-content {
+            margin-top: 10px;
+            font-size: 1.3rem;
+            word-break: break-word;
         }
         
         .navigation-buttons {
@@ -233,11 +275,37 @@
             padding: 1.5rem;
             margin-top: 2rem;
             border-left: 4px solid #e94f64;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
         
         .note-section h4 {
             color: #e94f64;
             margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .note-section h4 i {
+            color: #e94f64;
+        }
+        
+        .note-content {
+            white-space: pre-line;
+            line-height: 1.6;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .note-section .note-label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 0.5rem;
+        }
+        
+        .note-section .note-value {
+            color: #333;
         }
         
         .empty-state {
@@ -390,6 +458,15 @@
                         </div>
                     </c:when>
                     <c:otherwise>
+                        <!-- Debug: Hiển thị dữ liệu trực tiếp -->
+                        <div style="background: white; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+                            <h4>Debug Info:</h4>
+                            <p>Items size: ${items.size()}</p>
+                            <c:forEach var="item" items="${items}" varStatus="status">
+                                <p>Item ${status.index + 1}: Front='${item.frontContent}', Back='${item.backContent}'</p>
+                            </c:forEach>
+                        </div>
+                        
                         <div class="flashcard" id="flashcard" onclick="flipCard()">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front" id="cardFront">
@@ -472,20 +549,30 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
-        // Flashcard data
-        const flashcards = [
-            <c:forEach var="item" items="${items}" varStatus="status">
-                {
-                    id: ${item.flashcardItemID},
-                    front: '${item.frontContent != null ? item.frontContent.replace("'", "\\'") : ""}',
-                    back: '${item.backContent != null ? item.backContent.replace("'", "\\'") : ""}',
-                    frontImage: ${item.frontImage != null ? "'" + item.frontImage + "'" : "null"},
-                    backImage: ${item.backImage != null ? "'" + item.backImage + "'" : "null"},
-                    note: '${item.note != null ? item.note.replace("'", "\\'") : ""}',
-                    orderIndex: ${item.orderIndex}
-                }<c:if test="${!status.last}">,</c:if>
-            </c:forEach>
-        ];
+        // Flashcard data - phiên bản đơn giản để debug
+        const flashcards = [];
+        
+        <c:forEach var="item" items="${items}" varStatus="status">
+            flashcards.push({
+                id: ${item.flashcardItemID},
+                front: "${item.frontContent != null ? fn:replace(fn:replace(item.frontContent, '\\', '\\\\'), '\"', '\\\"') : ''}",
+                back: "${item.backContent != null ? fn:replace(fn:replace(item.backContent, '\\', '\\\\'), '\"', '\\\"') : ''}",
+                frontImage: ${item.frontImage != null && item.frontImage != 'null' ? "'" + item.frontImage + "'" : "null"},
+                backImage: ${item.backImage != null && item.backImage != 'null' ? "'" + item.backImage + "'" : "null"},
+                note: "${item.note != null ? fn:replace(fn:replace(item.note, '\\', '\\\\'), '\"', '\\\"') : ''}",
+                orderIndex: ${item.orderIndex}
+            });
+        </c:forEach>
+
+        // Debug: In ra thông tin chi tiết về dữ liệu flashcard
+        console.log('DEBUG FLASHCARDS DATA:', JSON.stringify(flashcards, null, 2));
+        console.log('DEBUG FLASHCARDS LENGTH:', flashcards.length);
+        
+        if (flashcards.length > 0) {
+            console.log('DEBUG FIRST CARD:', flashcards[0]);
+            console.log('DEBUG FIRST CARD FRONT:', flashcards[0].front);
+            console.log('DEBUG FIRST CARD BACK:', flashcards[0].back);
+        }
 
         let currentIndex = 0;
         let isStudyMode = false;
@@ -512,35 +599,66 @@
             const realIndex = getRealIndex();
             const card = flashcards[realIndex];
             console.log('[FlashcardViewer] updateCard - currentIndex:', currentIndex, 'realIndex:', realIndex, 'card:', card);
+            console.log('[FlashcardViewer] Front content:', card.front);
+            console.log('[FlashcardViewer] Back content:', card.back);
             console.log('[FlashcardViewer] FrontImage value:', card.frontImage, 'type:', typeof card.frontImage);
             console.log('[FlashcardViewer] BackImage value:', card.backImage, 'type:', typeof card.backImage);
+            console.log('[FlashcardViewer] Note content:', card.note);
             
             const frontContent = document.getElementById('frontContent');
             const backContent = document.getElementById('backContent');
             const noteContent = document.getElementById('noteContent');
             const noteSection = document.getElementById('noteSection');
 
-            // Update front content - ưu tiên ảnh nếu có
-            if (card.frontImage && card.frontImage !== null && card.frontImage.toString().trim() !== '') {
-                frontContent.innerHTML = `<img src="${card.frontImage}" alt="Front" class="flashcard-image">`;
+            // Update front content - tạo layout 2 phần: ảnh ở trên, nội dung ở dưới
+            let frontHtml = '<div class="flashcard-content">';
+            if (card.frontImage && card.frontImage !== null && card.frontImage !== 'null' && card.frontImage.toString().trim() !== '') {
+                frontHtml += `<img src="${card.frontImage}" alt="Front" class="flashcard-image">`;
                 console.log('[FlashcardViewer] Front image displayed:', card.frontImage);
-            } else {
-                frontContent.textContent = card.front || 'Không có nội dung';
-                console.log('[FlashcardViewer] Front text displayed:', card.front);
             }
-
-            // Update back content - ưu tiên ảnh nếu có
-            if (card.backImage && card.backImage !== null && card.backImage.toString().trim() !== '') {
-                backContent.innerHTML = `<img src="${card.backImage}" alt="Back" class="flashcard-image">`;
+            
+            // Kiểm tra và hiển thị nội dung mặt trước
+            const frontText = (card.front && card.front !== "false" && card.front !== "null" && card.front.trim() !== '') ? 
+                card.front : 'Không có nội dung';
+            console.log('[FlashcardViewer] Front text to display:', frontText);
+            frontHtml += `<div class="text-content">${frontText}</div>`;
+            
+            frontHtml += '</div>';
+            frontHtml += '<button class="flip-button" title="Lật thẻ"><i class="fas fa-sync-alt"></i></button>';
+            frontContent.innerHTML = frontHtml;
+            console.log('[FlashcardViewer] Front HTML set:', frontHtml);
+            
+            // Update back content - tạo layout 2 phần: ảnh ở trên, nội dung ở dưới
+            let backHtml = '<div class="flashcard-content">';
+            if (card.backImage && card.backImage !== null && card.backImage !== 'null' && card.backImage.toString().trim() !== '') {
+                backHtml += `<img src="${card.backImage}" alt="Back" class="flashcard-image">`;
                 console.log('[FlashcardViewer] Back image displayed:', card.backImage);
-            } else {
-                backContent.textContent = card.back || 'Không có nội dung';
-                console.log('[FlashcardViewer] Back text displayed:', card.back);
             }
+            
+            // Định dạng nội dung back để hiển thị xuống dòng
+            let formattedBackContent = (card.back && card.back !== "false" && card.back !== "null" && card.back.trim() !== '') ? 
+                card.back : 'Không có nội dung';
+            formattedBackContent = formattedBackContent.replace(/\n/g, '<br>');
+            console.log('[FlashcardViewer] Back text to display:', formattedBackContent);
+            
+            backHtml += `<div class="text-content">${formattedBackContent}</div>`;
+            backHtml += '</div>';
+            backHtml += '<button class="flip-button" title="Lật thẻ"><i class="fas fa-sync-alt"></i></button>';
+            backContent.innerHTML = backHtml;
+            console.log('[FlashcardViewer] Back HTML set:', backHtml);
 
             // Update note
             if (card.note && card.note.trim() !== '') {
-                noteContent.textContent = card.note;
+                // Định dạng ghi chú để hiển thị xuống dòng và phân tách các phần
+                let formattedNote = card.note;
+                
+                // Thay thế các phần "Cách đọc:" và "Ví dụ:" bằng HTML có định dạng
+                formattedNote = formattedNote
+                    .replace(/Từ bài học:/g, '<span class="note-label">Từ bài học:</span>')
+                    .replace(/Cách đọc:/g, '<span class="note-label">Cách đọc:</span>')
+                    .replace(/Ví dụ:/g, '<span class="note-label">Ví dụ:</span>');
+                
+                noteContent.innerHTML = `<div class="note-content">${formattedNote}</div>`;
                 noteSection.style.display = 'block';
                 console.log('[FlashcardViewer] Note displayed:', card.note);
             } else {
@@ -560,6 +678,14 @@
 
             // Reset card to front
             document.getElementById('flashcard').classList.remove('flipped');
+            
+            // Thêm event listener cho nút lật thẻ
+            document.querySelectorAll('.flip-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Ngăn event click lan tỏa đến flashcard
+                    flipCard();
+                });
+            });
         }
 
         function flipCard() {

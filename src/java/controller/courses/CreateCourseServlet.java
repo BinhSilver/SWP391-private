@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import config.S3Util;
+import service.CourseFlashcardService;
 
 @MultipartConfig
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
@@ -97,6 +98,17 @@ public class CreateCourseServlet extends HttpServlet {
             System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
             handleAllLessons(request, courseId, maxLesson);
+
+            // Tự động tạo flashcard cho khóa học sau khi đã có từ vựng
+            try {
+                CourseFlashcardService flashcardService = new CourseFlashcardService();
+                int flashcardId = flashcardService.createFlashcardFromCourse(courseId, user.getUserID());
+                System.out.println("[LOG] Đã tự động tạo flashcard cho khóa học " + courseId + ", flashcardId = " + flashcardId);
+            } catch (Exception ex) {
+                System.out.println("[ERROR] Không thể tự động tạo flashcard cho khóa học: " + ex.getMessage());
+                ex.printStackTrace();
+                // Không throw exception để tiếp tục quá trình tạo khóa học
+            }
 
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {

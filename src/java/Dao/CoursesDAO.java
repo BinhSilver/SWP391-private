@@ -116,6 +116,24 @@ public class CoursesDAO {
                     }
                 }
 
+                // XÓA FLASHCARD ITEM LIÊN QUAN ĐẾN TỪ VỰNG CỦA KHÓA HỌC (TRƯỚC KHI XÓA VOCABULARY)
+                try (PreparedStatement ps = conn.prepareStatement(
+                    "DELETE FROM FlashcardItems WHERE VocabID IN ("
+                    + "SELECT v.VocabID FROM Vocabulary v "
+                    + "INNER JOIN Lessons l ON v.LessonID = l.LessonID "
+                    + "WHERE l.CourseID = ?)")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                    System.out.println("[LOG] Đã xóa FlashcardItems liên quan đến từ vựng của khóa học " + courseID);
+                }
+
+                // XÓA FLASHCARD KHÔNG CÒN ITEM
+                try (PreparedStatement ps = conn.prepareStatement(
+                    "DELETE FROM Flashcards WHERE FlashcardID NOT IN (SELECT DISTINCT FlashcardID FROM FlashcardItems)")) {
+                    ps.executeUpdate();
+                    System.out.println("[LOG] Đã xóa Flashcards không còn item");
+                }
+
                 for (int lessonId : lessonIds) {
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
