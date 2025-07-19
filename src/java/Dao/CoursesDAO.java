@@ -137,10 +137,13 @@ public class CoursesDAO {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
+                    // Delete vocabulary that belongs to this lesson
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Vocabulary WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
                     }
+                    // Feedbacks table doesn't have LessonID column, it has CourseID
+                    // So we don't need to delete feedbacks here as they will be deleted when course is deleted
                     try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
                         ps.setInt(1, lessonId);
                         ps.executeUpdate();
@@ -186,6 +189,15 @@ public class CoursesDAO {
                     ps.executeUpdate();
                 }
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM CourseRatings WHERE CourseID = ?")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+                // Delete feedback votes first (due to foreign key constraint)
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM FeedbackVotes WHERE FeedbackID IN (SELECT FeedbackID FROM Feedbacks WHERE CourseID = ?)")) {
+                    ps.setInt(1, courseID);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE CourseID = ?")) {
                     ps.setInt(1, courseID);
                     ps.executeUpdate();
                 }
