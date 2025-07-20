@@ -107,4 +107,83 @@ public class LessonsDAO {
         }
         throw new SQLException("Insert Lesson failed, no ID obtained.");
     }
+
+    // Xóa lesson và toàn bộ dữ liệu liên quan
+    public void deleteLessonAndDependencies(int lessonId) throws SQLException {
+        try (Connection conn = JDBCConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // Xóa các bảng phụ liên quan đến lessonId
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Vocabulary WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                // Xóa quiz và các phụ thuộc
+                List<Integer> quizIds = new ArrayList<>();
+                try (PreparedStatement ps = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            quizIds.add(rs.getInt("QuizID"));
+                        }
+                    }
+                }
+                for (int quizId : quizIds) {
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                // Xóa lesson cuối cùng
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            }
+        }
+    }
 }

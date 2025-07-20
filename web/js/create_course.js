@@ -63,6 +63,31 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // --- Gán lại sự kiện xóa cho tất cả lesson (kể cả lesson gốc) ---
+    function attachDeleteLessonEvents() {
+        document.querySelectorAll('.btn-delete-lesson').forEach(btn => {
+            btn.onclick = function () {
+                if (tabList.querySelectorAll('.nav-item').length <= 1) {
+                    alert("Phải có ít nhất 1 lesson!");
+                    return;
+                }
+                if (confirm("Bạn có chắc muốn xóa lesson này?")) {
+                    const lessonPane = this.closest(".tab-pane");
+                    const lessonIndex = lessonPane.dataset.lessonIndex;
+                    const tabToDelete = document.querySelector(`#tab-${lessonIndex}`);
+                    if (tabToDelete) {
+                        tabToDelete.parentElement.remove();
+                    }
+                    lessonPane.remove();
+                    updateLessonIndices();
+                    if (!tabList.querySelector(".nav-link.active") && tabList.querySelector(".nav-link")) {
+                        new bootstrap.Tab(tabList.querySelector(".nav-link")).show();
+                    }
+                }
+            }
+        });
+    }
+
     // --- ADD NEW LESSON ---
     if (addLessonBtn) {
         addLessonBtn.addEventListener("click", () => {
@@ -84,28 +109,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const pane = paneWrapper.firstElementChild;
             tabContent.appendChild(pane);
 
-            // Xóa lesson
-            pane.querySelector(".btn-delete-lesson").addEventListener("click", function () {
-                if (confirm("Bạn có chắc muốn xóa lesson này?")) {
-                    const lessonPane = this.closest(".tab-pane");
-                    const lessonIndex = lessonPane.dataset.lessonIndex;
-
-                    const tabToDelete = document.querySelector(`#tab-${lessonIndex}`);
-                    if (tabToDelete) {
-                        tabToDelete.parentElement.remove();
-                    }
-
-                    lessonPane.remove();
-                    updateLessonIndices();
-
-                    if (!tabList.querySelector(".nav-link.active") && tabList.querySelector(".nav-link")) {
-                        new bootstrap.Tab(tabList.querySelector(".nav-link")).show();
-                    }
-                }
-            });
-
-            new bootstrap.Tab(document.getElementById(tabId)).show();
             updateLessonIndices();
+            attachDeleteLessonEvents();
+            new bootstrap.Tab(document.getElementById(tabId)).show();
         });
     }
 
@@ -608,6 +614,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // --- FINAL SUBMIT ---
         if (wizardForm) {
             wizardForm.addEventListener("submit", function (e) {
+                // Serialize toàn bộ quiz của các lesson vào input ẩn quizJson
+                if (typeof allCourseData !== 'undefined' && allCourseData.lessons) {
+                    const quizJsonInput = document.createElement('input');
+                    quizJsonInput.type = 'hidden';
+                    quizJsonInput.name = 'quizJson';
+                    quizJsonInput.value = JSON.stringify(allCourseData.lessons.map(l => l?.quizzes || []));
+                    wizardForm.appendChild(quizJsonInput);
+                }
                 const courseTitle = document.getElementById("courseTitle")?.value?.trim();
                 if (!courseTitle) {
                     alert("Vui lòng nhập tên khóa học!");
@@ -657,5 +671,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updateLessonIndices();
         attachQuizButtons();
         window.reattachQuizButtons = attachQuizButtons;
+        attachDeleteLessonEvents(); // Gán lại sự kiện xóa cho lesson gốc khi load trang
     });
 });

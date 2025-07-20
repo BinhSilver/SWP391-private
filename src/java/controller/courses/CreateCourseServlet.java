@@ -15,6 +15,8 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import config.S3Util;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @MultipartConfig
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
@@ -97,6 +99,39 @@ public class CreateCourseServlet extends HttpServlet {
             System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
             handleAllLessons(request, courseId, maxLesson);
+
+            // Lưu quiz cho từng lesson nếu có
+            String quizJson = request.getParameter("quizJson");
+            if (quizJson != null && !quizJson.isEmpty()) {
+                Gson gson = new Gson();
+                List<List<Map<String, Object>>> allQuizzes = gson.fromJson(quizJson, new TypeToken<List<List<Map<String, Object>>>>(){}.getType());
+                for (int i = 0; i < allQuizzes.size(); i++) {
+                    List<Map<String, Object>> quizList = allQuizzes.get(i);
+                    // Lấy lessonId vừa tạo theo thứ tự (giả sử lessonId tăng dần, hoặc map lại nếu cần)
+                    // Ở đây giả sử lessonId = lessonIdList.get(i)
+                    // Nếu bạn có mapping lessonIndex -> lessonId, hãy dùng đúng lessonId
+                    int lessonId = getLessonIdByIndex(courseId, i); // Cần cài đặt hàm này
+                    if (quizList != null && !quizList.isEmpty()) {
+                        List<QuizQuestion> questions = new ArrayList<>();
+                        for (Map<String, Object> q : quizList) {
+                            QuizQuestion qq = new QuizQuestion();
+                            qq.setQuestion((String) q.get("question"));
+                            qq.setTimeLimit(60); // hoặc lấy từ q nếu có
+                            List<Answer> answers = new ArrayList<>();
+                            answers.add(new Answer(0, 0, (String) q.get("optionA"), 1, "A".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionB"), 2, "B".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionC"), 3, "C".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionD"), 4, "D".equals(q.get("answer")) ? 1 : 0));
+                            qq.setAnswers(answers);
+                            questions.add(qq);
+                        }
+                        QuizDAO.saveQuestions(lessonId, questions);
+                    } else {
+                        // Nếu không có quiz, xóa quiz nếu có
+                        QuizDAO.saveQuestions(lessonId, new ArrayList<>());
+                    }
+                }
+            }
 
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
@@ -372,5 +407,15 @@ public class CreateCourseServlet extends HttpServlet {
 
     private boolean isValidPDF(String fileName) {
         return fileName.toLowerCase().endsWith(".pdf");
+    }
+
+    // Thêm hàm hỗ trợ lấy lessonId theo index
+    private int getLessonIdByIndex(int courseId, int index) throws SQLException {
+        LessonsDAO lessonsDao = new LessonsDAO();
+        List<Lesson> lessons = lessonsDao.getLessonsByCourseID(courseId);
+        if (index >= 0 && index < lessons.size()) {
+            return lessons.get(index).getLessonID();
+        }
+        return -1;
     }
 }
