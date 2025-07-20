@@ -86,7 +86,8 @@ public class CourseFlashcardService {
                                              .replace("\"", "\\\"")
                                              .replace("'", "\\'")
                                              .replace("\n", " ")
-                                             .replace("\r", "");
+                                             .replace("\r", "")
+                                             .replace("`", "\\`"); // Thêm escape cho backtick
                     item.setFrontContent(frontContent);
                     
                     // Mặt sau: Chỉ hiển thị nghĩa - định dạng an toàn
@@ -94,7 +95,10 @@ public class CourseFlashcardService {
                     if (meaning == null) meaning = "";
                     meaning = meaning.replace("\\", "\\\\")
                                    .replace("\"", "\\\"")
-                                   .replace("'", "\\'");
+                                   .replace("'", "\\'")
+                                   .replace("\n", " ")
+                                   .replace("\r", "")
+                                   .replace("`", "\\`"); // Thêm escape cho backtick
                     
                     // Đặt nghĩa vào mặt sau
                     item.setBackContent(meaning);
@@ -102,12 +106,15 @@ public class CourseFlashcardService {
                     // Đưa cách đọc và ví dụ vào phần ghi chú
                     StringBuilder noteContent = new StringBuilder();
                     noteContent.append("Từ bài học: ").append(lesson.getTitle()).append("\n\n");
-                    
+             
                     String reading = vocab.getReading();
                     if (reading != null && !reading.trim().isEmpty()) {
                         reading = reading.replace("\\", "\\\\")
                                        .replace("\"", "\\\"")
-                                       .replace("'", "\\'");
+                                       .replace("'", "\\'")
+                                       .replace("\n", " ")
+                                       .replace("\r", "")
+                                       .replace("`", "\\`"); // Thêm escape cho backtick
                         noteContent.append("Cách đọc: ").append(reading).append("\n\n");
                     }
                     
@@ -115,7 +122,10 @@ public class CourseFlashcardService {
                     if (example != null && !example.trim().isEmpty()) {
                         example = example.replace("\\", "\\\\")
                                        .replace("\"", "\\\"")
-                                       .replace("'", "\\'");
+                                       .replace("'", "\\'")
+                                       .replace("\n", " ")
+                                       .replace("\r", "")
+                                       .replace("`", "\\`"); // Thêm escape cho backtick
                         noteContent.append("Ví dụ: ").append(example);
                     }
                     

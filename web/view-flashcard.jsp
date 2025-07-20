@@ -99,14 +99,12 @@
             backface-visibility: hidden;
             border-radius: 15px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 1.5rem;
+            justify-content: center;
+            padding: 2rem;
             font-size: 1.5rem;
             font-weight: 600;
             color: white;
-            overflow: auto;
         }
         
         .flashcard-front {
@@ -119,11 +117,10 @@
         }
         
         .flashcard-image {
-            max-width: 80%;
-            max-height: 60%;
+            max-width: 100%;
+            max-height: 100%;
             border-radius: 10px;
-            object-fit: contain;
-            margin-bottom: 15px;
+            object-fit: cover;
         }
         
         .flashcard-content {
@@ -549,17 +546,17 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script>
-        // Flashcard data - phiên bản đơn giản để debug
+        // Flashcard data - sửa lỗi syntax JavaScript
         const flashcards = [];
         
         <c:forEach var="item" items="${items}" varStatus="status">
             flashcards.push({
                 id: ${item.flashcardItemID},
-                front: "${item.frontContent != null ? fn:replace(fn:replace(item.frontContent, '\\', '\\\\'), '\"', '\\\"') : ''}",
-                back: "${item.backContent != null ? fn:replace(fn:replace(item.backContent, '\\', '\\\\'), '\"', '\\\"') : ''}",
-                frontImage: ${item.frontImage != null && item.frontImage != 'null' ? "'" + item.frontImage + "'" : "null"},
-                backImage: ${item.backImage != null && item.backImage != 'null' ? "'" + item.backImage + "'" : "null"},
-                note: "${item.note != null ? fn:replace(fn:replace(item.note, '\\', '\\\\'), '\"', '\\\"') : ''}",
+                front: '${fn:replace(item.frontContent != null ? item.frontContent : "", "'", "\\'")}',
+                back: '${fn:replace(item.backContent != null ? item.backContent : "", "'", "\\'")}',
+                frontImage: '${item.frontImage != null && item.frontImage != "null" ? item.frontImage : ""}',
+                backImage: '${item.backImage != null && item.backImage != "null" ? item.backImage : ""}',
+                note: '${fn:replace(item.note != null ? item.note : "", "'", "\\'")}',
                 orderIndex: ${item.orderIndex}
             });
         </c:forEach>
@@ -610,66 +607,38 @@
             const noteContent = document.getElementById('noteContent');
             const noteSection = document.getElementById('noteSection');
 
-            // Update front content - tạo layout 2 phần: ảnh ở trên, nội dung ở dưới
-            let frontHtml = '<div class="flashcard-content">';
-            if (card.frontImage && card.frontImage !== null && card.frontImage !== 'null' && card.frontImage.toString().trim() !== '') {
-                frontHtml += `<img src="${card.frontImage}" alt="Front" class="flashcard-image">`;
+            // Update front content - áp dụng chuẩn từ nhánh trước
+            if (card.frontImage && card.frontImage !== 'null' && card.frontImage.trim() !== '') {
+                frontContent.innerHTML = `<img src="${card.frontImage}" alt="Front" class="flashcard-image">`;
                 console.log('[FlashcardViewer] Front image displayed:', card.frontImage);
+            } else {
+                frontContent.textContent = card.front || 'Không có nội dung';
+                console.log('[FlashcardViewer] Front text displayed:', card.front);
             }
             
-            // Kiểm tra và hiển thị nội dung mặt trước
-            const frontText = (card.front && card.front !== "false" && card.front !== "null" && card.front.trim() !== '') ? 
-                card.front : 'Không có nội dung';
-            console.log('[FlashcardViewer] Front text to display:', frontText);
-            frontHtml += `<div class="text-content">${frontText}</div>`;
-            
-            frontHtml += '</div>';
-            frontHtml += '<button class="flip-button" title="Lật thẻ"><i class="fas fa-sync-alt"></i></button>';
-            frontContent.innerHTML = frontHtml;
-            console.log('[FlashcardViewer] Front HTML set:', frontHtml);
-            
-            // Update back content - tạo layout 2 phần: ảnh ở trên, nội dung ở dưới
-            let backHtml = '<div class="flashcard-content">';
-            if (card.backImage && card.backImage !== null && card.backImage !== 'null' && card.backImage.toString().trim() !== '') {
-                backHtml += `<img src="${card.backImage}" alt="Back" class="flashcard-image">`;
+            // Update back content - áp dụng chuẩn từ nhánh trước
+            if (card.backImage && card.backImage !== 'null' && card.backImage.trim() !== '') {
+                backContent.innerHTML = `<img src="${card.backImage}" alt="Back" class="flashcard-image">`;
                 console.log('[FlashcardViewer] Back image displayed:', card.backImage);
+            } else {
+                backContent.textContent = card.back || 'Không có nội dung';
+                console.log('[FlashcardViewer] Back text displayed:', card.back);
             }
-            
-            // Định dạng nội dung back để hiển thị xuống dòng
-            let formattedBackContent = (card.back && card.back !== "false" && card.back !== "null" && card.back.trim() !== '') ? 
-                card.back : 'Không có nội dung';
-            formattedBackContent = formattedBackContent.replace(/\n/g, '<br>');
-            console.log('[FlashcardViewer] Back text to display:', formattedBackContent);
-            
-            backHtml += `<div class="text-content">${formattedBackContent}</div>`;
-            backHtml += '</div>';
-            backHtml += '<button class="flip-button" title="Lật thẻ"><i class="fas fa-sync-alt"></i></button>';
-            backContent.innerHTML = backHtml;
-            console.log('[FlashcardViewer] Back HTML set:', backHtml);
 
-            // Update note
-            if (card.note && card.note.trim() !== '') {
-                // Định dạng ghi chú để hiển thị xuống dòng và phân tách các phần
-                let formattedNote = card.note;
-                
-                // Thay thế các phần "Cách đọc:" và "Ví dụ:" bằng HTML có định dạng
-                formattedNote = formattedNote
-                    .replace(/Từ bài học:/g, '<span class="note-label">Từ bài học:</span>')
-                    .replace(/Cách đọc:/g, '<span class="note-label">Cách đọc:</span>')
-                    .replace(/Ví dụ:/g, '<span class="note-label">Ví dụ:</span>');
-                
-                noteContent.innerHTML = `<div class="note-content">${formattedNote}</div>`;
+            // Update note - áp dụng chuẩn từ nhánh trước
+            if (card.note && card.note !== 'null' && card.note.trim() !== '') {
+                noteContent.textContent = card.note;
                 noteSection.style.display = 'block';
                 console.log('[FlashcardViewer] Note displayed:', card.note);
             } else {
                 noteSection.style.display = 'none';
             }
 
-            // Update card info với OrderIndex
+            // Update card info
             const currentCardInfo = document.getElementById('currentCardInfo');
             if (currentCardInfo) {
-                currentCardInfo.textContent = `${currentIndex + 1} / ${flashcards.length} (OrderIndex: ${card.orderIndex})`;
-                console.log('[FlashcardViewer] currentCardInfo updated:', `${currentIndex + 1} / ${flashcards.length} (OrderIndex: ${card.orderIndex})`);
+                currentCardInfo.textContent = `${currentIndex + 1} / ${flashcards.length}`;
+                console.log('[FlashcardViewer] currentCardInfo updated:', `${currentIndex + 1} / ${flashcards.length}`);
             }
 
             // Update navigation buttons
@@ -678,14 +647,6 @@
 
             // Reset card to front
             document.getElementById('flashcard').classList.remove('flipped');
-            
-            // Thêm event listener cho nút lật thẻ
-            document.querySelectorAll('.flip-button').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Ngăn event click lan tỏa đến flashcard
-                    flipCard();
-                });
-            });
         }
 
         function flipCard() {
