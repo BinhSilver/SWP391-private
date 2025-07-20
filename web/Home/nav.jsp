@@ -68,6 +68,9 @@
                                 <li>
                                     <a class="dropdown-item" href="<c:url value='videocall.jsp'/>">Video Call</a>
                                 </li>
+                                 <li>
+                                    <a class="dropdown-item" href="<c:url value='voiceai.jsp'/>">Call With AI</a>
+                                </li>
                                 <c:if test="${authUser.roleID == 3}">
                                     <li>
                                         <a class="dropdown-item" href="<c:url value='teacher_dashboard'/>">Dashboard</a>

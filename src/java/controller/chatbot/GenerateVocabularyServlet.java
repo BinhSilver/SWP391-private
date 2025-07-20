@@ -17,7 +17,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -200,9 +202,7 @@ public class GenerateVocabularyServlet extends HttpServlet {
         }
 
         // Xử lý phản hồi streaming
-        List<Vocabulary> vocabularyList = new ArrayList<>();
         StringBuilder responseContent = new StringBuilder();
-
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -211,14 +211,12 @@ public class GenerateVocabularyServlet extends HttpServlet {
 
                 try {
                     JsonObject json = new Gson().fromJson(line, JsonObject.class);
-                    if (json.has("type") && json.get("type").getAsString().equals("message")) {
-                        responseContent.append(json.get("content").getAsString());
-                    } else if (json.has("type") && json.get("type").getAsString().equals("final")) {
+                    if (json.has("type") && json.get("type").getAsString().equals("final")) {
                         JsonObject content = json.getAsJsonObject("content");
                         if (content.has("final_response")) {
                             responseContent.append(content.get("final_response").getAsString());
                         }
-                        break; // Thoát khi nhận được phản hồi cuối
+                        break; // Thoát ngay sau khi nhận được final_response
                     }
                 } catch (JsonSyntaxException e) {
                     System.out.println("[ERROR] Failed to parse SSE line: " + line + ", Error: " + e.getMessage());
@@ -227,40 +225,83 @@ public class GenerateVocabularyServlet extends HttpServlet {
             }
         }
 
-        // Parse phản hồi từ AI theo định dạng mẫu
+        // Parse phản hồi từ AI
         String finalResponse = responseContent.toString();
         System.out.println("[DEBUG] Final AI Response: " + finalResponse);
-
-        // Parse các từ vựng từ phản hồi
-        vocabularyList = parseVocabularyFromResponse(finalResponse, lessonId);
-
-        return vocabularyList;
+        return parseVocabularyFromResponse(finalResponse, lessonId);
     }
 
     private List<Vocabulary> parseVocabularyFromResponse(String response, int lessonId) {
         List<Vocabulary> vocabularyList = new ArrayList<>();
+        Set<String> processedLines = new HashSet<>(); // Để tránh trùng lặp
+
         // Loại bỏ các ký tự * và ** từ phản hồi
         String cleanedResponse = response.replaceAll("[*]+", "").trim();
-        // Giả sử phản hồi có dạng như mẫu bạn cung cấp
+        if (cleanedResponse.isEmpty()) {
+            System.out.println("[ERROR] Response is empty after cleaning");
+            return vocabularyList;
+        }
+
+        // Tách phản hồi thành các dòng
         String[] lines = cleanedResponse.split("\n");
+
+        // Regex kiểm tra ký tự hợp lệ cho word và reading (chỉ chấp nhận hiragana, katakana, kanji)
+        String japaneseTextRegex = "[\\p{InHiragana}\\p{InKatakana}\\p{InCJKUnifiedIdeographs}]+";
+        // Regex kiểm tra meaning (chấp nhận chữ cái, số, khoảng trắng, và ký tự tiếng Việt)
+        String meaningRegex = "[\\p{L}\\p{N}\\s]+";
+
         for (String line : lines) {
+            // Bỏ qua dòng trống hoặc đã xử lý
+            if (line.trim().isEmpty() || processedLines.contains(line)) {
+                continue;
+            }
+
             // Kiểm tra dòng có định dạng từ vựng: Word:Meaning:Reading:Example
             if (line.matches("^[^:]+:[^:]+:[^:]+:[^:]+.*$")) {
                 String[] parts = line.split(":", 4);
                 if (parts.length >= 4) {
+                    // Làm sạch các phần tử
+                    String word = parts[0].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (お)
+                    String meaning = parts[1].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (thêm お->tên bạn)
+                    String reading = parts[2].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (おなまえ), (おくに)
+                    String example = parts[3].trim().replace("。", "。\n");
+
+                    // Kiểm tra tính hợp lệ của các trường
+                    if (word.isEmpty() || !word.matches(japaneseTextRegex)) {
+                        System.out.println("[WARN] Invalid word format for line: " + line);
+                        continue;
+                    }
+                    if (meaning.isEmpty() || !meaning.matches(meaningRegex)) {
+                        System.out.println("[WARN] Invalid meaning format for line: " + line);
+                        continue;
+                    }
+                    if (reading.isEmpty() || !reading.matches(japaneseTextRegex)) {
+                        System.out.println("[WARN] Invalid reading format for line: " + line);
+                        continue;
+                    }
+                    if (example.isEmpty()) {
+                        System.out.println("[WARN] Empty example for line: " + line);
+                        continue;
+                    }
+
+                    // Thêm dòng vào processedLines để tránh trùng lặp
+                    processedLines.add(line);
+
                     Vocabulary vocab = new Vocabulary();
                     vocab.setVocabID(0); // ID sẽ được set sau khi lưu vào database
                     vocab.setLessonID(lessonId);
-                    vocab.setWord(parts[0].trim());
-                    vocab.setMeaning(parts[1].trim());
-                    vocab.setReading(parts[2].trim());
-                    // Thêm dấu xuống dòng sau ký tự 。 trong trường example
-                    String example = parts[3].trim().replace("。", "。\n");
+                    vocab.setWord(word);
+                    vocab.setMeaning(meaning);
+                    vocab.setReading(reading);
                     vocab.setExample(example);
                     vocab.setImagePath(null); // Không có image từ API
                     vocabularyList.add(vocab);
                     System.out.println("[DEBUG] Parsed Vocabulary: " + vocab.getWord());
+                } else {
+                    System.out.println("[WARN] Invalid line format (less than 4 parts): " + line);
                 }
+            } else {
+                System.out.println("[WARN] Line does not match vocabulary format: " + line);
             }
         }
 
