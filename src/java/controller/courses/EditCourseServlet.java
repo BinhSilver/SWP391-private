@@ -232,6 +232,20 @@ public class EditCourseServlet extends HttpServlet {
                 }
             }
 
+            // Xử lý xóa lesson nếu có
+            String[] lessonsToDelete = request.getParameterValues("lessonsToDelete");
+            if (lessonsToDelete != null) {
+                LessonsDAO lessonsDAO = new LessonsDAO();
+                for (String lessonIdStr : lessonsToDelete) {
+                    try {
+                        int lessonId = Integer.parseInt(lessonIdStr);
+                        lessonsDAO.deleteLessonAndDependencies(lessonId);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());

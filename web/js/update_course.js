@@ -230,11 +230,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById(`tab-${lessonIndexToDelete}`).parentElement.remove();
                 document.getElementById(`lesson-${lessonIndexToDelete}`).remove();
 
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = `lessonsToDelete`;
-                hiddenInput.value = lessonBlock.querySelector('input[name*="[id]"]').value;
-                document.getElementById('wizardForm').appendChild(hiddenInput);
+                // Nếu lesson đã có id (lesson cũ), thêm input hidden để gửi về BE
+                const lessonIdInput = lessonBlock.querySelector('input[name*="[id]"]');
+                if (lessonIdInput && lessonIdInput.value) {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'lessonsToDelete';
+                    hiddenInput.value = lessonIdInput.value;
+                    document.getElementById('wizardForm').appendChild(hiddenInput);
+                }
 
                 currentLessonQuizIndexInput.value = "";
                 quizQuestionsContainer.innerHTML = "";
@@ -301,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target.classList.contains('btn-delete-question') || event.target.closest('.btn-delete-question')) {
             const deleteButton = event.target.closest('.btn-delete-question');
             const questionBlock = deleteButton.closest('.quiz-question-block');
-            const questionId = questionBlock.querySelector('input[name*="[id]"]').value;
+            const questionId = questionBlock.querySelector('input[name*="[id]"]')?.value;
             const currentLessonIndex = currentLessonQuizIndexInput.value;
 
             if (confirm('Bạn có chắc muốn xoá câu hỏi này không?')) {
