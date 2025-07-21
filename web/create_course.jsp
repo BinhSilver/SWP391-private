@@ -43,6 +43,7 @@
                         <input type="file" class="form-control" id="thumbnailFile" name="thumbnailFile" accept="image/*" />
                     </div>
 
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
@@ -246,61 +247,11 @@
             </div>
         </div>
 
-        <!-- TEMPLATE LESSON (Dùng cho JS khi thêm lesson mới) -->
-        <template id="lessonTemplate">
-            <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
-                <div class="lesson-block course-card border p-3 rounded mb-3" data-lesson-index="{{index}}">
-                    <h6 class="fw-semibold mb-3">Lesson {{indexLabel}}</h6>
-                    <div class="mb-2">
-                        <label class="form-label">Tên Bài Học</label>
-                        <input type="text" class="form-control" name="lessons[{{index}}][name]" required />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Mô tả bài học</label>
-                        <textarea class="form-control" name="lessons[{{index}}][description]" rows="2"></textarea>
-                    </div>
-                    <!-- Vocab -->
-                    <div class="mb-2 vocab-entry-container" data-lesson-index="{{index}}">
-                        <label class="form-label">Từ Vựng (Word:Meaning:Reading:Example)</label>
-                        <div class="input-group mb-2">
-                            <input type="text" class="form-control vocab-text" name="lessons[{{index}}][vocabText][0]" placeholder="Word:Meaning:Reading:Example" />
-                            <input type="file" class="form-control vocab-image" name="lessons[{{index}}][vocabImage][0]" accept="image/*" />
-                            <button type="button" class="btn btn-outline-success btn-add-vocab ms-2">+</button>
-                            <button type="button" class="btn btn-outline-danger btn-remove-vocab ms-1">-</button>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Tài Liệu Từ Vựng (PDF)</label>
-                        <input type="file" class="form-control" name="lessons[{{index}}][vocabDoc][]" accept="application/pdf" multiple />
-                    </div>
-                    <!-- Grammar -->
-                    <div class="mb-2">
-                        <label class="form-label">Video Ngữ Pháp</label>
-                        <input type="file" class="form-control" name="lessons[{{index}}][grammarVideo][]" accept="video/*" multiple />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Tài Liệu Ngữ Pháp</label>
-                        <input type="file" class="form-control" name="lessons[{{index}}][grammarDoc][]" accept="application/pdf" multiple />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Tài Liệu Kanji</label>
-                        <input type="file" class="form-control" name="lessons[{{index}}][kanjiDoc][]" accept="application/pdf" multiple />
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
-                        <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="{{index}}">Tạo Quiz</button>
-                        <button type="button" class="btn btn-outline-primary btn-generate-vocabulary" data-bs-toggle="modal" data-bs-target="#vocabularyModal" data-lesson-index="{{index}}">Tạo Vocabulary bằng AI</button>
-                        <button type="button" class="btn btn-outline-danger btn-delete-lesson">Xoá Lesson</button>
-                    </div>
-                </div>
-            </div>
-        </template>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="<c:url value='/js/create_course.js'/>"></script>
-        <script src="<c:url value='/chat/chatbox.js'/>"></script>
+
+
         <%@ include file="Home/footer.jsp" %>
     </body>
 </html>
-
 
