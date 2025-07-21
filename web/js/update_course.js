@@ -220,43 +220,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     addLessonBtn.addEventListener('click', addLesson);
 
-    lessonTabContent.addEventListener('click', function (event) {
-        if (event.target.classList.contains('btn-delete-lesson') || event.target.closest('.btn-delete-lesson')) {
-            const deleteButton = event.target.closest('.btn-delete-lesson');
-            const lessonBlock = deleteButton.closest('.lesson-block');
-            const lessonIndexToDelete = parseInt(lessonBlock.getAttribute('data-lesson-index'));
-
-            if (confirm('Bạn có chắc muốn xoá bài học này không?')) {
-                document.getElementById(`tab-${lessonIndexToDelete}`).parentElement.remove();
-                document.getElementById(`lesson-${lessonIndexToDelete}`).remove();
-
-                // Nếu lesson đã có id (lesson cũ), thêm input hidden để gửi về BE
-                const lessonIdInput = lessonBlock.querySelector('input[name*="[id]"]');
-                if (lessonIdInput && lessonIdInput.value) {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'lessonsToDelete';
-                    hiddenInput.value = lessonIdInput.value;
-                    document.getElementById('wizardForm').appendChild(hiddenInput);
+    // --- XÓA LESSON ---
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-delete-lesson')) {
+            const lessonBlock = e.target.closest('.lesson-block');
+            const lessonPane = lessonBlock.closest('.tab-pane');
+            const lessonIndex = lessonBlock.getAttribute('data-lesson-index');
+            // Nếu lesson đã có id (lesson cũ), thêm vào lessonsToDelete
+            const lessonIdInput = lessonBlock.querySelector('input[name^="lessons[' + lessonIndex + '][id]"]');
+            if (lessonIdInput && lessonIdInput.value) {
+                let lessonsToDeleteInput = document.querySelector('input[name="lessonsToDelete"]');
+                if (!lessonsToDeleteInput) {
+                    lessonsToDeleteInput = document.createElement('input');
+                    lessonsToDeleteInput.type = 'hidden';
+                    lessonsToDeleteInput.name = 'lessonsToDelete';
+                    lessonsToDeleteInput.value = '';
+                    document.getElementById('updateCourseForm').appendChild(lessonsToDeleteInput);
                 }
-
-                currentLessonQuizIndexInput.value = "";
-                quizQuestionsContainer.innerHTML = "";
-
-                // Xóa lesson khỏi allCourseData
-                if (typeof allCourseData !== 'undefined' && allCourseData.lessons && allCourseData.lessons[lessonIndexToDelete]) {
-                    allCourseData.lessons.splice(lessonIndexToDelete, 1);
-                }
-
-                const remainingTabs = lessonTabList.querySelectorAll('.nav-link');
-                if (remainingTabs.length > 0) {
-                    new bootstrap.Tab(remainingTabs[0]).show();
-                } else {
-                    addLesson();
-                }
-
-                updateLessonIndices();
+                lessonsToDeleteInput.value += (lessonsToDeleteInput.value ? ',' : '') + lessonIdInput.value;
             }
+            // Xóa tab và pane
+            const tabId = 'tab-' + lessonIndex;
+            const tab = document.getElementById(tabId);
+            if (tab) tab.parentElement.remove();
+            lessonPane.remove();
+            updateLessonIndices();
         }
     });
 

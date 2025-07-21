@@ -235,12 +235,16 @@ public class EditCourseServlet extends HttpServlet {
             // Xử lý xóa lesson nếu có
             String[] lessonsToDelete = request.getParameterValues("lessonsToDelete");
             if (lessonsToDelete != null) {
-                LessonsDAO lessonsDAO = new LessonsDAO();
                 for (String lessonIdStr : lessonsToDelete) {
                     try {
                         int lessonId = Integer.parseInt(lessonIdStr);
-                        lessonsDAO.deleteLessonAndDependencies(lessonId);
+                        // Xóa quiz, tài liệu, từ vựng liên quan trước khi xóa lesson
+                        new QuizDAO().deleteByLessonId(lessonId);
+                        mDao.deleteByLessonId(lessonId);
+                        vDao.deleteByLessonId(lessonId);
+                        lDao.delete(lessonId);
                     } catch (Exception ex) {
+                        System.out.println("[ERROR] Lỗi khi xóa lesson: " + ex.getMessage());
                         ex.printStackTrace();
                     }
                 }

@@ -667,6 +667,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // --- XÓA LESSON ---
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-delete-lesson')) {
+                const lessonBlock = e.target.closest('.lesson-block');
+                const lessonPane = lessonBlock.closest('.tab-pane');
+                const lessonIndex = lessonBlock.getAttribute('data-lesson-index');
+                // Nếu lesson đã có id (lesson cũ), thêm vào lessonsToDelete
+                const lessonIdInput = lessonBlock.querySelector('input[name^="lessons[' + lessonIndex + '][id]"]');
+                if (lessonIdInput && lessonIdInput.value) {
+                    let lessonsToDeleteInput = document.querySelector('input[name="lessonsToDelete"]');
+                    if (!lessonsToDeleteInput) {
+                        lessonsToDeleteInput = document.createElement('input');
+                        lessonsToDeleteInput.type = 'hidden';
+                        lessonsToDeleteInput.name = 'lessonsToDelete';
+                        lessonsToDeleteInput.value = '';
+                        document.getElementById('wizardForm').appendChild(lessonsToDeleteInput);
+                    }
+                    lessonsToDeleteInput.value += (lessonsToDeleteInput.value ? ',' : '') + lessonIdInput.value;
+                }
+                // Xóa tab và pane
+                const tabId = 'tab-' + lessonIndex;
+                const tab = document.getElementById(tabId);
+                if (tab) tab.parentElement.remove();
+                lessonPane.remove();
+                updateLessonIndices();
+            }
+        });
+
         // --- INITIALIZE ---
         updateLessonIndices();
         attachQuizButtons();

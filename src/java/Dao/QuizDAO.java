@@ -474,4 +474,13 @@ public class QuizDAO {
             return false;
         }
     }
+
+    public void deleteByLessonId(int lessonId) throws SQLException {
+        String sql = "DELETE FROM Quizzes WHERE LessonID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lessonId);
+            ps.executeUpdate();
+        }
+    }
 }

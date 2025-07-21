@@ -221,22 +221,19 @@ public class CreateCourseServlet extends HttpServlet {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
         VocabularyDAO vocabDao = new VocabularyDAO();
-
+        List<Integer> lessonIdList = new ArrayList<>();
         for (int i = 0; i <= maxLesson; i++) {
             String title = request.getParameter("lessons[" + i + "][name]");
             String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
-
-            System.out.println("[LOG] Lesson " + i + ": title=" + title + ", description=" + description + ", isHidden=" + isHidden);
-
+            if (title == null || title.trim().isEmpty()) continue; // Bỏ qua lesson rỗng
             Lesson lesson = new Lesson();
             lesson.setTitle(title);
             lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
-
             int lessonId = lessonsDao.addAndReturnID(lesson);
-
+            lessonIdList.add(lessonId);
             saveMaterialsForLesson(request, i, lessonId, courseId, materialsDao);
             saveVocabularyForLesson(request, i, lessonId, vocabDao);
             saveQuizForLesson(request, i, lessonId);
