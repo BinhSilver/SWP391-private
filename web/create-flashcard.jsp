@@ -318,7 +318,7 @@
                         <div class="mb-3">
                             <label class="form-label">Ảnh mặt trước</label>
                             <div class="file-input-wrapper">
-                                <input type="file" name="frontImage${cardCount-1}" accept="image/*" 
+                                <input type="file" name="frontImage${cardCount > 1 ? '-' + cardCount : ''}" accept="image/*" 
                                        onchange="previewImage(this, 'frontPreview${uniqueId}')">
                                 <label class="file-input-label">
                                     <i class="fas fa-upload"></i>
@@ -338,7 +338,7 @@
                         <div class="mb-3">
                             <label class="form-label">Ảnh mặt sau</label>
                             <div class="file-input-wrapper">
-                                <input type="file" name="backImage${cardCount-1}" accept="image/*" 
+                                <input type="file" name="backImage${cardCount > 1 ? '-' + cardCount : ''}" accept="image/*" 
                                        onchange="previewImage(this, 'backPreview${uniqueId}')">
                                 <label class="file-input-label">
                                     <i class="fas fa-upload"></i>

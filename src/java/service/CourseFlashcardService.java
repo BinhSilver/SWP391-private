@@ -90,7 +90,7 @@ public class CourseFlashcardService {
                                              .replace("`", "\\`"); // Thêm escape cho backtick
                     item.setFrontContent(frontContent);
                     
-                    // Mặt sau: Chỉ hiển thị nghĩa - định dạng an toàn
+                    // Mặt sau: Nghĩa tiếng Việt - định dạng an toàn
                     String meaning = vocab.getMeaning();
                     if (meaning == null) meaning = "";
                     meaning = meaning.replace("\\", "\\\\")

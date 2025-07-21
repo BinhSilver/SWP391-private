@@ -232,6 +232,20 @@ public class EditCourseServlet extends HttpServlet {
                 }
             }
 
+            // Xử lý xóa lesson nếu có
+            String[] lessonsToDelete = request.getParameterValues("lessonsToDelete");
+            if (lessonsToDelete != null) {
+                LessonsDAO lessonsDAO = new LessonsDAO();
+                for (String lessonIdStr : lessonsToDelete) {
+                    try {
+                        int lessonId = Integer.parseInt(lessonIdStr);
+                        lessonsDAO.deleteLessonAndDependencies(lessonId);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());
@@ -273,11 +287,12 @@ public class EditCourseServlet extends HttpServlet {
                     String materialType = type.startsWith("vocab") ? "Từ Vựng"
                             : type.startsWith("grammar") ? "Ngữ pháp"
                             : type.startsWith("kanji") ? "Kanji" : "";
-                    String fileType = type.endsWith("Video") ? "video" : "PDF";
+                    String fileType = type.endsWith("Video") ? "Video" : "PDF";
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
+                    material.setTitle(materialType + " - " + originalName);
                     material.setFilePath(fileUrl);
                     // XÓA TÀI LIỆU CŨ CÙNG LOẠI (nếu có)
                     List<LessonMaterial> oldMats = mDao.getMaterialsByLessonID(lessonId);
@@ -361,9 +376,14 @@ public class EditCourseServlet extends HttpServlet {
                     }
                     vDao.delete(vocabId);
                     if (vocabToDelete != null && vocabToDelete.getImagePath() != null) {
-                        String s3Key = vocabToDelete.getImagePath().substring(getServletContext().getRealPath(VOCAB_IMAGE_PATH).length() + 1);
-                        S3Util.deleteFile(s3Key);
-                        System.out.println("[LOG] Đã xóa hình ảnh từ vựng từ S3: " + s3Key);
+                        // Lấy S3 key từ URL S3 đầy đủ
+                        String imagePath = vocabToDelete.getImagePath();
+                        if (imagePath.startsWith("https://")) {
+                            // URL S3 đầy đủ, lấy key từ sau domain
+                            String s3Key = imagePath.substring(imagePath.indexOf("/", 8)); // Bỏ qua "https://"
+                            S3Util.deleteFile(s3Key);
+                            System.out.println("[LOG] Đã xóa hình ảnh từ vựng từ S3: " + s3Key);
+                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

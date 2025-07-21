@@ -105,9 +105,21 @@ public class CreateFlashcardServlet extends HttpServlet {
                 System.out.println("[CreateFlashcardServlet] Item " + i + ": frontContent=" + frontContent + 
                                 ", backContent=" + backContent + ", note=" + note);
 
-                // Xử lý ảnh mặt trước và mặt sau
-                Part frontImagePart = request.getPart("frontImage" + (i > 1 ? "-" + i : ""));
-                Part backImagePart = request.getPart("backImage" + (i > 1 ? "-" + i : ""));
+                // Xử lý ảnh mặt trước và mặt sau - Sửa logic tên file
+                Part frontImagePart = null;
+                Part backImagePart = null;
+                
+                try {
+                    frontImagePart = request.getPart("frontImage" + (i > 1 ? "-" + i : ""));
+                } catch (Exception e) {
+                    System.out.println("[CreateFlashcardServlet] Không tìm thấy frontImage cho item " + i);
+                }
+                
+                try {
+                    backImagePart = request.getPart("backImage" + (i > 1 ? "-" + i : ""));
+                } catch (Exception e) {
+                    System.out.println("[CreateFlashcardServlet] Không tìm thấy backImage cho item " + i);
+                }
                 
                 String frontImageUrl = null;
                 String backImageUrl = null;
@@ -197,10 +209,10 @@ public class CreateFlashcardServlet extends HttpServlet {
     }
 
     private int getItemCount(HttpServletRequest request) {
-        // Kiểm tra các tham số frontContent, frontContent-1, frontContent-2, ...
+        // Kiểm tra các tham số frontContent, frontContent-2, frontContent-3, ...
         int count = 0;
         
-        // Kiểm tra tham số frontContent (không có số)
+        // Kiểm tra tham số frontContent (không có số) - item đầu tiên
         if (request.getParameter("frontContent") != null) {
             count = 1;
         }
@@ -210,6 +222,14 @@ public class CreateFlashcardServlet extends HttpServlet {
         while (request.getParameter("frontContent-" + i) != null) {
             count++;
             i++;
+        }
+        
+        // Debug: In ra tất cả các tham số để kiểm tra
+        System.out.println("[CreateFlashcardServlet] Debug - Tất cả parameters:");
+        java.util.Enumeration<String> paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            System.out.println("  " + paramName + " = " + request.getParameter(paramName));
         }
         
         System.out.println("[CreateFlashcardServlet] Đếm được " + count + " flashcard items");
