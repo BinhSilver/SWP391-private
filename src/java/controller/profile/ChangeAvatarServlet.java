@@ -3,7 +3,6 @@ package controller.profile;
 import Dao.UserDAO;
 import model.User;
 import config.S3Util;
-import com.cloudinary.Cloudinary;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;

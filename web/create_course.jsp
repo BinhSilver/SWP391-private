@@ -43,6 +43,7 @@
                         <input type="file" class="form-control" id="thumbnailFile" name="thumbnailFile" accept="image/*" />
                     </div>
 
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isHidden" name="isHidden" />
                         <label class="form-check-label" for="isHidden">Ẩn khóa học (chỉ admin thấy)</label>
@@ -248,6 +249,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="<c:url value='/js/create_course.js'/>"></script>
+
 
         <%@ include file="Home/footer.jsp" %>
     </body>

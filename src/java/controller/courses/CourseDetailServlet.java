@@ -74,6 +74,13 @@ public class CourseDetailServlet extends HttpServlet {
         // 4. Lấy danh sách bài học
         List<Lesson> lessons = lessonDAO.getLessonsByCourseID(courseID);
 
+        // Nếu là vào trang làm quiz (doQuiz), lưu thời điểm bắt đầu vào session
+        String quizParam = request.getParameter("doQuiz");
+        if (quizParam != null && quizParam.equals("1")) {
+            HttpSession quizSession = request.getSession();
+            quizSession.setAttribute("quizStartTime", System.currentTimeMillis());
+        }
+
         // 5. Lấy tài liệu của từng bài học
         Map<Integer, List<LessonMaterial>> lessonMaterialsMap = materialDAO.getAllMaterialsGroupedByLesson(courseID);
 
@@ -107,6 +114,7 @@ public class CourseDetailServlet extends HttpServlet {
             request.setAttribute("lessonCompletionMap", lessonCompletionMap);
             request.setAttribute("completedLessons", completedLessons);
             request.setAttribute("overallProgress", overallProgress);
+            request.setAttribute("completed", overallProgress == 100 ? 1 : 0); // Thêm dòng này để JSP nhận biết đã hoàn thành
             request.setAttribute("lessonUnlockStatus", lessonUnlockStatus);
             
             LOGGER.log(Level.INFO, "User {0} progress for course {1}: {2}%", 
@@ -114,6 +122,15 @@ public class CourseDetailServlet extends HttpServlet {
         }
         request.setAttribute("accessedLessons", accessedLessons);
         request.setAttribute("hasAccessedCourse", hasAccessedCourse);
+
+        // 11. Lấy danh sách feedback cho khóa học
+        try (java.sql.Connection conn = DB.JDBCConnection.getConnection()) {
+            Dao.FeedbackDAO feedbackDAO = new Dao.FeedbackDAO(conn);
+            List<model.Feedback> feedbacks = feedbackDAO.getFeedbacksByCourseId(courseID);
+            request.setAttribute("feedbacks", feedbacks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // 10. Đẩy dữ liệu về trang JSP
         request.setAttribute("course", course);

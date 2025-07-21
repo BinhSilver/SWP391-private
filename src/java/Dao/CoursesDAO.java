@@ -101,140 +101,152 @@ public class CoursesDAO {
         }
     }
 
-    public void delete(int courseID) throws SQLException {
-        try (Connection conn = JDBCConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                List<Integer> lessonIds = new ArrayList<>();
-                String lessonSql = "SELECT LessonID FROM Lessons WHERE CourseID = ?";
-                try (PreparedStatement ps = conn.prepareStatement(lessonSql)) {
-                    ps.setInt(1, courseID);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        while (rs.next()) {
-                            lessonIds.add(rs.getInt("LessonID"));
-                        }
+     public void delete(int courseID) throws SQLException {
+    try (Connection conn = JDBCConnection.getConnection()) {
+        conn.setAutoCommit(false);
+        try {
+            List<Integer> lessonIds = new ArrayList<>();
+            try (PreparedStatement ps = conn.prepareStatement("SELECT LessonID FROM Lessons WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        lessonIds.add(rs.getInt("LessonID"));
                     }
                 }
-
-                for (int lessonId : lessonIds) {
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-
-                    List<Integer> quizIds = new ArrayList<>();
-                    try (PreparedStatement ps = conn.prepareStatement(
-                            "SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        try (ResultSet rs = ps.executeQuery()) {
-                            while (rs.next()) {
-                                quizIds.add(rs.getInt("QuizID"));
-                            }
-                        }
-                    }
-                    for (int quizId : quizIds) {
-                        try (PreparedStatement ps = conn.prepareStatement(
-                                "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
-                            ps.setInt(1, quizId);
-                            ps.executeUpdate();
-                        }
-                        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
-                            ps.setInt(1, quizId);
-                            ps.executeUpdate();
-                        }
-                        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
-                            ps.setInt(1, quizId);
-                            ps.executeUpdate();
-                        }
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
-                        ps.setInt(1, lessonId);
-                        ps.executeUpdate();
-                    }
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM CourseRatings WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-
-                List<Integer> testIds = new ArrayList<>();
-                try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        while (rs.next()) {
-                            testIds.add(rs.getInt("TestID"));
-                        }
-                    }
-                }
-                for (int testId : testIds) {
-                    try (PreparedStatement ps = conn.prepareStatement(
-                            "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)")) {
-                        ps.setInt(1, testId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE TestID = ?")) {
-                        ps.setInt(1, testId);
-                        ps.executeUpdate();
-                    }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM TestResults WHERE TestID = ?")) {
-                        ps.setInt(1, testId);
-                        ps.executeUpdate();
-                    }
-                }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Tests WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
-                    ps.setInt(1, courseID);
-                    ps.executeUpdate();
-                }
-
-                conn.commit();
-            } catch (Exception ex) {
-                conn.rollback();
-                throw ex;
             }
+
+            for (int lessonId : lessonIds) {
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Vocabulary WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonAccess WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonMaterials WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GrammarPoints WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Kanji WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM LessonVocabulary WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+
+                List<Integer> quizIds = new ArrayList<>();
+                try (PreparedStatement ps = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            quizIds.add(rs.getInt("QuizID"));
+                        }
+                    }
+                }
+                for (int quizId : quizIds) {
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
+                        ps.setInt(1, quizId);
+                        ps.executeUpdate();
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
+                    ps.setInt(1, lessonId);
+                    ps.executeUpdate();
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
+
+            List<Integer> testIds = new ArrayList<>();
+            try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        testIds.add(rs.getInt("TestID"));
+                    }
+                }
+            }
+            for (int testId : testIds) {
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)")) {
+                    ps.setInt(1, testId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE TestID = ?")) {
+                    ps.setInt(1, testId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM TestResults WHERE TestID = ?")) {
+                    ps.setInt(1, testId);
+                    ps.executeUpdate();
+                }
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Tests WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM CourseRatings WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
+
+            // ❌ KHÔNG xóa Progress hoặc Feedbacks theo CourseID vì bảng không có cột này
+
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+        } catch (Exception ex) {
+            conn.rollback();
+            ex.printStackTrace();
+            throw new SQLException("Xóa khóa học thất bại: " + ex.getMessage(), ex);
         }
     }
+}
+
+
+/**
+ * Helper method để thực hiện delete query với parameter
+ */
+private void deleteByQuery(Connection conn, String query, int parameter) throws SQLException {
+    try (PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setInt(1, parameter);
+        int deletedRows = ps.executeUpdate();
+        System.out.println("[DEBUG] Executed: " + query + " with parameter: " + parameter + " - Deleted rows: " + deletedRows);
+    }
+}
 
     public int getTotalCourses() throws SQLException {
         String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Courses]";
