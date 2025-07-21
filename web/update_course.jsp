@@ -126,7 +126,7 @@
                                                                 </div>
                                                                 <div class="mt-2">
                                                                     <c:if test="${not empty vocab.imagePath}">
-                                                                        <img src="<c:url value='/imgvocab/${vocab.imagePath}'/>" alt="${vocab.word}" style="max-width: 100px;" class="mb-2" />
+                                                                        <img src="${vocab.imagePath}" alt="${vocab.word}" style="max-width: 100px;" class="mb-2" />
                                                                     </c:if>
                                                                     <input type="file" class="form-control" name="lessons[${loop.index}][existingVocabulary][${vocab.vocabID}][image]" accept="image/*" />
                                                                 </div>

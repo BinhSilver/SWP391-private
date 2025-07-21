@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import config.S3Util;
+import service.CourseFlashcardService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -30,6 +31,23 @@ public class CreateCourseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Kiểm tra quyền truy cập - chỉ giáo viên và admin mới có thể tạo khóa học
+        User user = getCurrentUser(request);
+        if (user == null) {
+            System.out.println("[ERROR] Không có user đăng nhập, chuyển hướng về trang đăng nhập.");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        // Kiểm tra role - chỉ role 3 (giáo viên) và 4 (admin) mới có quyền
+        if (user.getRoleID() != 3 && user.getRoleID() != 4) {
+            System.out.println("[ERROR] User không có quyền tạo khóa học. RoleID: " + user.getRoleID());
+            request.setAttribute("error", "Bạn không có quyền tạo khóa học. Chỉ giáo viên và admin mới có quyền này.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
+        System.out.println("[LOG] User " + user.getFullName() + " (RoleID: " + user.getRoleID() + ") truy cập trang tạo khóa học");
         request.getRequestDispatcher("create_course.jsp").forward(request, response);
     }
 
@@ -100,6 +118,17 @@ public class CreateCourseServlet extends HttpServlet {
 
             handleAllLessons(request, courseId, maxLesson);
 
+            // Tự động tạo flashcard cho khóa học sau khi đã có từ vựng
+            try {
+                CourseFlashcardService flashcardService = new CourseFlashcardService();
+                int flashcardId = flashcardService.createFlashcardFromCourse(courseId, user.getUserID());
+                System.out.println("[LOG] Đã tự động tạo flashcard cho khóa học " + courseId + ", flashcardId = " + flashcardId);
+            } catch (Exception ex) {
+                System.out.println("[ERROR] Không thể tự động tạo flashcard cho khóa học: " + ex.getMessage());
+                ex.printStackTrace();
+                // Không throw exception để tiếp tục quá trình tạo khóa học
+            }
+            
             // Lưu quiz cho từng lesson nếu có
             String quizJson = request.getParameter("quizJson");
             if (quizJson != null && !quizJson.isEmpty()) {
@@ -192,22 +221,19 @@ public class CreateCourseServlet extends HttpServlet {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
         VocabularyDAO vocabDao = new VocabularyDAO();
-
+        List<Integer> lessonIdList = new ArrayList<>();
         for (int i = 0; i <= maxLesson; i++) {
             String title = request.getParameter("lessons[" + i + "][name]");
             String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
-
-            System.out.println("[LOG] Lesson " + i + ": title=" + title + ", description=" + description + ", isHidden=" + isHidden);
-
+            if (title == null || title.trim().isEmpty()) continue; // Bỏ qua lesson rỗng
             Lesson lesson = new Lesson();
             lesson.setTitle(title);
             lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
-
             int lessonId = lessonsDao.addAndReturnID(lesson);
-
+            lessonIdList.add(lessonId);
             saveMaterialsForLesson(request, i, lessonId, courseId, materialsDao);
             saveVocabularyForLesson(request, i, lessonId, vocabDao);
             saveQuizForLesson(request, i, lessonId);
@@ -252,12 +278,13 @@ public class CreateCourseServlet extends HttpServlet {
                     String materialType = type.startsWith("vocab") ? "Từ Vựng"
                             : type.startsWith("grammar") ? "Ngữ pháp"
                             : type.startsWith("kanji") ? "Kanji" : "";
-                    String fileType = type.endsWith("Video") ? "video" : "PDF";
+                    String fileType = type.endsWith("Video") ? "Video" : "PDF";
 
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
+                    material.setTitle(materialType + " - " + originalName);
                     material.setFilePath(fileUrl);
                     materialsDao.add(material);
                 }

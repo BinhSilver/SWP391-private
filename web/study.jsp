@@ -83,21 +83,19 @@
                     </div>
 
                     <!-- VIDEO -->
-                    <c:set var="showedVideo" value="false" />
                     <c:forEach var="m" items="${materials}">
-                        <c:if test="${m.fileType eq 'Video' && !showedVideo}">
+                        <c:if test="${m.materialType eq 'Ngữ pháp' && m.fileType eq 'Video'}">
                             <div class="material-item">
                                 <h5><i class="fas fa-play-circle me-2"></i>Video bài học</h5>
                                 <strong><i class="fas fa-film me-2"></i>${m.title}</strong>
                                 <div class="file-viewer position-relative">
                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
                                     <video controls preload="metadata">
-                                        <source src="files/lesson8_grammarVideo_1752740459670.mp4" type="video/mp4">
+                                        <source src="${m.filePath}" type="video/mp4">
                                         Trình duyệt của bạn không hỗ trợ video.
                                     </video>
                                 </div>
                             </div>
-                            <c:set var="showedVideo" value="true" />
                         </c:if>
                     </c:forEach>
 
@@ -191,7 +189,7 @@
                                                         <button class="play-btn" data-word="${vocab.word}" style="color: white;"><i class="fa-solid fa-volume-up"></i> Phát phát âm</button>
                                                     </div>
                                                     <c:if test="${not empty vocab.imagePath}">
-                                                        <img src="${pageContext.request.contextPath}/imgvocab/${vocab.imagePath}" alt="${vocab.word}" class="vocab-image">
+                                                        <img src="${vocab.imagePath}" alt="${vocab.word}" class="vocab-image">
                                                     </c:if>
                                                 </div>
                                             </div>
@@ -203,7 +201,22 @@
                                     </div>
                                       </div>
                                     <c:forEach var="m" items="${materials}">
-                                        <c:if test="${m.materialType eq 'Từ vựng'}">
+                                        <c:if test="${m.materialType eq 'Từ vựng' && m.fileType eq 'Video'}">
+                                            <div class="material-item">
+                                                <h5><i class="fas fa-play-circle me-2"></i>Video Từ vựng</h5>
+                                                <strong><i class="fas fa-film me-2"></i>${m.title}</strong>
+                                                <div class="file-viewer position-relative">
+                                                    <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
+                                                    <video controls preload="metadata">
+                                                        <source src="${m.filePath}" type="video/mp4">
+                                                        Trình duyệt của bạn không hỗ trợ video.
+                                                    </video>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
+                                    <c:forEach var="m" items="${materials}">
+                                        <c:if test="${m.materialType eq 'Từ vựng' && m.fileType eq 'PDF'}">
                                             <div class="material-item">
                                                 <h5><i class="fas fa-file-pdf me-2"></i>Tài liệu từ vựng</h5>
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
@@ -223,7 +236,22 @@
                                         <p class="section-description">Học cách viết và ý nghĩa của các ký tự Kanji</p>
                                     </div>
                                     <c:forEach var="m" items="${materials}">
-                                        <c:if test="${m.materialType eq 'Kanji'}">
+                                        <c:if test="${m.materialType eq 'Kanji' && m.fileType eq 'Video'}">
+                                            <div class="material-item">
+                                                <h5><i class="fas fa-play-circle me-2"></i>Video Kanji</h5>
+                                                <strong><i class="fas fa-film me-2"></i>${m.title}</strong>
+                                                <div class="file-viewer position-relative">
+                                                    <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
+                                                    <video controls preload="metadata">
+                                                        <source src="${m.filePath}" type="video/mp4">
+                                                        Trình duyệt của bạn không hỗ trợ video.
+                                                    </video>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
+                                    <c:forEach var="m" items="${materials}">
+                                        <c:if test="${m.materialType eq 'Kanji' && m.fileType eq 'PDF'}">
                                             <div class="material-item">
                                                 <h5><i class="fas fa-file-pdf me-2"></i>Tài liệu Kanji</h5>
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>

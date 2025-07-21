@@ -92,6 +92,15 @@ public static ArrayList<Vocabulary> searchVocabulary(String keyword) throws SQLE
             stmt.executeUpdate();
         }
     }
+
+    public void deleteByLessonId(int lessonId) throws SQLException {
+        String sql = "DELETE FROM Vocabulary WHERE LessonID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lessonId);
+            ps.executeUpdate();
+        }
+    }
     public static void main(String[] args) throws SQLException {
         VocabularyDAO a = new VocabularyDAO();
         test.Testcase.printlist(a.searchVocabulary("c"));

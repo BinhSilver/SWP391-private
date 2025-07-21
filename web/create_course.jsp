@@ -20,6 +20,13 @@
         <%@ include file="/Home/nav.jsp" %>
 
         <section class="container py-5">
+            <!-- Debug info -->
+            <div class="alert alert-info">
+                <strong>Debug:</strong> Trang create_course.jsp đã load thành công.
+                <br>User: ${sessionScope.authUser != null ? sessionScope.authUser.fullName : 'Chưa đăng nhập'}
+                <br>Role: ${sessionScope.authUser != null ? sessionScope.authUser.roleID : 'N/A'}
+            </div>
+            
             <h2 class="text-danger fw-bold text-center mb-4">Tạo Khóa Học Mới</h2>
             <form id="wizardForm" method="post" action="CreateCourseServlet" enctype="multipart/form-data"
                   class="bg-white p-4 rounded-4 shadow-sm">
@@ -235,6 +242,20 @@
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Lưu Quiz</button>
                         </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL IMPORT QUIZ -->
+        <div class="modal fade" id="quizImportModal" tabindex="-1" aria-labelledby="quizImportModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="quizImportModalLabel">Import Quiz từ Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
                         <div class="quiz-import-excel border rounded-3 p-3 mb-3 bg-light text-center d-flex flex-column align-items-center justify-content-center">
                             <label for="quizFile" class="form-label fw-semibold text-success mb-2" style="font-size:1.1rem;">
                                 <i class="fas fa-file-excel me-2" style="color:#198754;font-size:1.5rem;"></i>Import Quiz từ Excel
@@ -242,16 +263,80 @@
                             <input type="file" class="form-control mb-2 w-auto" id="quizFile" accept=".xlsx, .xls" style="max-width:260px;">
                             <small class="form-text text-muted">Chỉ chấp nhận file Excel (.xlsx, .xls) theo định dạng mẫu.</small>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-success" id="importQuizBtn">Import Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
                     </form>
                 </div>
             </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            console.log('=== CREATE COURSE PAGE DEBUG ===');
+            console.log('Page loaded successfully');
+            console.log('Bootstrap loaded:', typeof bootstrap !== 'undefined');
+            console.log('Form element:', document.getElementById('wizardForm'));
+            console.log('Add lesson button:', document.getElementById('addLessonBtn'));
+            console.log('================================');
+        </script>
         <script src="<c:url value='/js/create_course.js'/>"></script>
 
 
         <%@ include file="Home/footer.jsp" %>
     </body>
 </html>
+
+<template id="lessonTemplate">
+    <div class="tab-pane fade" id="lesson-{{index}}" role="tabpanel" data-lesson-index="{{index}}">
+        <div class="lesson-block course-card border p-3 rounded mb-3" data-lesson-index="{{index}}">
+            <h6 class="fw-semibold mb-3">Lesson {{indexLabel}}</h6>
+            <div class="mb-2">
+                <label class="form-label">Tên Bài Học</label>
+                <input type="text" class="form-control" name="lessons[{{index}}][name]" required />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Mô tả bài học</label>
+                <textarea class="form-control" name="lessons[{{index}}][description]" rows="2"></textarea>
+            </div>
+            <!-- Vocab -->
+            <div class="mb-2 vocab-entry-container" data-lesson-index="{{index}}">
+                <label class="form-label">Từ Vựng (Word:Meaning:Reading:Example)</label>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control vocab-text" name="lessons[{{index}}][vocabText][0]" placeholder="Word:Meaning:Reading:Example" />
+                    <input type="file" class="form-control vocab-image" name="lessons[{{index}}][vocabImage][0]" accept="image/*" />
+                    <button type="button" class="btn btn-outline-success btn-add-vocab ms-2">+</button>
+                    <button type="button" class="btn btn-outline-danger btn-remove-vocab ms-1">-</button>
+                </div>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tài Liệu Từ Vựng (PDF)</label>
+                <input type="file" class="form-control" name="lessons[{{index}}][vocabDoc][]" accept="application/pdf" multiple />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Video Ngữ Pháp</label>
+                <input type="file" class="form-control" name="lessons[{{index}}][grammarVideo][]" accept="video/*" multiple />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tài Liệu Ngữ Pháp</label>
+                <input type="file" class="form-control" name="lessons[{{index}}][grammarDoc][]" accept="application/pdf" multiple />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tài Liệu Kanji</label>
+                <input type="file" class="form-control" name="lessons[{{index}}][kanjiDoc][]" accept="application/pdf" multiple />
+            </div>
+            <div class="d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-outline-success btn-save-lesson">Lưu Lesson</button>
+                <button type="button" class="btn btn-outline-info btn-toggle-quiz" data-bs-toggle="modal" data-bs-target="#quizModal" data-lesson-index="{{index}}">Tạo Quiz</button>
+                <button type="button" class="btn btn-outline-primary btn-generate-vocabulary" data-bs-toggle="modal" data-bs-target="#vocabularyModal" data-lesson-index="{{index}}">Tạo Vocabulary bằng AI</button>
+                <button type="button" class="btn btn-outline-danger btn-delete-lesson">Xoá Lesson</button>
+            </div>
+        </div>
+    </div>
+</template>
 
