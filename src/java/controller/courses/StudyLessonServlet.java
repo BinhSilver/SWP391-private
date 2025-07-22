@@ -102,7 +102,6 @@ public class StudyLessonServlet extends HttpServlet {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error loading vocabulary", e);
         }
-
         // Get current progress
         int currentProgress = 0;
         if (progressDAO.getUserLessonProgress(user.getUserID(), lessonId) != null) {
@@ -116,6 +115,7 @@ public class StudyLessonServlet extends HttpServlet {
         request.setAttribute("vocabulary", vocabulary);
         request.setAttribute("lessons", lessons);
         request.setAttribute("currentProgress", currentProgress);
+        request.setAttribute("isTeacher", user.getRoleID() == 3 || user.getRoleID() == 4);
         
         // Prepare adjacent lessons for navigation
         int prevLessonId = -1;

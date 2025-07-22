@@ -165,7 +165,12 @@ CREATE TABLE GrammarPoints (
 CREATE TABLE Flashcards (
     FlashcardID INT PRIMARY KEY IDENTITY,
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
-    Title NVARCHAR(100)
+    Title NVARCHAR(100),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+    IsPublic BIT DEFAULT 0,
+    Description NVARCHAR(500),
+    CoverImage NVARCHAR(500)
 );
 
 CREATE TABLE FlashcardItems (
@@ -173,8 +178,15 @@ CREATE TABLE FlashcardItems (
     FlashcardID INT FOREIGN KEY REFERENCES Flashcards(FlashcardID),
     VocabID INT NULL FOREIGN KEY REFERENCES Vocabulary(VocabID),
     UserVocabID INT NULL FOREIGN KEY REFERENCES UserVocabulary(UserVocabID),
-    Note NVARCHAR(255)
+    Note NVARCHAR(255),
+    FrontContent NVARCHAR(500),
+    BackContent NVARCHAR(500),
+    FrontImage NVARCHAR(500),
+    BackImage NVARCHAR(500),
+    OrderIndex INT DEFAULT 0
 );
+
+
 
 CREATE TABLE Quizzes (
     QuizID INT PRIMARY KEY IDENTITY,
@@ -292,14 +304,15 @@ CREATE TABLE Feedbacks (
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
     Content NVARCHAR(MAX),
-    CreatedAt DATETIME DEFAULT GETDATE()
+    CreatedAt DATETIME DEFAULT GETDATE(),
+	Rating INT CHECK (Rating BETWEEN 1 AND 5) NOT NULL DEFAULT 5
 );
 
 CREATE TABLE FeedbackVotes (
     VoteID INT PRIMARY KEY IDENTITY,
     FeedbackID INT FOREIGN KEY REFERENCES Feedbacks(FeedbackID),
-    UserID INT FOREIGN KEY REFERENCES Users(UserID)
-	VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+	VoteType INT CHECK (VoteType IN (1, -1)) -- 1: like, -1: dislike
 );
 
 CREATE TABLE CourseRatings (
@@ -311,10 +324,6 @@ CREATE TABLE CourseRatings (
     RatedAt DATETIME DEFAULT GETDATE()
 );
 
-ALTER TABLE Feedbacks ADD CourseID INT FOREIGN KEY REFERENCES Courses(CourseID), IsDeleted BIT DEFAULT 0;
-ALTER TABLE Feedbacks DROP COLUMN LessonID; -- Nếu feedback chỉ cho khóa học
-ALTER TABLE FeedbackVotes ADD VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
-
 CREATE TABLE Progress (
     ProgressID INT PRIMARY KEY IDENTITY,
     UserID INT FOREIGN KEY REFERENCES Users(UserID),
@@ -323,6 +332,7 @@ CREATE TABLE Progress (
     CompletionPercent INT CHECK (CompletionPercent BETWEEN 0 AND 100),
     LastAccessed DATETIME DEFAULT GETDATE()
 );
+
 
 -- =========================
 -- 3. SEED DATA
@@ -345,7 +355,7 @@ DECLARE @TeacherID INT = (SELECT UserID FROM Users WHERE Email = 'teacher@gmail.
 
 -- Tạo khóa học với CreatedBy là giáo viên
 INSERT INTO Courses (Title, Description, IsHidden, IsSuggested, CreatedBy, imageUrl)
-VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1, @TeacherID, N'course_n5_thumbnail.png');
+VALUES (N'Khóa học Giao tiếp N5', N'Khóa học tiếng Nhật sơ cấp tập trung vào giao tiếp cơ bản.', 0, 1, @TeacherID, N'image/N5thumbnail.jpg');
 DECLARE @CourseID INT = SCOPE_IDENTITY();
 
 INSERT INTO Lessons (CourseID, Title, Description, IsHidden)
@@ -358,17 +368,17 @@ DECLARE @LessonID3 INT = (SELECT LessonID FROM Lessons WHERE Title = N'Bài 3: H
 
 INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath, IsHidden)
 VALUES (@LessonID1, N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/courseN5/vocabN5/Lesson1.pdf', 0),
-       (@LessonID1, N'Kanji', N'PDF', N'Kanji Bài 1', N'files/courseN5/kanjiN5/Lesson1.pdf', 0),
+       (@LessonID1, N'Kanji', N'PDF', N'Kanji Bài 1', N'files/courseN5/kanjiN5/Lesson8.pdf', 0),
        (@LessonID1, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/courseN5/grammarN5/Lesson1.pdf', 0),
-       (@LessonID1, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/courseN5/videos/Lesson1_grammar.mp4', 0),
+       (@LessonID1, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'web/files/lesson27_grammarVideo_1752087643271', 0),
        (@LessonID2, N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/courseN5/vocabN5/Lesson2.pdf', 0),
        (@LessonID2, N'Kanji', N'PDF', N'Kanji Bài 2', N'files/courseN5/kanjiN5/Lesson2.pdf', 0),
        (@LessonID2, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/courseN5/grammarN5/Lesson2.pdf', 0),
-       (@LessonID2, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/courseN5/videos/Lesson2_grammar.mp4', 0),
+       (@LessonID2, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'web/files/lesson27_grammarVideo_1752087643271', 0),
        (@LessonID3, N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/courseN5/vocabN5/Lesson3.pdf', 0),
        (@LessonID3, N'Kanji', N'PDF', N'Kanji Bài 3', N'files/courseN5/kanjiN5/Lesson3.pdf', 0),
        (@LessonID3, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf', 0),
-       (@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/courseN5/videos/Lesson3_grammar.mp4', 0);
+       (@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'web/files/lesson27_grammarVideo_1752087643271', 0);
 
 INSERT INTO Vocabulary ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
 VALUES (N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'mizu.png'),

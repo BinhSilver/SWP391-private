@@ -26,6 +26,17 @@ public class QuizDAO {
 
             deleteQuestionsAndAnswers(conn, quizId);
 
+            // Nếu không có câu hỏi nào, xóa luôn quiz khỏi DB
+            if (questions == null || questions.isEmpty()) {
+                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE QuizID = ?")) {
+                    ps.setInt(1, quizId);
+                    ps.executeUpdate();
+                }
+                conn.commit();
+                System.out.println("[saveQuestions] Xóa quiz vì không có câu hỏi!");
+                return true;
+            }
+
             for (QuizQuestion question : questions) {
                 PreparedStatement qStmt = conn.prepareStatement(insertQuestionSql);
                 qStmt.setInt(1, quizId);
@@ -461,6 +472,15 @@ public class QuizDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void deleteByLessonId(int lessonId) throws SQLException {
+        String sql = "DELETE FROM Quizzes WHERE LessonID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lessonId);
+            ps.executeUpdate();
         }
     }
 }

@@ -19,6 +19,17 @@ public class FlashcardItemDAO {
     // Tạo flashcard item mới
     public int createFlashcardItem(FlashcardItem item) throws SQLException {
         String sql = "INSERT INTO FlashcardItems (FlashcardID, VocabID, UserVocabID, Note, FrontContent, BackContent, FrontImage, BackImage, OrderIndex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        // Debug: In ra thông tin trước khi lưu vào database
+        System.out.println("[FlashcardItemDAO] Lưu item vào DB: " +
+                        "FlashcardID=" + item.getFlashcardID() +
+                        ", FrontContent='" + item.getFrontContent() + "'" +
+                        ", BackContent='" + item.getBackContent() + "'" +
+                        ", Note='" + item.getNote() + "'" +
+                        ", FrontImage='" + item.getFrontImage() + "'" +
+                        ", BackImage='" + item.getBackImage() + "'" +
+                        ", OrderIndex=" + item.getOrderIndex());
+        
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, item.getFlashcardID());
             ps.setObject(2, item.getVocabID());
@@ -31,13 +42,17 @@ public class FlashcardItemDAO {
             ps.setInt(9, item.getOrderIndex());
             
             int affectedRows = ps.executeUpdate();
+            System.out.println("[FlashcardItemDAO] Số dòng bị ảnh hưởng: " + affectedRows);
+            
             if (affectedRows == 0) {
                 throw new SQLException("Creating flashcard item failed, no rows affected.");
             }
 
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
+                    int newId = generatedKeys.getInt(1);
+                    System.out.println("[FlashcardItemDAO] Tạo thành công item với ID: " + newId);
+                    return newId;
                 } else {
                     throw new SQLException("Creating flashcard item failed, no ID obtained.");
                 }
@@ -49,6 +64,8 @@ public class FlashcardItemDAO {
     public List<FlashcardItem> getFlashcardItemsByFlashcardID(int flashcardID) throws SQLException {
         List<FlashcardItem> items = new ArrayList<>();
         String sql = "SELECT * FROM FlashcardItems WHERE FlashcardID = ? ORDER BY OrderIndex ASC";
+        
+        System.out.println("[FlashcardItemDAO] SQL: " + sql + ", flashcardID=" + flashcardID);
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, flashcardID);
@@ -65,10 +82,23 @@ public class FlashcardItemDAO {
                     item.setFrontImage(rs.getString("FrontImage"));
                     item.setBackImage(rs.getString("BackImage"));
                     item.setOrderIndex(rs.getInt("OrderIndex"));
+                    
+                    // Debug: In ra thông tin chi tiết về item được đọc từ database
+                    System.out.println("[FlashcardItemDAO] Đọc item từ DB: " +
+                                    "ID=" + item.getFlashcardItemID() +
+                                    ", FrontContent='" + item.getFrontContent() + "'" +
+                                    ", BackContent='" + item.getBackContent() + "'" +
+                                    ", Note='" + item.getNote() + "'" +
+                                    ", FrontImage='" + item.getFrontImage() + "'" +
+                                    ", BackImage='" + item.getBackImage() + "'" +
+                                    ", OrderIndex=" + item.getOrderIndex());
+                    
                     items.add(item);
                 }
             }
         }
+        
+        System.out.println("[FlashcardItemDAO] Tổng số items đọc được: " + items.size());
         return items;
     }
 

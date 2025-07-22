@@ -145,4 +145,13 @@ public class LessonMaterialsDAO {
         LessonMaterialsDAO dao = new LessonMaterialsDAO();
         return dao.getMaterialsByLessonID(lessonId);
     }
+
+    public void deleteByLessonId(int lessonId) throws SQLException {
+        String sql = "DELETE FROM LessonMaterials WHERE LessonID = ?";
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lessonId);
+            ps.executeUpdate();
+        }
+    }
 }

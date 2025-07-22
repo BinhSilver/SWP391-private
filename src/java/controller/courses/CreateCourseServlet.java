@@ -14,6 +14,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import config.S3Util;
+import service.CourseFlashcardService;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @MultipartConfig
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/CreateCourseServlet"})
@@ -27,6 +31,23 @@ public class CreateCourseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Kiểm tra quyền truy cập - chỉ giáo viên và admin mới có thể tạo khóa học
+        User user = getCurrentUser(request);
+        if (user == null) {
+            System.out.println("[ERROR] Không có user đăng nhập, chuyển hướng về trang đăng nhập.");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        // Kiểm tra role - chỉ role 3 (giáo viên) và 4 (admin) mới có quyền
+        if (user.getRoleID() != 3 && user.getRoleID() != 4) {
+            System.out.println("[ERROR] User không có quyền tạo khóa học. RoleID: " + user.getRoleID());
+            request.setAttribute("error", "Bạn không có quyền tạo khóa học. Chỉ giáo viên và admin mới có quyền này.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
+        System.out.println("[LOG] User " + user.getFullName() + " (RoleID: " + user.getRoleID() + ") truy cập trang tạo khóa học");
         request.getRequestDispatcher("create_course.jsp").forward(request, response);
     }
 
@@ -36,7 +57,6 @@ public class CreateCourseServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // Log toàn bộ parameter map
         System.out.println("===== PARAMETER MAP =====");
         request.getParameterMap().forEach((k, v) -> System.out.println(k + " = " + Arrays.toString(v)));
         System.out.println("=========================");
@@ -49,14 +69,6 @@ public class CreateCourseServlet extends HttpServlet {
                 return;
             }
 
-            // Tạo thư mục lưu trữ nếu chưa tồn tại
-            String uploadDirPath = ABSOLUTE_UPLOAD_PATH;
-            String vocabImageDirPath = getServletContext().getRealPath(VOCAB_IMAGE_PATH);
-            File uploadDir = new File(uploadDirPath);
-            File vocabImageDir = new File(vocabImageDirPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
-            if (!vocabImageDir.exists()) vocabImageDir.mkdirs();
-
             // Xử lý ảnh thumbnail khóa học
             String imageUrl = null;
             Part imagePart = request.getPart("thumbnailFile");
@@ -66,9 +78,16 @@ public class CreateCourseServlet extends HttpServlet {
                     throw new IllegalArgumentException("Thumbnail phải là file ảnh (jpg, jpeg, png, gif).");
                 }
                 System.out.println("[LOG] Nhận file thumbnail: " + fileName + ", size: " + imagePart.getSize());
-                String filePath = uploadDirPath + File.separator + fileName;
-                saveFile(imagePart, filePath);
-                imageUrl = "files/" + fileName; // Lưu đường dẫn tương đối trong database
+                try (InputStream is = imagePart.getInputStream()) {
+                    // Tạm thời chưa có courseId, upload vào temp, sau đó sẽ update lại key nếu cần
+                    String tempKey = "course/temp/" + System.currentTimeMillis() + "_" + fileName;
+                    imageUrl = S3Util.uploadFile(is, imagePart.getSize(), tempKey, imagePart.getContentType());
+                    System.out.println("[LOG] Đã upload thumbnail lên S3: " + imageUrl);
+                } catch (Exception ex) {
+                    System.out.println("[ERROR] Upload thumbnail lên S3 thất bại: " + ex.getMessage());
+                    ex.printStackTrace();
+                    throw ex;
+                }
             }
 
             // Lấy thông tin khóa học
@@ -77,13 +96,75 @@ public class CreateCourseServlet extends HttpServlet {
             System.out.println("[LOG] Thông tin course: " + course);
             int courseId = saveCourseAndReturnId(course);
 
+            // Nếu có thumbnail, đổi key về đúng courseId
+            if (imageUrl != null) {
+                String fileName = getFileName(request.getPart("thumbnailFile"));
+                try (InputStream is = request.getPart("thumbnailFile").getInputStream()) {
+                    String key = "course/" + courseId + "/" + fileName;
+                    imageUrl = S3Util.uploadFile(is, request.getPart("thumbnailFile").getSize(), key, request.getPart("thumbnailFile").getContentType());
+                    System.out.println("[LOG] Đã upload lại thumbnail vào folder đúng courseId: " + imageUrl);
+                    // Update lại imageUrl cho course
+                    CoursesDAO dao = new CoursesDAO();
+                    course.setImageUrl(imageUrl);
+                    dao.update(course);
+                } catch (Exception ex) {
+                    System.out.println("[ERROR] Upload lại thumbnail vào folder courseId thất bại: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+
             int maxLesson = getMaxLessonIndex(request);
             System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
-            handleAllLessons(request, courseId, maxLesson, uploadDirPath, vocabImageDirPath);
+            handleAllLessons(request, courseId, maxLesson);
+
+            // Tự động tạo flashcard cho khóa học sau khi đã có từ vựng
+            try {
+                CourseFlashcardService flashcardService = new CourseFlashcardService();
+                int flashcardId = flashcardService.createFlashcardFromCourse(courseId, user.getUserID());
+                System.out.println("[LOG] Đã tự động tạo flashcard cho khóa học " + courseId + ", flashcardId = " + flashcardId);
+            } catch (Exception ex) {
+                System.out.println("[ERROR] Không thể tự động tạo flashcard cho khóa học: " + ex.getMessage());
+                ex.printStackTrace();
+                // Không throw exception để tiếp tục quá trình tạo khóa học
+            }
+            
+            // Lưu quiz cho từng lesson nếu có
+            String quizJson = request.getParameter("quizJson");
+            if (quizJson != null && !quizJson.isEmpty()) {
+                Gson gson = new Gson();
+                List<List<Map<String, Object>>> allQuizzes = gson.fromJson(quizJson, new TypeToken<List<List<Map<String, Object>>>>(){}.getType());
+                for (int i = 0; i < allQuizzes.size(); i++) {
+                    List<Map<String, Object>> quizList = allQuizzes.get(i);
+                    // Lấy lessonId vừa tạo theo thứ tự (giả sử lessonId tăng dần, hoặc map lại nếu cần)
+                    // Ở đây giả sử lessonId = lessonIdList.get(i)
+                    // Nếu bạn có mapping lessonIndex -> lessonId, hãy dùng đúng lessonId
+                    int lessonId = getLessonIdByIndex(courseId, i); // Cần cài đặt hàm này
+                    if (quizList != null && !quizList.isEmpty()) {
+                        List<QuizQuestion> questions = new ArrayList<>();
+                        for (Map<String, Object> q : quizList) {
+                            QuizQuestion qq = new QuizQuestion();
+                            qq.setQuestion((String) q.get("question"));
+                            qq.setTimeLimit(60); // hoặc lấy từ q nếu có
+                            List<Answer> answers = new ArrayList<>();
+                            answers.add(new Answer(0, 0, (String) q.get("optionA"), 1, "A".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionB"), 2, "B".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionC"), 3, "C".equals(q.get("answer")) ? 1 : 0));
+                            answers.add(new Answer(0, 0, (String) q.get("optionD"), 4, "D".equals(q.get("answer")) ? 1 : 0));
+                            qq.setAnswers(answers);
+                            questions.add(qq);
+                        }
+                        QuizDAO.saveQuestions(lessonId, questions);
+                    } else {
+                        // Nếu không có quiz, xóa quiz nếu có
+                        QuizDAO.saveQuestions(lessonId, new ArrayList<>());
+                    }
+                }
+            }
 
             response.sendRedirect("CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
+            System.out.println("[ERROR] " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             request.getRequestDispatcher("create_course.jsp").forward(request, response);
@@ -135,34 +216,31 @@ public class CreateCourseServlet extends HttpServlet {
         return maxLesson;
     }
 
-    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson, String uploadDirPath, String vocabImageDirPath)
+    private void handleAllLessons(HttpServletRequest request, int courseId, int maxLesson)
             throws Exception {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
         VocabularyDAO vocabDao = new VocabularyDAO();
-
+        List<Integer> lessonIdList = new ArrayList<>();
         for (int i = 0; i <= maxLesson; i++) {
             String title = request.getParameter("lessons[" + i + "][name]");
             String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
-
-            System.out.println("[LOG] Lesson " + i + ": title=" + title + ", description=" + description + ", isHidden=" + isHidden);
-
+            if (title == null || title.trim().isEmpty()) continue; // Bỏ qua lesson rỗng
             Lesson lesson = new Lesson();
             lesson.setTitle(title);
             lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
-
             int lessonId = lessonsDao.addAndReturnID(lesson);
-
-            saveMaterialsForLesson(request, i, lessonId, uploadDirPath, materialsDao);
-            saveVocabularyForLesson(request, i, lessonId, vocabImageDirPath, vocabDao);
+            lessonIdList.add(lessonId);
+            saveMaterialsForLesson(request, i, lessonId, courseId, materialsDao);
+            saveVocabularyForLesson(request, i, lessonId, vocabDao);
             saveQuizForLesson(request, i, lessonId);
         }
     }
 
-    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String uploadDirPath, LessonMaterialsDAO materialsDao)
+    private void saveMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, int courseId, LessonMaterialsDAO materialsDao)
             throws Exception {
         String[] fieldTypes = {"vocabVideo", "vocabDoc", "grammarVideo", "grammarDoc", "kanjiVideo", "kanjiDoc"};
         Collection<Part> parts = request.getParts();
@@ -186,27 +264,35 @@ public class CreateCourseServlet extends HttpServlet {
                     System.out.println("[LOG] Lesson " + lessonIndex + " nhận file: " + originalName + " (" + type + ") size: " + part.getSize());
                     String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                     String savedFileName = "lesson" + lessonId + "_" + type + "_" + System.currentTimeMillis() + ext;
-                    String savePath = uploadDirPath + File.separator + savedFileName;
-
-                    saveFile(part, savePath);
+                    String s3Key = "course/" + courseId + "/lesson" + lessonId + "/" + savedFileName;
+                    String fileUrl = null;
+                    try (InputStream is = part.getInputStream()) {
+                        fileUrl = S3Util.uploadFile(is, part.getSize(), s3Key, part.getContentType());
+                        System.out.println("[LOG] Đã upload file tài liệu lên S3: " + fileUrl);
+                    } catch (Exception ex) {
+                        System.out.println("[ERROR] Upload file tài liệu lên S3 thất bại: " + ex.getMessage());
+                        ex.printStackTrace();
+                        throw ex;
+                    }
 
                     String materialType = type.startsWith("vocab") ? "Từ Vựng"
                             : type.startsWith("grammar") ? "Ngữ pháp"
                             : type.startsWith("kanji") ? "Kanji" : "";
-                    String fileType = type.endsWith("Video") ? "video" : "PDF";
+                    String fileType = type.endsWith("Video") ? "Video" : "PDF";
 
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
-                    material.setFilePath("files/" + savedFileName); // Lưu đường dẫn tương đối trong database
+                    material.setTitle(materialType + " - " + originalName);
+                    material.setFilePath(fileUrl);
                     materialsDao.add(material);
                 }
             }
         }
     }
 
-    private void saveVocabularyForLesson(HttpServletRequest request, int lessonIndex, int lessonId, String imgVocabDir, VocabularyDAO vocabDao)
+    private void saveVocabularyForLesson(HttpServletRequest request, int lessonIndex, int lessonId, VocabularyDAO vocabDao)
             throws Exception {
         Map<String, String[]> paramMap = request.getParameterMap();
         for (String key : paramMap.keySet()) {
@@ -233,10 +319,17 @@ public class CreateCourseServlet extends HttpServlet {
                                 }
                                 String ext = originalName.contains(".") ? originalName.substring(originalName.lastIndexOf('.')) : "";
                                 String savedFileName = vocab.getWord().replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ext;
-                                String savePath = imgVocabDir + File.separator + savedFileName;
-                                saveFile(imagePart, savePath);
-                                // Chỉ lưu tên file vào database
-                                vocab.setImagePath(savedFileName);
+                                String s3Key = "course/" + lessonId + "/vocab/" + savedFileName;
+                                String imageUrl = null;
+                                try (InputStream is = imagePart.getInputStream()) {
+                                    imageUrl = S3Util.uploadFile(is, imagePart.getSize(), s3Key, imagePart.getContentType());
+                                    System.out.println("[LOG] Đã upload hình ảnh từ vựng lên S3: " + imageUrl);
+                                } catch (Exception ex) {
+                                    System.out.println("[ERROR] Upload hình ảnh từ vựng lên S3 thất bại: " + ex.getMessage());
+                                    ex.printStackTrace();
+                                    throw ex;
+                                }
+                                vocab.setImagePath(imageUrl);
                             }
                         }
 
@@ -341,5 +434,15 @@ public class CreateCourseServlet extends HttpServlet {
 
     private boolean isValidPDF(String fileName) {
         return fileName.toLowerCase().endsWith(".pdf");
+    }
+
+    // Thêm hàm hỗ trợ lấy lessonId theo index
+    private int getLessonIdByIndex(int courseId, int index) throws SQLException {
+        LessonsDAO lessonsDao = new LessonsDAO();
+        List<Lesson> lessons = lessonsDao.getLessonsByCourseID(courseId);
+        if (index >= 0 && index < lessons.size()) {
+            return lessons.get(index).getLessonID();
+        }
+        return -1;
     }
 }

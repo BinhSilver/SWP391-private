@@ -45,4 +45,14 @@ public class S3Util {
         // Trả về link public
         return "https://" + bucket + ".s3." + s3.getRegionName() + ".amazonaws.com/" + key;
     }
+
+    public static void deleteFile(String key) {
+        try {
+            s3.deleteObject(bucket, key);
+            System.out.println("[LOG][S3Util] Đã xóa file trên S3: " + key);
+        } catch (Exception e) {
+            System.out.println("[ERROR][S3Util] Lỗi khi xóa file trên S3: " + key + " - " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 } 
