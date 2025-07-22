@@ -123,7 +123,7 @@ public class LoginServlet extends HttpServlet {
             CoursesDAO coursesDAO = new CoursesDAO();
             List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();
             request.setAttribute("suggestedCourses", suggestedCourses);
-
+  request.getRequestDispatcher("/editprofile");
             // ✅ Forward về index.jsp để giữ lại dữ liệu
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         } else {
