@@ -12,9 +12,9 @@
 <html>
     <head>
         <title>Edit Profile</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/Profile/profile.css">
-        <script src="js/suggest-address.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <link rel="stylesheet" href="Profile/profile.css">
+    
+   
     </head>
     <body>
         <div class="container">
