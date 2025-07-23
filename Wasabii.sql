@@ -298,8 +298,8 @@ CREATE TABLE Feedbacks (
 CREATE TABLE FeedbackVotes (
     VoteID INT PRIMARY KEY IDENTITY,
     FeedbackID INT FOREIGN KEY REFERENCES Feedbacks(FeedbackID),
-    UserID INT FOREIGN KEY REFERENCES Users(UserID)
-	VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+	VoteType INT CHECK (VoteType IN (1, -1)) -- 1: like, -1: dislike
 );
 
 CREATE TABLE CourseRatings (
@@ -310,10 +310,6 @@ CREATE TABLE CourseRatings (
     Comment NVARCHAR(MAX),
     RatedAt DATETIME DEFAULT GETDATE()
 );
-
-ALTER TABLE Feedbacks ADD CourseID INT FOREIGN KEY REFERENCES Courses(CourseID), IsDeleted BIT DEFAULT 0;
-ALTER TABLE Feedbacks DROP COLUMN LessonID; -- Nếu feedback chỉ cho khóa học
-ALTER TABLE FeedbackVotes ADD VoteType INT CHECK (VoteType IN (1, -1)); -- 1: like, -1: dislike
 
 CREATE TABLE Progress (
     ProgressID INT PRIMARY KEY IDENTITY,
