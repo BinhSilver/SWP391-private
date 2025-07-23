@@ -297,6 +297,7 @@
             cardCount++;
             const cardItems = document.getElementById('cardItems');
             const uniqueId = Date.now() + '_' + cardCount; // Tạo ID duy nhất
+            const suffix = cardCount > 1 ? '-' + cardCount : '';
             
             const cardItem = document.createElement('div');
             cardItem.className = 'card-item';
@@ -312,13 +313,13 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Mặt trước *</label>
-                            <input type="text" class="form-control" name="frontContent" required 
+                            <input type="text" class="form-control" name="frontContent${suffix}" required 
                                    placeholder="Nội dung mặt trước">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ảnh mặt trước</label>
                             <div class="file-input-wrapper">
-                                <input type="file" name="frontImage${cardCount-1}" accept="image/*" 
+                                <input type="file" name="frontImage${suffix}" accept="image/*" 
                                        onchange="previewImage(this, 'frontPreview${uniqueId}')">
                                 <label class="file-input-label">
                                     <i class="fas fa-upload"></i>
@@ -332,13 +333,13 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Mặt sau *</label>
-                            <input type="text" class="form-control" name="backContent" required 
+                            <input type="text" class="form-control" name="backContent${suffix}" required 
                                    placeholder="Nội dung mặt sau">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ảnh mặt sau</label>
                             <div class="file-input-wrapper">
-                                <input type="file" name="backImage${cardCount-1}" accept="image/*" 
+                                <input type="file" name="backImage${suffix}" accept="image/*" 
                                        onchange="previewImage(this, 'backPreview${uniqueId}')">
                                 <label class="file-input-label">
                                     <i class="fas fa-upload"></i>
@@ -352,12 +353,13 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Ghi chú</label>
-                    <textarea class="form-control" name="note" rows="2" 
+                    <textarea class="form-control" name="note${suffix}" rows="2" 
                               placeholder="Ghi chú bổ sung (tùy chọn)"></textarea>
                 </div>
             `;
             
             cardItems.appendChild(cardItem);
+            updateCardNumbers(); // Đảm bảo cập nhật lại name đúng thứ tự sau khi thêm
         }
 
         function removeCardItem(button) {
@@ -369,8 +371,15 @@
         function updateCardNumbers() {
             const cardItems = document.querySelectorAll('.card-item');
             cardItems.forEach((item, index) => {
+                const number = index + 1;
                 const numberElement = item.querySelector('.card-number');
-                numberElement.textContent = index + 1;
+                numberElement.textContent = number;
+                // Cập nhật lại name cho input/textarea
+                item.querySelector('input[name^="frontContent"]').name = 'frontContent' + (number > 1 ? '-' + number : '');
+                item.querySelector('input[name^="backContent"]').name = 'backContent' + (number > 1 ? '-' + number : '');
+                item.querySelector('input[name^="frontImage"]').name = 'frontImage' + (number > 1 ? '-' + number : '');
+                item.querySelector('input[name^="backImage"]').name = 'backImage' + (number > 1 ? '-' + number : '');
+                item.querySelector('textarea[name^="note"]').name = 'note' + (number > 1 ? '-' + number : '');
             });
             cardCount = cardItems.length;
         }
@@ -408,6 +417,11 @@
             addCardItem();
         });
 
+        // Thêm hàm getItemCount cho client-side để backend nhận đúng số lượng item
+        function getItemCount() {
+            return document.querySelectorAll('.card-item').length;
+        }
+
         // Form validation
         document.getElementById('flashcardForm').addEventListener('submit', function(e) {
             const title = document.getElementById('title').value.trim();
@@ -416,28 +430,37 @@
                 alert('Vui lòng nhập tiêu đề flashcard!');
                 return;
             }
-
             const cardItems = document.querySelectorAll('.card-item');
             if (cardItems.length === 0) {
                 e.preventDefault();
                 alert('Vui lòng thêm ít nhất một thẻ flashcard!');
                 return;
             }
-
             let hasValidContent = false;
             cardItems.forEach(item => {
-                const frontContent = item.querySelector('input[name="frontContent"]').value.trim();
-                const backContent = item.querySelector('input[name="backContent"]').value.trim();
+                const frontContent = item.querySelector('input[name^="frontContent"]').value.trim();
+                const backContent = item.querySelector('input[name^="backContent"]').value.trim();
                 if (frontContent && backContent) {
                     hasValidContent = true;
                 }
             });
-
             if (!hasValidContent) {
                 e.preventDefault();
                 alert('Vui lòng nhập nội dung cho ít nhất một thẻ flashcard!');
                 return;
             }
+            // Đảm bảo cập nhật lại name đúng thứ tự trước khi lấy itemCount
+            updateCardNumbers();
+            // Thêm input ẩn
+            let itemCountInput = document.getElementById('itemCountInput');
+            if (!itemCountInput) {
+                itemCountInput = document.createElement('input');
+                itemCountInput.type = 'hidden';
+                itemCountInput.name = 'itemCount';
+                itemCountInput.id = 'itemCountInput';
+                this.appendChild(itemCountInput);
+            }
+            itemCountInput.value = getItemCount();
         });
     </script>
 </body>

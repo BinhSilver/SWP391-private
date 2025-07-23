@@ -17,6 +17,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import config.S3Util;
+import service.CourseFlashcardService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -32,6 +33,23 @@ public class CreateCourseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Kiểm tra quyền truy cập - chỉ giáo viên và admin mới có thể tạo khóa học
+        User user = getCurrentUser(request);
+        if (user == null) {
+            System.out.println("[ERROR] Không có user đăng nhập, chuyển hướng về trang đăng nhập.");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        // Kiểm tra role - chỉ role 3 (giáo viên) và 4 (admin) mới có quyền
+        if (user.getRoleID() != 3 && user.getRoleID() != 4) {
+            System.out.println("[ERROR] User không có quyền tạo khóa học. RoleID: " + user.getRoleID());
+            request.setAttribute("error", "Bạn không có quyền tạo khóa học. Chỉ giáo viên và admin mới có quyền này.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
+        System.out.println("[LOG] User " + user.getFullName() + " (RoleID: " + user.getRoleID() + ") truy cập trang tạo khóa học");
         request.getRequestDispatcher("create_course.jsp").forward(request, response);
     }
 
@@ -127,6 +145,10 @@ public class CreateCourseServlet extends HttpServlet {
                     item.setVocabID(vocab.getVocabID());
                     item.setFrontContent(vocab.getWord());
                     item.setBackContent(vocab.getMeaning());
+                    item.setFrontImage(null);
+                    item.setBackImage(vocab.getImagePath());
+                    item.setNote((vocab.getReading() != null ? vocab.getReading() : "") +
+                                 (vocab.getExample() != null && !vocab.getExample().isEmpty() ? ": " + vocab.getExample() : ""));
                     item.setOrderIndex(order++);
                     flashcardItemDAO.createFlashcardItem(item);
                 }
@@ -224,22 +246,19 @@ public class CreateCourseServlet extends HttpServlet {
         LessonsDAO lessonsDao = new LessonsDAO();
         LessonMaterialsDAO materialsDao = new LessonMaterialsDAO();
         VocabularyDAO vocabDao = new VocabularyDAO();
-
+        List<Integer> lessonIdList = new ArrayList<>();
         for (int i = 0; i <= maxLesson; i++) {
             String title = request.getParameter("lessons[" + i + "][name]");
             String description = request.getParameter("lessons[" + i + "][description]");
             boolean isHidden = request.getParameter("lessons[" + i + "][isHidden]") != null;
-
-            System.out.println("[LOG] Lesson " + i + ": title=" + title + ", description=" + description + ", isHidden=" + isHidden);
-
+            if (title == null || title.trim().isEmpty()) continue; // Bỏ qua lesson rỗng
             Lesson lesson = new Lesson();
             lesson.setTitle(title);
             lesson.setDescription(description);
             lesson.setCourseID(courseId);
             lesson.setIsHidden(isHidden);
-
             int lessonId = lessonsDao.addAndReturnID(lesson);
-
+            lessonIdList.add(lessonId);
             saveMaterialsForLesson(request, i, lessonId, courseId, materialsDao);
             saveVocabularyForLesson(request, i, lessonId, vocabDao);
             saveQuizForLesson(request, i, lessonId);
@@ -284,12 +303,13 @@ public class CreateCourseServlet extends HttpServlet {
                     String materialType = type.startsWith("vocab") ? "Từ Vựng"
                             : type.startsWith("grammar") ? "Ngữ pháp"
                             : type.startsWith("kanji") ? "Kanji" : "";
-                    String fileType = type.endsWith("Video") ? "video" : "PDF";
+                    String fileType = type.endsWith("Video") ? "Video" : "PDF";
 
                     LessonMaterial material = new LessonMaterial();
                     material.setLessonID(lessonId);
                     material.setMaterialType(materialType);
                     material.setFileType(fileType);
+                    material.setTitle(materialType + " - " + originalName);
                     material.setFilePath(fileUrl);
                     materialsDao.add(material);
                 }
@@ -313,8 +333,7 @@ public class CreateCourseServlet extends HttpServlet {
                         vocab.setReading(parts[2].trim());
                         vocab.setExample(parts[3].trim());
                         vocab.setLessonID(lessonId);
-
-                        // Xử lý ảnh từ vựng
+                        // Xử lý ảnh từ vựng như cũ
                         Part imagePart = request.getPart("lessons[" + lessonIndex + "][vocabImage][" + vocabIndex + "]");
                         if (imagePart != null && imagePart.getSize() > 0) {
                             String originalName = imagePart.getSubmittedFileName();
@@ -337,10 +356,21 @@ public class CreateCourseServlet extends HttpServlet {
                                 vocab.setImagePath(imageUrl);
                             }
                         }
-
                         vocabDao.add(vocab);
                     } else {
-                        throw new IllegalArgumentException("Định dạng từ vựng không đúng: " + vocabText + ". Yêu cầu Word:Meaning:Reading:Example");
+                        System.out.println("[WARNING] Định dạng từ vựng không đúng, bỏ qua: " + vocabText);
+                        System.out.println("[DEBUG] Số phần sau split: " + parts.length);
+                        for (int pi = 0; pi < parts.length; pi++) {
+                            System.out.println("[DEBUG] part[" + pi + "]: '" + parts[pi] + "'");
+                        }
+                        // Log mã unicode từng ký tự nếu cần
+                        for (int ci = 0; ci < vocabText.length(); ci++) {
+                            char c = vocabText.charAt(ci);
+                            if (c < 32 || c > 126) {
+                                System.out.println("[DEBUG] Ký tự lạ tại vị trí " + ci + ": '" + c + "' (Unicode: " + (int)c + ")");
+                            }
+                        }
+                        continue;
                     }
                 }
             }

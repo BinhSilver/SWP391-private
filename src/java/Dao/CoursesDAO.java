@@ -156,18 +156,64 @@ public class CoursesDAO {
                         }
                     }
                 }
-                for (int quizId : quizIds) {
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)")) {
-                        ps.setInt(1, quizId);
-                        ps.executeUpdate();
+                System.out.println("[LOG] Tìm thấy " + quizIds.size() + " bài học");
+
+                // 2. Xóa FlashcardItems trước (vì liên quan đến Vocabulary)
+                try {
+                    deleteByQuery(conn, "DELETE FROM FlashcardItems WHERE VocabID IN ("
+                        + "SELECT v.VocabID FROM Vocabulary v "
+                        + "INNER JOIN Lessons l ON v.LessonID = l.LessonID "
+                        + "WHERE l.CourseID = ?)", courseID);
+                    System.out.println("[LOG] Đã xóa FlashcardItems");
+                } catch (Exception e) {
+                    System.out.println("[WARNING] Lỗi khi xóa FlashcardItems: " + e.getMessage());
+                }
+
+                // 3. Xóa Flashcards không còn item
+                try {
+                    deleteByQuery(conn, "DELETE FROM Flashcards WHERE FlashcardID NOT IN (SELECT DISTINCT FlashcardID FROM FlashcardItems)");
+                    System.out.println("[LOG] Đã xóa Flashcards không còn item");
+                } catch (Exception e) {
+                    System.out.println("[WARNING] Lỗi khi xóa Flashcards: " + e.getMessage());
+                }
+
+                // 4. Xóa dữ liệu liên quan đến từng lesson
+                for (int innerLessonId : lessonIds) {
+                    System.out.println("[LOG] Đang xóa lesson " + innerLessonId);
+                    
+                    // Xóa quiz và câu hỏi liên quan trước
+                    quizIds.clear();
+                    try (PreparedStatement psQuiz = conn.prepareStatement("SELECT QuizID FROM Quizzes WHERE LessonID = ?")) {
+                        psQuiz.setInt(1, innerLessonId);
+                        try (ResultSet rs = psQuiz.executeQuery()) {
+                            while (rs.next()) {
+                                quizIds.add(rs.getInt("QuizID"));
+                            }
+                        }
                     }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE QuizID = ?")) {
-                        ps.setInt(1, quizId);
-                        ps.executeUpdate();
+                    
+                    for (int quizId : quizIds) {
+                        try {
+                            deleteByQuery(conn, "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = ?)", quizId);
+                            deleteByQuery(conn, "DELETE FROM Questions WHERE QuizID = ?", quizId);
+                            deleteByQuery(conn, "DELETE FROM QuizResults WHERE QuizID = ?", quizId);
+                        } catch (Exception e) {
+                            System.out.println("[WARNING] Lỗi khi xóa quiz " + quizId + ": " + e.getMessage());
+                        }
                     }
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM QuizResults WHERE QuizID = ?")) {
-                        ps.setInt(1, quizId);
-                        ps.executeUpdate();
+                    
+                    // Xóa các bảng liên quan đến lesson
+                    try {
+                        deleteByQuery(conn, "DELETE FROM Quizzes WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM LessonAccess WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM LessonMaterials WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM GrammarPoints WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM Kanji WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM LessonVocabulary WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM Vocabulary WHERE LessonID = ?", innerLessonId);
+                        deleteByQuery(conn, "DELETE FROM Progress WHERE LessonID = ?", innerLessonId);
+                    } catch (Exception e) {
+                        System.out.println("[WARNING] Lỗi khi xóa dữ liệu lesson " + innerLessonId + ": " + e.getMessage());
                     }
                 }
                 try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Quizzes WHERE LessonID = ?")) {
@@ -177,38 +223,53 @@ public class CoursesDAO {
                 // KHÔNG xóa Feedbacks bằng LessonID
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
-                ps.setInt(1, courseID);
-                ps.executeUpdate();
-            }
-
-            List<Integer> testIds = new ArrayList<>();
-            try (PreparedStatement ps = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
-                ps.setInt(1, courseID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        testIds.add(rs.getInt("TestID"));
+                // 5. Xóa test và câu hỏi liên quan
+                List<Integer> testIds = new ArrayList<>();
+                try (PreparedStatement psTest = conn.prepareStatement("SELECT TestID FROM Tests WHERE CourseID = ?")) {
+                    psTest.setInt(1, courseID);
+                    try (ResultSet rs = psTest.executeQuery()) {
+                        while (rs.next()) {
+                            testIds.add(rs.getInt("TestID"));
+                        }
                     }
                 }
-            }
-            for (int testId : testIds) {
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)")) {
-                    ps.setInt(1, testId);
-                    ps.executeUpdate();
+                
+                for (int testId : testIds) {
+                    try {
+                        deleteByQuery(conn, "DELETE FROM Answers WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE TestID = ?)", testId);
+                        deleteByQuery(conn, "DELETE FROM Questions WHERE TestID = ?", testId);
+                        deleteByQuery(conn, "DELETE FROM TestResults WHERE TestID = ?", testId);
+                    } catch (Exception e) {
+                        System.out.println("[WARNING] Lỗi khi xóa test " + testId + ": " + e.getMessage());
+                    }
                 }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Questions WHERE TestID = ?")) {
-                    ps.setInt(1, testId);
-                    ps.executeUpdate();
+                
+                try {
+                    deleteByQuery(conn, "DELETE FROM Tests WHERE CourseID = ?", courseID);
+                } catch (Exception e) {
+                    System.out.println("[WARNING] Lỗi khi xóa Tests: " + e.getMessage());
                 }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM TestResults WHERE TestID = ?")) {
-                    ps.setInt(1, testId);
-                    ps.executeUpdate();
+
+                // 6. Xóa dữ liệu liên quan đến course
+                try {
+                    deleteByQuery(conn, "DELETE FROM Lessons WHERE CourseID = ?", courseID);
+                    deleteByQuery(conn, "DELETE FROM Enrollment WHERE CourseID = ?", courseID);
+                    deleteByQuery(conn, "DELETE FROM CourseRatings WHERE CourseID = ?", courseID);
+                    deleteByQuery(conn, "DELETE FROM FeedbackVotes WHERE FeedbackID IN (SELECT FeedbackID FROM Feedbacks WHERE CourseID = ?)", courseID);
+                    deleteByQuery(conn, "DELETE FROM Feedbacks WHERE CourseID = ?", courseID);
+                    deleteByQuery(conn, "DELETE FROM Progress WHERE CourseID = ?", courseID);
+                } catch (Exception e) {
+                    System.out.println("[WARNING] Lỗi khi xóa dữ liệu course: " + e.getMessage());
                 }
-            }
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Tests WHERE CourseID = ?")) {
-                ps.setInt(1, courseID);
-                ps.executeUpdate();
-            }
+                
+                // 7. Cuối cùng xóa course
+                try {
+                    deleteByQuery(conn, "DELETE FROM Courses WHERE CourseID = ?", courseID);
+                    System.out.println("[LOG] Đã xóa course " + courseID);
+                } catch (Exception e) {
+                    System.out.println("[ERROR] Lỗi khi xóa course: " + e.getMessage());
+                    throw e;
+                }
 
             // Xóa các bảng liên quan đến CourseID
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE CourseID = ?")) {
@@ -242,17 +303,25 @@ public class CoursesDAO {
     }
 }
 
-
 /**
  * Helper method để thực hiện delete query với parameter
  */
 private void deleteByQuery(Connection conn, String query, int parameter) throws SQLException {
     try (PreparedStatement ps = conn.prepareStatement(query)) {
-        ps.setInt(1, parameter);
+        if (parameter > 0) {
+            ps.setInt(1, parameter);
+        }
         int deletedRows = ps.executeUpdate();
         System.out.println("[DEBUG] Executed: " + query + " with parameter: " + parameter + " - Deleted rows: " + deletedRows);
     }
 }
+
+    private void deleteByQuery(Connection conn, String query) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            int deletedRows = ps.executeUpdate();
+            System.out.println("[DEBUG] Executed: " + query + " - Deleted rows: " + deletedRows);
+        }
+    }
 
     public int getTotalCourses() throws SQLException {
         String sql = "SELECT COUNT(*) AS Total FROM [dbo].[Courses]";
