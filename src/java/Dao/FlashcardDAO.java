@@ -19,19 +19,22 @@ public class FlashcardDAO {
 
     // Tạo flashcard mới
     public int createFlashcard(Flashcard flashcard) throws SQLException {
-        String sql = "INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage) VALUES (?, ?, GETDATE(), GETDATE(), ?, ?, ?)";
+        String sql = "INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage, CourseID) VALUES (?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, flashcard.getUserID());
             ps.setString(2, flashcard.getTitle());
             ps.setBoolean(3, flashcard.isPublicFlag());
             ps.setString(4, flashcard.getDescription());
             ps.setString(5, flashcard.getCoverImage());
-            
+            if (flashcard.getCourseID() == 0) {
+                ps.setNull(6, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(6, flashcard.getCourseID());
+            }
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating flashcard failed, no rows affected.");
             }
-
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1);
@@ -185,5 +188,18 @@ public class FlashcardDAO {
         }
         System.out.println("[FlashcardDAO] Trả về " + flashcards.size() + " flashcard từ khóa học cho userID=" + userID);
         return flashcards;
+    }
+
+    // Xóa tất cả flashcard theo courseId
+    public void deleteFlashcardsByCourseId(int courseId) throws SQLException {
+        String sql = "SELECT FlashcardID FROM Flashcards WHERE CourseID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, courseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    deleteFlashcard(rs.getInt("FlashcardID"));
+                }
+            }
+        }
     }
 } 

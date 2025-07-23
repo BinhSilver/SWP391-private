@@ -5,6 +5,8 @@ import Dao.LessonsDAO;
 import Dao.LessonMaterialsDAO;
 import Dao.QuizDAO;
 import Dao.VocabularyDAO;
+import Dao.FlashcardDAO;
+import Dao.FlashcardItemDAO;
 import model.*;
 
 import java.io.*;
@@ -95,10 +97,40 @@ public class CreateCourseServlet extends HttpServlet {
                 }
             }
 
+            // Sau khi đã có courseId và user
+            FlashcardDAO flashcardDAO = new FlashcardDAO();
+            Flashcard flashcard = new Flashcard();
+            flashcard.setUserID(user.getUserID());
+            flashcard.setTitle("Flashcard cho khóa học: " + course.getTitle());
+            flashcard.setDescription(course.getDescription()); // Lấy description từ khóa học
+            flashcard.setPublicFlag(false);
+            flashcard.setCourseID(courseId); // Gán courseID cho flashcard
+            flashcard.setCoverImage(course.getImageUrl()); // Lấy thumbnail của khóa học làm cover image cho flashcard
+            int flashcardId = flashcardDAO.createFlashcard(flashcard);
+
             int maxLesson = getMaxLessonIndex(request);
             System.out.println("[LOG] Số lượng lesson: " + (maxLesson + 1));
 
             handleAllLessons(request, courseId, maxLesson);
+
+            // Tạo FlashcardItem cho từng từ vựng của khóa học (sau khi đã tạo lesson và vocab)
+            LessonsDAO lessonsDAO = new LessonsDAO();
+            VocabularyDAO vocabularyDAO = new VocabularyDAO();
+            FlashcardItemDAO flashcardItemDAO = new FlashcardItemDAO();
+            List<Lesson> lessons = lessonsDAO.getLessonsByCourseID(courseId);
+            int order = 1;
+            for (Lesson lesson : lessons) {
+                List<Vocabulary> vocabList = vocabularyDAO.getVocabularyByLessonId(lesson.getLessonID());
+                for (Vocabulary vocab : vocabList) {
+                    FlashcardItem item = new FlashcardItem();
+                    item.setFlashcardID(flashcardId);
+                    item.setVocabID(vocab.getVocabID());
+                    item.setFrontContent(vocab.getWord());
+                    item.setBackContent(vocab.getMeaning());
+                    item.setOrderIndex(order++);
+                    flashcardItemDAO.createFlashcardItem(item);
+                }
+            }
 
             // Lưu quiz cho từng lesson nếu có
             String quizJson = request.getParameter("quizJson");

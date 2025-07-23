@@ -254,30 +254,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <script>
-        function deleteFlashcard(flashcardID) {
-            document.getElementById('flashcardID').value = flashcardID;
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
-        }
-
-        // Ẩn popup xóa flashcard sau 5s
-        setTimeout(function() {
-            var alert = document.getElementById('deleteSuccessAlert');
-            if(alert) {
-                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                bsAlert.close();
-            }
-        }, 5000);
-
-        // Ẩn popup tạo flashcard sau 5s
-        setTimeout(function() {
-            var alert = document.getElementById('createSuccessAlert');
-            if(alert) {
-                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                bsAlert.close();
-            }
-        }, 5000);
-    </script>
+    <script src="<c:url value='/js/flashcard.js'/>"></script>
     </div>
 </body>
 </html> 

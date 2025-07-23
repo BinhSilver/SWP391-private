@@ -170,7 +170,8 @@ CREATE TABLE Flashcards (
     UpdatedAt DATETIME DEFAULT GETDATE(),
     IsPublic BIT DEFAULT 0,
     Description NVARCHAR(500),
-    CoverImage NVARCHAR(500)
+    CoverImage NVARCHAR(500),
+    CourseID INT NULL FOREIGN KEY REFERENCES Courses(CourseID) -- Thêm trường này
 );
 
 CREATE TABLE FlashcardItems (

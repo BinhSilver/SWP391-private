@@ -105,6 +105,8 @@ public class CoursesDAO {
     try (Connection conn = JDBCConnection.getConnection()) {
         conn.setAutoCommit(false);
         try {
+            // Xóa flashcard tự động tạo từ khóa học
+            new Dao.FlashcardDAO().deleteFlashcardsByCourseId(courseID);
             List<Integer> lessonIds = new ArrayList<>();
             try (PreparedStatement ps = conn.prepareStatement("SELECT LessonID FROM Lessons WHERE CourseID = ?")) {
                 ps.setInt(1, courseID);
@@ -172,10 +174,7 @@ public class CoursesDAO {
                     ps.setInt(1, lessonId);
                     ps.executeUpdate();
                 }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE LessonID = ?")) {
-                    ps.setInt(1, lessonId);
-                    ps.executeUpdate();
-                }
+                // KHÔNG xóa Feedbacks bằng LessonID
             }
 
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Lessons WHERE CourseID = ?")) {
@@ -211,6 +210,11 @@ public class CoursesDAO {
                 ps.executeUpdate();
             }
 
+            // Xóa các bảng liên quan đến CourseID
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Feedbacks WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Enrollment WHERE CourseID = ?")) {
                 ps.setInt(1, courseID);
                 ps.executeUpdate();
@@ -219,8 +223,10 @@ public class CoursesDAO {
                 ps.setInt(1, courseID);
                 ps.executeUpdate();
             }
-
-            // ❌ KHÔNG xóa Progress hoặc Feedbacks theo CourseID vì bảng không có cột này
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Progress WHERE CourseID = ?")) {
+                ps.setInt(1, courseID);
+                ps.executeUpdate();
+            }
 
             try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Courses WHERE CourseID = ?")) {
                 ps.setInt(1, courseID);
