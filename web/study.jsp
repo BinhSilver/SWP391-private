@@ -12,307 +12,6 @@
         <link rel="stylesheet" href="<c:url value='/css/study.css'/>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
              <script src="https://code.responsivevoice.org/responsivevoice.js?key=YC77U5uD"></script>
-             <style>
-                /* Pink theme variables */
-                :root {
-                    --primary-pink: #e84b76;
-                    --secondary-pink: #f28faa;
-                    --light-pink: #fce7ed;
-                    --dark-pink: #d12d58;
-                    --completed-green: #28a745;
-                }
-                
-                .lesson-progress {
-                    background-color: #f8f9fa;
-                    border-radius: 10px;
-                    padding: 15px;
-                    margin: 20px 0;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-                
-                .progress-title {
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 10px;
-                }
-                
-                .progress-icon {
-                    font-size: 1.2em;
-                    margin-right: 10px;
-                    color: var(--primary-pink);
-                }
-                
-                .progress-bar {
-                    background-color: var(--primary-pink) !important;
-                }
-                
-                .navigation-buttons {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 30px;
-                    padding-top: 15px;
-                    border-top: 1px solid #ddd;
-                }
-                
-                .nav-button {
-                    display: flex;
-                    align-items: center;
-                    padding: 8px 16px;
-                    border-radius: 5px;
-                    background-color: #f8f9fa;
-                    text-decoration: none;
-                    color: #333;
-                    border: 1px solid #ddd;
-                    transition: all 0.2s;
-                }
-                
-                .nav-button:hover {
-                    background-color: var(--light-pink);
-                    color: var(--dark-pink);
-                    border-color: var(--secondary-pink);
-                }
-                
-                .nav-button.disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-                
-                .nav-icon {
-                    margin: 0 8px;
-                }
-                
-                .complete-button {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    background-color: var(--primary-pink);
-                    color: white;
-                    border: none;
-                    font-weight: bold;
-                    transition: all 0.3s;
-                    margin: 10px 0;
-                }
-                
-                .complete-button:hover {
-                    background-color: var(--dark-pink);
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-                }
-                
-                .complete-button.completed {
-                    background-color: #6c757d;
-                    cursor: default;
-                }
-                
-                .complete-icon {
-                    margin-right: 8px;
-                }
-                
-                #completionModal .modal-header {
-                    background-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                .celebration-icon {
-                    font-size: 3em;
-                    color: var(--primary-pink);
-                    margin-bottom: 15px;
-                }
-                
-                .modal-footer .btn-success {
-                    background-color: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                .modal-footer .btn-success:hover {
-                    background-color: var(--dark-pink);
-                    border-color: var(--dark-pink);
-                    color: white;
-                }
-                
-                /* Sidebar styling */
-                .sidebar-inner {
-                    padding: 15px;
-                }
-                
-                .study-sidebar h5 {
-                    color: var(--primary-pink);
-                    font-weight: 600;
-                    margin-bottom: 15px;
-                }
-                
-                .list-group-item {
-                    border: none;
-                    border-radius: 8px !important;
-                    margin-bottom: 5px;
-                    transition: all 0.2s;
-                }
-                
-                .list-group-item:hover {
-                    background-color: var(--light-pink);
-                }
-                
-                .list-group-item.active-lesson {
-                    background-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                /* Button styling */
-                .btn-success {
-                    background-color: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                .btn-success:hover {
-                    background-color: var(--dark-pink);
-                    border-color: var(--dark-pink);
-                    color: white;
-                }
-                
-                /* Ghi đè CSS cho thanh navbar để giống với trang chi tiết khóa học */
-                .navbar {
-                    background-color: #fff !important;
-                    border-bottom: 1px solid #eee !important;
-                    padding: 0 !important;
-                    position: sticky !important;
-                    top: 0 !important;
-                    z-index: 999 !important;
-                }
-                
-                .navbar .nav-link {
-                    color: #444 !important;
-                    background-color: transparent !important;
-                    border-radius: 0 !important;
-                    font-weight: 500 !important;
-                    transition: color 0.3s !important;
-                }
-                
-                .navbar .nav-link:hover {
-                    color: #e94f64 !important;
-                    background-color: transparent !important;
-                    border-color: transparent !important;
-                }
-                
-                .navbar .nav-link.active {
-                    color: #e94f64 !important;
-                    border-bottom: none !important;
-                    font-weight: 500 !important;
-                    background-color: transparent !important;
-                }
-                
-                /* Tab styling cho nội dung bài học */
-                .lesson-tabs {
-                    border-bottom: 1px solid #ddd;
-                }
-                
-                .lesson-tabs .nav-link {
-                    color: white !important;
-                    border-radius: 5px 5px 0 0 !important;
-                    padding: 10px 15px !important;
-                    background-color: var(--primary-pink) !important;
-                }
-                
-                .lesson-tabs .nav-link:hover {
-                    color: white !important;
-                    border-color: transparent !important;
-                    background-color: var(--dark-pink) !important;
-                }
-                
-                .lesson-tabs .nav-link.active {
-                    color: white !important;
-                    border-bottom: 2px solid white !important;
-                    font-weight: 600 !important;
-                }
-                
-                /* Ensuring all buttons with pink backgrounds have white text */
-                .btn-primary {
-                    background-color: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                .btn-primary:hover {
-                    background-color: var(--dark-pink);
-                    border-color: var(--dark-pink);
-                    color: white;
-                }
-                
-                /* Lesson card styling */
-                .lesson-item {
-                    border: 1px solid #eee;
-                    border-radius: 8px;
-                    margin-bottom: 10px;
-                    transition: all 0.3s;
-                }
-                
-                .lesson-item.active-lesson {
-                    border-color: var(--primary-pink);
-                    background-color: var(--light-pink);
-                }
-                
-                .lesson-header {
-                    background-color: #f8f9fa;
-                    border-bottom: 1px solid #eee;
-                    padding: 15px;
-                    border-radius: 8px 8px 0 0;
-                }
-                
-                .lesson-header h2 {
-                    color: var(--primary-pink);
-                    font-weight: 600;
-                }
-
-                /* Top navigation buttons */
-                .lesson-nav-buttons .btn-outline-primary {
-                    color: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                }
-                
-                .lesson-nav-buttons .btn-outline-primary:hover {
-                    background-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                /* Section completion button */
-                .section-complete-btn .btn-success {
-                    border-radius: 20px;
-                    padding: 5px 15px;
-                    font-size: 0.9rem;
-                    color: white;
-                }
-                
-                /* Sidebar completion button */
-                #sidebarCompleteBtn {
-                    background-color: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                    color: white;
-                }
-                
-                #sidebarCompleteBtn:hover {
-                    background-color: var(--dark-pink);
-                    border-color: var(--dark-pink);
-                    color: white;
-                }
-                
-                /* Fullscreen button styling */
-                .fullscreen-toggle {
-                    background-color: rgba(255, 255, 255, 0.7);
-                    color: var(--primary-pink);
-                    padding: 5px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                
-                .fullscreen-toggle:hover {
-                    background-color: var(--primary-pink);
-                    color: white;
-                }
-             </style>
     </head>
     <body>
         <div class="page-wrapper">
@@ -393,7 +92,7 @@
                                 <div class="file-viewer position-relative">
                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
                                     <video controls preload="metadata">
-                                        <source src="${pageContext.request.contextPath}/${m.filePath}" type="video/mp4">
+                                        <source src="files/lesson8_grammarVideo_1752740459670.mp4" type="video/mp4">
                                         Trình duyệt của bạn không hỗ trợ video.
                                     </video>
                                 </div>
@@ -458,7 +157,7 @@
                                             <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                             <div class="file-viewer position-relative">
                                                 <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu ngữ pháp"></iframe>
+                                                <iframe src="${m.filePath}" title="Tài liệu ngữ pháp"></iframe>
                                             </div>
                                         </div>
                                     </c:if>
@@ -510,7 +209,7 @@
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                                 <div class="file-viewer position-relative">
                                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                    <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu từ vựng"></iframe>
+                                                    <iframe src="${m.filePath}" title="Tài liệu từ vựng"></iframe>
                                                 </div>
                                             </div>
                                         </c:if>
@@ -530,7 +229,7 @@
                                                 <strong><i class="fas fa-document me-2"></i>${m.title}</strong>
                                                 <div class="file-viewer position-relative">
                                                     <i class="fa-solid fa-expand fullscreen-toggle" title="Xem toàn màn hình"></i>
-                                                    <iframe src="${pageContext.request.contextPath}/${m.filePath}" title="Tài liệu Kanji"></iframe>
+                                                    <iframe src="${m.filePath}" title="Tài liệu Kanji"></iframe>
                                                 </div>
                                             </div>
                                         </c:if>

@@ -110,7 +110,7 @@
                     cancelButtonText: 'Hủy'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch('<c:url value="/DeleteCourseServlet" />', {
+                        fetch('<c:url value="/Delete" />', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

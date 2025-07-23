@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "DeleteCourseServlet", urlPatterns = {"/DeleteCourseServlet"})
+@WebServlet(name = "DeleteCourseServlet", urlPatterns = {"/Delete"})
 public class DeleteCourseServlet extends HttpServlet {
 
     @Override

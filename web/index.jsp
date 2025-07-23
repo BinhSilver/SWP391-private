@@ -18,7 +18,6 @@
 
         <div class="page-wrapper">
             <%@ include file="Home/nav.jsp" %>
-
             <%@ include file="chatBoxjsp/chatBox.jsp" %>
             <!-- Hero Section -->
             <section class="hero">
