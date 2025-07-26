@@ -28,6 +28,34 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        // Xử lý error từ Google OAuth
+        String error = request.getParameter("error");
+        if (error != null) {
+            String errorMessage = "";
+            switch (error) {
+                case "google_oauth_error":
+                    errorMessage = "Có lỗi xảy ra khi đăng nhập bằng Google. Vui lòng thử lại.";
+                    break;
+                case "no_code":
+                    errorMessage = "Không nhận được mã xác thực từ Google. Vui lòng thử lại.";
+                    break;
+                case "create_user_failed":
+                    errorMessage = "Không thể tạo tài khoản mới. Vui lòng thử lại.";
+                    break;
+                case "google_login_failed":
+                    errorMessage = "Đăng nhập Google thất bại. Vui lòng thử lại.";
+                    break;
+                case "token_exchange_failed":
+                    errorMessage = "Không thể xác thực với Google. Vui lòng thử lại.";
+                    break;
+                default:
+                    errorMessage = "Có lỗi xảy ra. Vui lòng thử lại.";
+                    break;
+            }
+            request.setAttribute("message", errorMessage);
+        }
+        
         request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
     }
 
@@ -91,41 +119,53 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         User user = dao.getUserByEmail(email);
 
-        if (user != null && checkPassword(password, user.getPasswordHash())) {  
-            if (!user.isActive()) {  // Sử dụng phương thức getter isActive() nếu trường là boolean
-                request.setAttribute("message", "Tài khoản đã bị khóa, vui lòng liên hệ admin để mở khóa");
-                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
-                return;
-            }         
-            User fullUser = null;
-            try {
-                fullUser = dao.getUserById(user.getUserID());
-            } catch (SQLException e) {
-                e.printStackTrace();
-                request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
-
+        if (user != null) {
+            // Kiểm tra xem user có phải là Google user không
+            if (dao.isGoogleUser(email)) {
+                request.setAttribute("message", "Tài khoản này được tạo bằng Google. Vui lòng đăng nhập bằng Google.");
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
+            
+            if (checkPassword(password, user.getPasswordHash())) {  
+                if (!user.isActive()) {  // Sử dụng phương thức getter isActive() nếu trường là boolean
+                    request.setAttribute("message", "Tài khoản đã bị khóa, vui lòng liên hệ admin để mở khóa");
+                    request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                    return;
+                }         
+                User fullUser = null;
+                try {
+                    fullUser = dao.getUserById(user.getUserID());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    request.setAttribute("message", "Lỗi hệ thống khi đăng nhập!");
 
-            HttpSession session = request.getSession();
-            session.setAttribute("authUser", fullUser);
-            session.setAttribute("userID", fullUser.getUserID());
-            session.setMaxInactiveInterval(60 * 60 * 24);
+                    request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
+                    return;
+                }
 
-            if ("on".equals(rememberMe)) {
-                setRememberMeCookies(response, email);
+                HttpSession session = request.getSession();
+                session.setAttribute("authUser", fullUser);
+                session.setAttribute("userID", fullUser.getUserID());
+                session.setMaxInactiveInterval(60 * 60 * 24);
+
+                if ("on".equals(rememberMe)) {
+                    setRememberMeCookies(response, email);
+                } else {
+                    clearRememberMeCookies(response);
+                }
+
+                // ✅ Thêm danh sách khóa học đề xuất
+                CoursesDAO coursesDAO = new CoursesDAO();
+                List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();
+                request.setAttribute("suggestedCourses", suggestedCourses);
+
+                // ✅ Forward về index.jsp để giữ lại dữ liệu
+                request.getRequestDispatcher("/index.jsp").forward(request, response);
             } else {
-                clearRememberMeCookies(response);
+                request.setAttribute("message", "Sai email hoặc mật khẩu");
+                request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             }
-
-            // ✅ Thêm danh sách khóa học đề xuất
-            CoursesDAO coursesDAO = new CoursesDAO();
-            List<Course> suggestedCourses = coursesDAO.getSuggestedCourses();
-            request.setAttribute("suggestedCourses", suggestedCourses);
-  request.getRequestDispatcher("/editprofile");
-            // ✅ Forward về index.jsp để giữ lại dữ liệu
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
         } else {
             request.setAttribute("message", "Sai email hoặc mật khẩu");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
@@ -250,6 +290,10 @@ public class LoginServlet extends HttpServlet {
     }
 
     private boolean checkPassword(String rawPassword, String hashedPassword) {
+        // Nếu user đăng nhập bằng Google, không cho phép đăng nhập bằng password thông thường
+        if (hashedPassword != null && hashedPassword.startsWith("GOOGLE_LOGIN_")) {
+            return false; // User này phải đăng nhập bằng Google
+        }
         return rawPassword.equals(hashedPassword);
     }
 

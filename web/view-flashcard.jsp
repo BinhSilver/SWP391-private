@@ -87,15 +87,7 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <!-- Debug: Hiển thị dữ liệu trực tiếp -->
-                        <div class="debug-info">
-                            <h4>Debug Info:</h4>
-                            <p>Items size: ${items.size()}</p>
-                            <c:forEach var="item" items="${items}" varStatus="status">
-                                <p>Item ${status.index + 1}: Front='${item.frontContent}', Back='${item.backContent}'</p>
-                            </c:forEach>
-                        </div>
-                        
+                                               
                         <!-- Hidden data container -->
                         <div id="flashcardData" style="display: none;">
                             <c:forEach var="item" items="${items}" varStatus="status">

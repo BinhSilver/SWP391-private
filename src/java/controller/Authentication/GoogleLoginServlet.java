@@ -13,7 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import java.net.URLEncoder;
 
 @WebServlet("/login-google")
 public class GoogleLoginServlet extends HttpServlet {
@@ -22,12 +22,28 @@ public class GoogleLoginServlet extends HttpServlet {
     private static final String SCOPE = "openid email profile";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String url = new GoogleAuthorizationCodeRequestUrl(
+        try {
+            System.out.println("Bắt đầu Google OAuth flow");
+            
+            // Tạo URL OAuth thủ công
+            String authUrl = String.format(
+                "https://accounts.google.com/o/oauth2/auth?" +
+                "client_id=%s&" +
+                "redirect_uri=%s&" +
+                "response_type=code&" +
+                "scope=%s",
                 CLIENT_ID,
-                REDIRECT_URI,
-                java.util.Arrays.asList(SCOPE.split(" "))
-        ).build();
+                URLEncoder.encode(REDIRECT_URI, "UTF-8"),
+                URLEncoder.encode(SCOPE, "UTF-8")
+            );
 
-        response.sendRedirect(url);
+            System.out.println("Redirecting to Google OAuth URL: " + authUrl);
+            response.sendRedirect(authUrl);
+            
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tạo Google OAuth URL: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/login?error=google_oauth_error");
+        }
     }
 }

@@ -13,7 +13,7 @@ import controller.Email.EmailUtil;
 public class UserDAO {
 
     public void insertUser(User user) throws SQLException {
-        String sql = "INSERT INTO [dbo].[Users] (RoleID, Email, PasswordHash, GoogleID, FullName, IsActive, IsLocked) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO [dbo].[Users] (RoleID, Email, PasswordHash, GoogleID, FullName, IsActive, IsLocked, CreatedAt, Gender) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), ?)";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, user.getRoleID());
             stmt.setString(2, user.getEmail());
@@ -22,6 +22,7 @@ public class UserDAO {
             stmt.setString(5, user.getFullName());
             stmt.setBoolean(6, user.isActive());
             stmt.setBoolean(7, user.isLocked());
+            stmt.setString(8, user.getGender() != null ? user.getGender() : "Khác");
             stmt.executeUpdate();
         }
     }
@@ -66,7 +67,7 @@ public class UserDAO {
     public void updateUser(User user) throws SQLException {
         String sql = "UPDATE [dbo].[Users] SET RoleID = ?, Email = ?, PasswordHash = ?, GoogleID = ?, FullName = ?, "
                 + "IsActive = ?, IsLocked = ?, BirthDate = ?, PhoneNumber = ?, JapaneseLevel = ?, Address = ?, "
-                + "Country = ?, Avatar = ? WHERE UserID = ?";
+                + "Country = ?, Avatar = ?, IsTeacherPending = ?, CertificatePath = ? WHERE UserID = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, user.getRoleID());
             stmt.setString(2, user.getEmail());
@@ -81,7 +82,9 @@ public class UserDAO {
             stmt.setString(11, user.getAddress());
             stmt.setString(12, user.getCountry());
             stmt.setString(13, user.getAvatar());
-            stmt.setInt(14, user.getUserID());
+            stmt.setBoolean(14, user.isTeacherPending());
+            stmt.setString(15, user.getCertificatePath());
+            stmt.setInt(16, user.getUserID());
             stmt.executeUpdate();
         }
     }
@@ -295,7 +298,8 @@ public class UserDAO {
             user.setCountry(rs.getString("Country"));
             user.setAvatar(rs.getString("Avatar")); // Sử dụng setAvatar thay vì setAvatarUrl
             user.setGender(rs.getString("Gender"));
-            user.setCertificatePath(rs.getString("CertificatePath")); // <--- THÊM DÒNG NÀY
+            user.setCertificatePath(rs.getString("CertificatePath"));
+            user.setTeacherPending(rs.getBoolean("IsTeacherPending"));
         } catch (SQLException | NullPointerException ignored) {
         }
         return user;
@@ -415,6 +419,35 @@ public class UserDAO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public boolean isGoogleUser(String email) {
+        String sql = "SELECT PasswordHash FROM Users WHERE email = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String passwordHash = rs.getString("PasswordHash");
+                return passwordHash != null && passwordHash.startsWith("GOOGLE_LOGIN_");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public User getUserByGoogleId(String googleId) {
+        String sql = "SELECT * FROM Users WHERE GoogleID = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, googleId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) throws SQLException {
