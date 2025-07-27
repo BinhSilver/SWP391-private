@@ -379,34 +379,41 @@ body {
 }
 
 .course-card-horizontal {
-    width: 350px;
-    height: 150px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(233,79,100,0.10);
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 1.2rem 1.5rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: 1.5px solid #e94f64;
+    cursor: pointer;
 }
-
+.course-card-horizontal:hover {
+    box-shadow: 0 8px 32px rgba(233,79,100,0.18);
+    transform: translateY(-4px) scale(1.03);
+    border-color: #b92c44;
+}
 .course-thumb-wrap {
     width: 110px;
     height: 110px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 28px;
+    margin-right: 32px;
 }
-
 .course-thumb {
     width: 110px;
     height: 110px;
     object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    border: 1.5px solid #eee;
+    box-shadow: 0 2px 8px rgba(233,79,100,0.10);
+    border: 1.5px solid #e94f64;
     background: #f8f8f8;
     display: block;
 }
-
 .course-title-wrap {
     flex: 1;
     display: flex;
@@ -415,7 +422,6 @@ body {
     height: 100%;
     justify-content: flex-start;
 }
-
 .course-title-link {
     font-size: 1.45rem;
     font-weight: 700;
@@ -431,10 +437,29 @@ body {
     word-break: break-word;
     letter-spacing: 1px;
 }
-
 .course-card-horizontal:hover .course-title-link {
     color: #b92c44;
     text-decoration: underline;
+}
+@media (max-width: 600px) {
+    .course-card-horizontal {
+        width: 98vw;
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.7rem 0.5rem;
+        margin-bottom: 1.2rem;
+    }
+    .course-thumb-wrap, .course-thumb {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        margin-right: 0;
+        margin-bottom: 0.7rem;
+    }
+    .course-title-link {
+        font-size: 1.05rem;
+    }
 }
 
 .course-card-vertical {
