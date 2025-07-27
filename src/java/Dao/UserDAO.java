@@ -411,6 +411,25 @@ public class UserDAO {
         }
     }
 
+    public void rejectTeacher(int userId) {
+        String sql = "UPDATE Users SET IsTeacherPending = 0 WHERE UserID = ?";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Gửi email từ chối giáo viên
+        User user = getUserByIdSafe(userId);
+        if (user != null) {
+            try {
+                EmailUtil.sendTeacherRejectedMail(user);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     // Helper để lấy user không throw exception
     private User getUserByIdSafe(int userId) {
         try {

@@ -95,4 +95,46 @@ public class EmailUtil {
         Transport.send(msg);
     }
 
+    public static void sendTeacherRejectedMail(model.User user) throws MessagingException {
+        final String fromEmail = "vaductai2905@gmail.com";
+        final String password = "wout bsms srjj nnkb";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, password);
+            }
+        });
+
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(fromEmail, false));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+        msg.setSubject("Thông báo về đơn xin làm giáo viên");
+        String content = "<h2>Thông báo về đơn xin làm giáo viên</h2>"
+                + "<p>Xin chào <b>" + (user.getFullName() != null ? user.getFullName() : user.getEmail()) + "</b>,</p>"
+                + "<p>Chúng tôi rất tiếc phải thông báo rằng đơn xin làm giáo viên của bạn đã không được chấp thuận.</p>"
+                + "<p><strong>Lý do có thể:</strong></p>"
+                + "<ul>"
+                + "<li>Chứng chỉ không đủ điều kiện hoặc không hợp lệ</li>"
+                + "<li>Thông tin trong đơn không đầy đủ hoặc không chính xác</li>"
+                + "<li>Không đáp ứng các yêu cầu về trình độ giảng dạy</li>"
+                + "</ul>"
+                + "<p><strong>Bạn có thể:</strong></p>"
+                + "<ul>"
+                + "<li>Nộp lại đơn với chứng chỉ mới hoặc bổ sung thông tin</li>"
+                + "<li>Liên hệ admin để được tư vấn thêm</li>"
+                + "<li>Tiếp tục sử dụng tài khoản với vai trò học sinh</li>"
+                + "</ul>"
+                + "<p>Cảm ơn bạn đã quan tâm đến Wasabii!</p>"
+                + "<hr><small>Đây là email tự động, vui lòng không trả lời email này.</small>";
+        msg.setContent(content, "text/html; charset=UTF-8");
+        msg.setSentDate(new java.util.Date());
+        Transport.send(msg);
+    }
+
 }

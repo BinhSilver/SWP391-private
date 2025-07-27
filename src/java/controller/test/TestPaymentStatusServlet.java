@@ -214,7 +214,6 @@ public class TestPaymentStatusServlet extends HttpServlet {
                 orderCode,
                 "Success",
                 "FORCE_UPDATE_" + System.currentTimeMillis(),
-                "MANUAL",
                 "00"
             );
             

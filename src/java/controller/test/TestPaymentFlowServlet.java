@@ -174,7 +174,6 @@ public class TestPaymentFlowServlet extends HttpServlet {
                 testOrderCode,
                 "Success",
                 "TEST_TXN_" + testOrderCode,
-                "VCB", // Test bank code
                 "00"   // Success response code
             );
             
@@ -187,7 +186,7 @@ public class TestPaymentFlowServlet extends HttpServlet {
                     out.println("✓ Update verified:");
                     out.println("  Status: " + updatedPayment.getTransactionStatus());
                     out.println("  TransactionNo: " + updatedPayment.getTransactionNo());
-                    out.println("  BankCode: " + updatedPayment.getBankCode());
+                    // out.println("  BankCode: " + updatedPayment.getBankCode()); // BankCode removed
                     out.println("  ResponseCode: " + updatedPayment.getResponseCode());
                     out.println("  PaymentDate: " + updatedPayment.getPaymentDate());
                 } else {
@@ -235,7 +234,7 @@ public class TestPaymentFlowServlet extends HttpServlet {
                 out.println("  OrderInfo: " + payment.getOrderInfo());
                 out.println("  TransactionStatus: " + payment.getTransactionStatus());
                 out.println("  TransactionNo: " + payment.getTransactionNo());
-                out.println("  BankCode: " + payment.getBankCode());
+                // out.println("  BankCode: " + payment.getBankCode()); // BankCode removed
                 out.println("  ResponseCode: " + payment.getResponseCode());
                 out.println("  OrderCode: " + payment.getOrderCode());
                 out.println("  CheckoutUrl: " + payment.getCheckoutUrl());

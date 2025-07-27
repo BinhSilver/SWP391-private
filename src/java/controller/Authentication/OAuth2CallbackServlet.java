@@ -111,6 +111,18 @@ public class OAuth2CallbackServlet extends HttpServlet {
                     }
                 }
 
+                // Load premium info for all users (Free, Premium, Teacher, Admin)
+                try {
+                    Dao.UserPremiumDAO userPremiumDAO = new Dao.UserPremiumDAO();
+                    model.UserPremium premium = userPremiumDAO.getCurrentUserPremium(user.getUserID());
+                    if (premium != null) {
+                        System.out.println("Premium info loaded for Google user: " + user.getUserID() + " (role: " + user.getRoleID() + ")");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error loading premium info for Google user: " + e.getMessage());
+                    e.printStackTrace();
+                }
+
                 // Lưu thông tin user vào session
                 HttpSession session = request.getSession();
                 session.setAttribute("authUser", user);

@@ -1,0 +1,309 @@
+body {
+    background: linear-gradient(135deg, #e94f64 0%, #d63384 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.upload-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(233, 79, 100, 0.15);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    border: 1px solid rgba(233, 79, 100, 0.1);
+}
+
+.upload-area {
+    border: 3px dashed #e94f64;
+    border-radius: 15px;
+    padding: 40px;
+    margin: 20px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(233, 79, 100, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.upload-area:hover::before {
+    left: 100%;
+}
+
+.upload-area:hover {
+    border-color: #d63384;
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(233, 79, 100, 0.2);
+}
+
+.upload-area.dragover {
+    border-color: #28a745;
+    background: #d4edda;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    color: #e94f64;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon {
+    transform: scale(1.1);
+    color: #d63384;
+}
+
+.file-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    display: none;
+    border: 1px solid rgba(233, 79, 100, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #e94f64 0%, #d63384 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 15px 50px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 1rem;
+}
+
+.btn-upload:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(233, 79, 100, 0.3);
+    color: white;
+    background: linear-gradient(135deg, #d63384 0%, #e94f64 100%);
+}
+
+.btn-upload:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: #ccc;
+}
+
+.alert {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    border-left: 4px solid #dc3545;
+}
+
+.progress {
+    height: 12px;
+    border-radius: 10px;
+    margin: 15px 0;
+    display: none;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #e94f64 0%, #d63384 100%);
+    transition: width 0.3s ease;
+}
+
+.text-primary {
+    color: #e94f64 !important;
+}
+
+.text-info {
+    color: #d63384 !important;
+}
+
+h2 {
+    color: #e94f64;
+    font-weight: 700;
+}
+
+h5 {
+    color: #333;
+    font-weight: 600;
+}
+
+.pending-notification {
+    background: linear-gradient(135deg, #e94f64 0%, #d63384 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(233, 79, 100, 0.3);
+}
+
+.pending-notification i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.requirements {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 1px solid rgba(233, 79, 100, 0.1);
+}
+
+.requirements h5 {
+    color: #e94f64;
+    margin-bottom: 15px;
+}
+
+.requirements ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.requirements ul li {
+    padding: 8px 0;
+    position: relative;
+    padding-left: 25px;
+    color: #666;
+}
+
+.requirements ul li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #e94f64;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.btn-outline-secondary {
+    border-color: #e94f64;
+    color: #e94f64;
+    border-radius: 25px;
+    padding: 10px 30px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #e94f64;
+    border-color: #e94f64;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-light {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 25px;
+    padding: 10px 30px;
+    color: #e94f64;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background: white;
+    color: #d63384;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+}
+
+.file-info .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+    border-radius: 20px;
+    padding: 5px 15px;
+    transition: all 0.3s ease;
+}
+
+.file-info .btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.05);
+}
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .upload-card {
+        margin: 10px;
+        padding: 30px 20px;
+    }
+    .upload-area {
+        padding: 30px 20px;
+    }
+    .upload-icon {
+        font-size: 3rem;
+    }
+    .btn-upload {
+        padding: 12px 40px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-card {
+        padding: 25px 15px;
+    }
+    .upload-area {
+        padding: 25px 15px;
+    }
+    .upload-icon {
+        font-size: 2.5rem;
+    }
+    .pending-notification {
+        padding: 20px 15px;
+    }
+} 
