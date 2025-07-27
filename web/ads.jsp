@@ -1,59 +1,67 @@
-<!-- ads.jsp -->
-<style>
-    .ads-container {
-        position: relative; /* ?? chi?m ch? trong flow c?a trang */
-        width: 100%;
-    }
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-    .wasabii-ad-left,
-    .wasabii-ad-right {
-        position: fixed;
-        top: 150px; /* ?i?u ch?nh cho ?�ng chi?u cao navbar (t�y v�o nav.jsp) */
-        width: 120px;
-        height: calc(100% - 100px);
-        z-index: 998;
-        background-color: #ffffff;
-        text-align: center;
-        padding-top: 10px;
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
-        height: 550px;
-    }
-
-    .wasabii-ad-left {
-        left: 0;
-    }
-
-    .wasabii-ad-right {
-        right: 0;
-    }
-
-    @media screen and (max-width: 992px) {
-        .wasabii-ad-left, .wasabii-ad-right {
+<c:if test="${not empty authUser && authUser.roleID == 1}">
+    <style>
+        #ads-box {
+            position: fixed;
+            bottom: 20px;
+            left: 20px; /* Chuyển sang góc trái */
+            width: 400px; /* To hơn */
+            background-color: #fff3e0;
+            border: 1px solid #ffcc80;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            z-index: 9999;
             display: none;
+            border-radius: 12px;
+            font-family: "Segoe UI", sans-serif;
         }
-    }
-</style>
 
-<div class="ads-container">
-    <div class="wasabii-ad-left">
-        <a href="https://go.isclix.com/deep_link/v6/6760849022404507866/5979386823886321997?sub4=oneatweb&url_enc=aHR0cHM6Ly9wcm9tby5oaWdobGFuZHNjb2ZmZWUuY29tLnZuL3V1ZGFpNA%3D%3D" target="_blank">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1T4RyVHyOm0PlrdJI1nCFggbGoxlq_sFzbg&s"
-                 alt="Highlands Ad"
-                 width="120"
-                 height="550"
-                 style="object-fit: cover; border-radius: 4px;" />
-        </a>
+        #ads-box h4 {
+            margin: 0 0 12px 0;
+            font-size: 22px;
+            color: #e65100;
+        }
 
+        #ads-box p {
+            margin: 0;
+            font-size: 16px;
+            color: #4e342e;
+        }
+
+        #ads-box form {
+            margin-top: 16px;
+            text-align: right;
+        }
+
+        #ads-box button {
+            background-color: #fb8c00;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        #ads-box button:hover {
+            background-color: #f57c00;
+        }
+    </style>
+
+    <div id="ads-box">
+        <h4>🌟 Nâng cấp Premium ngay</h4>
+        <p>Loại bỏ quảng cáo, học nhanh hơn, thêm tính năng cao cấp chỉ dành cho bạn.</p>
+        <form action="${pageContext.request.contextPath}/payment">
+            <button type="submit">Nâng cấp ngay</button>
+        </form>
     </div>
 
-    <div class="wasabii-ad-right">
-        <a href="https://go.isclix.com/deep_link/v6/6760849022404507866/5979386823886321997?sub4=oneatweb&url_enc=aHR0cHM6Ly9wcm9tby5oaWdobGFuZHNjb2ZmZWUuY29tLnZuL3V1ZGFpNA%3D%3D" target="_blank">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1T4RyVHyOm0PlrdJI1nCFggbGoxlq_sFzbg&s"
-                 alt="Highlands Ad"
-                 width="120"
-                 height="550"
-                 style="object-fit: cover; border-radius: 4px;" />
-        </a>
-
-    </div>
-</div>
+    <script>
+        setTimeout(function () {
+            document.getElementById("ads-box").style.display = "block";
+        }, 15000);
+    </script>
+</c:if>
