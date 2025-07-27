@@ -22,13 +22,5 @@
         </session-timeout>
     </session-config>
     
-    <!-- Servlet Mappings -->
-    <servlet>
-        <servlet-name>HomeServlet</servlet-name>
-        <servlet-class>controller.User.HomeServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>HomeServlet</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
+   
 </web-app>

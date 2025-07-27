@@ -91,7 +91,10 @@ public class EditCourseServlet extends HttpServlet {
                 for (QuizQuestion question : quizQuestions) {
                     Map<String, Object> quizData = new HashMap<>();
                     quizData.put("id", question.getId());
-                    quizData.put("question", question.getQuestion());
+                    // Patch: ensure question text is never null
+                    String questionText = question.getQuestion();
+                    if (questionText == null) questionText = "";
+                    quizData.put("question", questionText);
 
                     String optionA = "", optionB = "", optionC = "", optionD = "";
                     for (Answer answer : question.getAnswers()) {
@@ -142,6 +145,24 @@ public class EditCourseServlet extends HttpServlet {
         System.out.println("===== EditCourseServlet doPost START =====");
 
         try {
+            String action = request.getParameter("action");
+            if ("saveLesson".equals(action)) {
+                response.setContentType("application/json;charset=UTF-8");
+                try {
+                    int courseId = Integer.parseInt(request.getParameter("courseId"));
+                    Lesson lesson = saveLesson(request, courseId);
+                    response.getWriter().write("{" +
+                        "\"success\":true," +
+                        "\"lessonId\":" + lesson.getLessonID() +
+                        "}");
+                } catch (Exception ex) {
+                    response.getWriter().write("{" +
+                        "\"success\":false," +
+                        "\"message\":\"" + ex.getMessage().replace("\"", "'") + "\"}");
+                }
+                return;
+            }
+
             String courseIdRaw = request.getParameter("courseId");
             String title = request.getParameter("courseTitle");
             String description = request.getParameter("courseDescription");
@@ -225,11 +246,41 @@ public class EditCourseServlet extends HttpServlet {
             }
 
             for (int lessonIndex : lessonIndexes) {
-                Integer lessonId = lessonIndexToId.get(lessonIndex);
-                if (lessonId != null) {
-                    processMaterialsForLesson(request, lessonIndex, lessonId, courseId, mDao, parts);
-                    processVocabularyForLesson(request, lessonIndex, lessonId, courseId, vDao, parts);
+                String lessonIdStr = request.getParameter("lessons[" + lessonIndex + "][id]");
+                Integer lessonId = null;
+                if (lessonIdStr != null && !lessonIdStr.isEmpty() && !lessonIdStr.equals("0")) {
+                    // Lesson cũ: update
+                    lessonId = Integer.parseInt(lessonIdStr);
+                    // Update lesson info
+                    String lessonName = request.getParameter("lessons[" + lessonIndex + "][name]");
+                    String lessonDesc = request.getParameter("lessons[" + lessonIndex + "][desc]");
+                    String orderIndexStr = request.getParameter("lessons[" + lessonIndex + "][orderIndex]");
+                    int orderIndex = orderIndexStr != null ? Integer.parseInt(orderIndexStr) : lessonIndex;
+                    Lesson lesson = new Lesson();
+                    lesson.setLessonID(lessonId);
+                    lesson.setCourseID(courseId);
+                    lesson.setTitle(lessonName);
+                    lesson.setDescription(lessonDesc);
+                    lesson.setOrderIndex(orderIndex);
+                    lesson.setIsHidden(false); // Nếu có field ẩn thì lấy thêm
+                    lDao.update(lesson);
+                } else {
+                    // Lesson mới: insert
+                    String lessonName = request.getParameter("lessons[" + lessonIndex + "][name]");
+                    String lessonDesc = request.getParameter("lessons[" + lessonIndex + "][desc]");
+                    String orderIndexStr = request.getParameter("lessons[" + lessonIndex + "][orderIndex]");
+                    int orderIndex = orderIndexStr != null ? Integer.parseInt(orderIndexStr) : lessonIndex;
+                    Lesson lesson = new Lesson();
+                    lesson.setCourseID(courseId);
+                    lesson.setTitle(lessonName);
+                    lesson.setDescription(lessonDesc);
+                    lesson.setOrderIndex(orderIndex);
+                    lesson.setIsHidden(false); // Nếu có field ẩn thì lấy thêm
+                    lessonId = lDao.addAndReturnID(lesson);
                 }
+                // Xử lý tài liệu, từ vựng cho lessonId vừa có (cũ hoặc mới)
+                processMaterialsForLesson(request, lessonIndex, lessonId, courseId, mDao, parts);
+                processVocabularyForLesson(request, lessonIndex, lessonId, courseId, vDao, parts);
             }
 
             // Xử lý xóa lesson nếu có
@@ -257,6 +308,32 @@ public class EditCourseServlet extends HttpServlet {
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             request.getRequestDispatcher("update_course.jsp").forward(request, response);
         }
+    }
+
+    // Hàm lưu lesson riêng lẻ (AJAX hoặc dùng lại ở nơi khác)
+    public static Lesson saveLesson(HttpServletRequest request, int courseId) throws Exception {
+        LessonsDAO lDao = new LessonsDAO();
+        String lessonIdStr = request.getParameter("lessonId");
+        String name = request.getParameter("name");
+        String desc = request.getParameter("desc");
+        String orderIndexStr = request.getParameter("orderIndex");
+        int orderIndex = orderIndexStr != null ? Integer.parseInt(orderIndexStr) : 0;
+        Lesson lesson = new Lesson();
+        lesson.setCourseID(courseId);
+        lesson.setTitle(name);
+        lesson.setDescription(desc);
+        lesson.setOrderIndex(orderIndex);
+        lesson.setIsHidden(false); // Nếu có field ẩn thì lấy thêm
+        if (lessonIdStr != null && !lessonIdStr.isEmpty() && !lessonIdStr.equals("0")) {
+            // Update
+            lesson.setLessonID(Integer.parseInt(lessonIdStr));
+            lDao.update(lesson);
+        } else {
+            // Insert
+            int newId = lDao.addAndReturnID(lesson);
+            lesson.setLessonID(newId);
+        }
+        return lesson;
     }
 
     private void processMaterialsForLesson(HttpServletRequest request, int lessonIndex, int lessonId, int courseId, LessonMaterialsDAO mDao, Collection<Part> parts) throws Exception {

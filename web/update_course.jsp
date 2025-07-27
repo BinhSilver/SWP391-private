@@ -535,9 +535,7 @@
             };
     </script>
 
-    <script src="<c:url value='/js/edit_course.js'/>"></script>
     <script src="<c:url value='/chat/chatbox.js'/>"></script>
-    <script src="<c:url value='/js/edit_course.js'/>"></script>
     <script src="<c:url value='/js/update_course.js'/>"></script>
 </body>
 </html>
