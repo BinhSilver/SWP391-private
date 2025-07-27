@@ -100,11 +100,26 @@ public class CreateFlashcardServlet extends HttpServlet {
                 itemCount = Integer.parseInt(itemCountStr);
             } catch (Exception ignore) {}
             System.out.println("[CreateFlashcardServlet] Số lượng item: " + itemCount);
+            
+            // Debug: In ra tất cả parameters
+            System.out.println("[CreateFlashcardServlet] All parameters:");
+            java.util.Enumeration<String> paramNames = request.getParameterNames();
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                String paramValue = request.getParameter(paramName);
+                System.out.println("  " + paramName + " = " + paramValue);
+            }
 
             for (int i = 1; i <= itemCount; i++) {
                 String frontContent = request.getParameter("frontContent" + (i > 1 ? "-" + i : ""));
                 String backContent = request.getParameter("backContent" + (i > 1 ? "-" + i : ""));
                 String note = request.getParameter("note" + (i > 1 ? "-" + i : ""));
+                
+                // Debug: In ra tên parameter để kiểm tra
+                System.out.println("[CreateFlashcardServlet] Looking for parameters:");
+                System.out.println("  frontContent param: frontContent" + (i > 1 ? "-" + i : ""));
+                System.out.println("  backContent param: backContent" + (i > 1 ? "-" + i : ""));
+                System.out.println("  note param: note" + (i > 1 ? "-" + i : ""));
                 
                 System.out.println("[CreateFlashcardServlet] Item " + i + ": frontContent=" + frontContent + 
                                 ", backContent=" + backContent + ", note=" + note);

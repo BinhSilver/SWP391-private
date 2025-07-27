@@ -11,17 +11,16 @@
     <title>${flashcard.title} - Wasabii</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="<c:url value='/css/flashcard.css'/>" rel="stylesheet">
-    <link href="<c:url value='/css/flashcard-viewer.css'/>" rel="stylesheet">
-    <link rel="stylesheet" href="<c:url value='/css/nav.css'/>" rel="stylesheet">
-    <link rel="stylesheet" href="<c:url value='/css/indexstyle.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/nav.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/indexstyle.css'/>" rel="stylesheet">
+    <link href="<c:url value='/css/view-flashcard.css'/>" rel="stylesheet">
 </head>
-<body>
+<body class="view-flashcard-page">
     <!-- Navigation -->
     <%@ include file="Home/nav.jsp" %>
 
     <!-- Main Content -->
-    <div class="container mt-4">
+    <div class="container mt-4 view-flashcard-page">
         <!-- Error Messages -->
         <c:if test="${not empty error}">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -40,10 +39,26 @@
             </a>
             
             <!-- Header -->
-            <div class="flashcard-header text-center">
+            <div class="flashcard-header text-center position-relative">
                 <h1>${flashcard.title}</h1>
                 <c:if test="${not empty flashcard.description}">
                     <p>${flashcard.description}</p>
+                </c:if>
+                
+                <!-- Edit button for flashcard owner -->
+                <c:if test="${authUser.userID eq flashcard.userID}">
+                    <a href="edit-flashcard?id=${flashcard.flashcardID}" class="edit-button">
+                        <i class="fas fa-edit"></i> Chỉnh sửa
+                    </a>
+                </c:if>
+                
+                <!-- Debug info (remove in production) -->
+                <c:if test="${authUser.userID ne flashcard.userID}">
+                    <div class="debug-info">
+                        <small>
+                            User ID: ${authUser.userID} | Flashcard User ID: ${flashcard.userID}
+                        </small>
+                    </div>
                 </c:if>
             </div>
 
