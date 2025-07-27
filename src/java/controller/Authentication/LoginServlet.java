@@ -149,6 +149,19 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("userID", fullUser.getUserID());
                 session.setMaxInactiveInterval(60 * 60 * 24);
 
+                // Load premium info for all users (Free, Premium, Teacher, Admin)
+                try {
+                    Dao.UserPremiumDAO userPremiumDAO = new Dao.UserPremiumDAO();
+                    model.UserPremium premium = userPremiumDAO.getCurrentUserPremium(fullUser.getUserID());
+                    if (premium != null) {
+                        session.setAttribute("userPremium", premium);
+                        System.out.println("Premium info loaded for user: " + fullUser.getUserID() + " (role: " + fullUser.getRoleID() + ")");
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error loading premium info: " + e.getMessage());
+                    e.printStackTrace();
+                }
+
                 if ("on".equals(rememberMe)) {
                     setRememberMeCookies(response, email);
                 } else {

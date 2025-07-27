@@ -18,7 +18,7 @@
 
             <!-- Danh sách khóa học -->
             <section class="course-list container my-5">
-                <h2>Danh Sách Khóa Học</h2>
+                <h2 class="text-danger fw-bold text-center mb-4">Danh Sách Khóa Học</h2>
                 <c:if test="${empty courses}">
                     <div class="alert alert-info mt-4">Không có khóa học nào được tìm thấy.</div>
                 </c:if>

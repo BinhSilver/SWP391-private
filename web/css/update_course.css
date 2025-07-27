@@ -226,40 +226,116 @@
 
 /* Modal quiz */
 .update-course-page .modal-content {
-    border-radius: 1rem;
+    border-radius: 1.2rem;
+    box-shadow: 0 8px 32px rgba(233,79,100,0.13);
     border: none;
     overflow: hidden;
 }
-
 .update-course-page .modal-header {
-    border-bottom: none;
-    padding-bottom: 0.5rem;
-    background-color: #e94f64;
+    background: linear-gradient(90deg, #e94f64 60%, #fff 100%);
     color: #fff;
+    border-bottom: none;
+    border-radius: 1.2rem 1.2rem 0 0;
 }
-
-.update-course-page .modal-header .btn-close {
-    filter: invert(1);
+.update-course-page .modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
 }
-
 .update-course-page .modal-body {
-    padding-top: 0;
+    background: #f9f9fb;
+    padding-top: 0.5rem;
 }
 
 /* Quiz question block */
 .update-course-page .quiz-question-block {
-    background: #fcfcfc;
-    border: 1.2px solid #ddd;
-    border-radius: 10px;
-    padding: 1.1rem;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    background: #fff;
+    border: 1.5px solid #e94f64;
+    border-radius: 14px;
+    padding: 1.2rem 1rem 1rem 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(233,79,100,0.07);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+}
+.update-course-page .quiz-question-block:hover {
+    box-shadow: 0 8px 32px rgba(233,79,100,0.13);
+    border-color: #b92c44;
+}
+.update-course-page .quiz-question-block h6 {
+    font-weight: 700;
+    color: #e94f64;
+    font-size: 1.08rem;
 }
 
-.update-course-page .quiz-question-block h6 {
-    font-weight: 600;
-    color: #e94f64;
+/* Quiz Inputs */
+.update-course-page .quiz-question-block input[type="text"],
+.update-course-page .quiz-question-block select {
+    border-radius: 8px;
+    border: 1.5px solid #e2e2e2;
+    padding: 0.5rem 0.75rem;
     font-size: 1rem;
+    margin-bottom: 6px;
+    transition: border-color 0.2s;
+}
+.update-course-page .quiz-question-block input[type="text"]:focus,
+.update-course-page .quiz-question-block select:focus {
+    border-color: #e94f64;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(233,79,100,0.08);
+}
+
+/* Highlight correct answer */
+.update-course-page .quiz-question-block select[name*="[answer]"] {
+    background: #fff8f9;
+    border: 1.5px solid #e94f64;
+    color: #e94f64;
+    font-weight: 600;
+}
+
+/* Quiz Buttons */
+.update-course-page .quiz-question-block .btn {
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    padding: 0.35rem 0.9rem;
+    margin-right: 0.3rem;
+    margin-top: 0.2rem;
+}
+.update-course-page .quiz-question-block .btn-delete-question {
+    color: #fff;
+    background: #e94f64;
+    border: none;
+    font-size: 0.98rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 7px;
+    transition: background 0.2s;
+}
+.update-course-page .quiz-question-block .btn-delete-question:hover {
+    background: #b92c44;
+}
+
+/* Quiz Add Button */
+.update-course-page #addQuestionBtn {
+    background: #fff;
+    color: #e94f64;
+    border: 2px solid #e94f64;
+    font-weight: 700;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    transition: background 0.2s, color 0.2s;
+}
+.update-course-page #addQuestionBtn:hover {
+    background: #e94f64;
+    color: #fff;
+}
+
+/* Quiz Time Setting */
+.update-course-page .quiz-time-setting {
+    background: #fff8f9;
+    border: 1.5px solid #e94f64;
+    border-radius: 10px;
+    margin-bottom: 1.2rem;
 }
 
 /* File list & delete */
@@ -315,8 +391,11 @@
 
 @media (max-width: 600px) {
     .update-course-page .modal-dialog {
-        max-width: 96vw;
+        max-width: 98vw;
         margin: 8px auto;
+    }
+    .update-course-page .quiz-question-block {
+        padding: 0.7rem 0.5rem;
     }
 }
 
@@ -354,4 +433,13 @@
     font-style: italic;
     color: #888;
     margin-bottom: 12px;
+}
+
+/* Quiz Helper Text */
+.update-course-page .quiz-helper {
+    font-size: 0.98rem;
+    color: #888;
+    margin-bottom: 0.7rem;
+    margin-top: -0.5rem;
+    font-style: italic;
 }

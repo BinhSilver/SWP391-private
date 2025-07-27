@@ -77,32 +77,29 @@ public class PaymentDAO {
      * @param orderCode Order code to update
      * @param transactionStatus New transaction status
      * @param transactionNo Transaction number from PayOS
-     * @param bankCode Bank code if available
      * @param responseCode Response code from PayOS
      * @param conn Database connection to use (for transaction support)
      * @return true if update successful, false otherwise
      */
     public boolean updatePaymentStatus(long orderCode, String transactionStatus, 
-                                     String transactionNo, String bankCode, String responseCode, Connection conn) throws SQLException {
-        String sql = "UPDATE Payments SET TransactionStatus = ?, TransactionNo = ?, BankCode = ?, " +
+                                     String transactionNo, String responseCode, Connection conn) throws SQLException {
+        String sql = "UPDATE Payments SET TransactionStatus = ?, TransactionNo = ?, " +
                     "ResponseCode = ?, PaymentDate = ?, Status = ? WHERE OrderCode = ?";
         
         System.out.println("=== PaymentDAO.updatePaymentStatus (with connection): Starting payment update ===");
         System.out.println("OrderCode: " + orderCode);
         System.out.println("New Status: " + transactionStatus);
         System.out.println("TransactionNo: " + transactionNo);
-        System.out.println("BankCode: " + bankCode);
         System.out.println("ResponseCode: " + responseCode);
         
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, transactionStatus);
             stmt.setString(2, transactionNo);
-            stmt.setString(3, bankCode);
-            stmt.setString(4, responseCode);
-            stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis())); // Payment date as current time
-            stmt.setString(6, "COMPLETED"); // Status field
-            stmt.setLong(7, orderCode);
+            stmt.setString(3, responseCode);
+            stmt.setTimestamp(4, new Timestamp(System.currentTimeMillis())); // Payment date as current time
+            stmt.setString(5, "COMPLETED"); // Status field
+            stmt.setLong(6, orderCode);
             
             System.out.println("Executing update SQL with provided connection: " + sql);
             
@@ -129,20 +126,18 @@ public class PaymentDAO {
      * @param orderCode Order code to update
      * @param transactionStatus New transaction status
      * @param transactionNo Transaction number from PayOS
-     * @param bankCode Bank code if available
      * @param responseCode Response code from PayOS
      * @return true if update successful, false otherwise
      */
     public boolean updatePaymentStatus(long orderCode, String transactionStatus, 
-                                     String transactionNo, String bankCode, String responseCode) throws SQLException {
-        String sql = "UPDATE Payments SET TransactionStatus = ?, TransactionNo = ?, BankCode = ?, " +
+                                     String transactionNo, String responseCode) throws SQLException {
+        String sql = "UPDATE Payments SET TransactionStatus = ?, TransactionNo = ?, " +
                     "ResponseCode = ?, PaymentDate = ?, Status = ? WHERE OrderCode = ?";
         
         System.out.println("=== PaymentDAO.updatePaymentStatus: Starting payment update ===");
         System.out.println("OrderCode: " + orderCode);
         System.out.println("New Status: " + transactionStatus);
         System.out.println("TransactionNo: " + transactionNo);
-        System.out.println("BankCode: " + bankCode);
         System.out.println("ResponseCode: " + responseCode);
         
         try (Connection conn = JDBCConnection.getConnection();
@@ -150,11 +145,10 @@ public class PaymentDAO {
             
             stmt.setString(1, transactionStatus);
             stmt.setString(2, transactionNo);
-            stmt.setString(3, bankCode);
-            stmt.setString(4, responseCode);
-            stmt.setTimestamp(5, new Timestamp(System.currentTimeMillis())); // Payment date as current time
-            stmt.setString(6, "COMPLETED"); // Status field
-            stmt.setLong(7, orderCode);
+            stmt.setString(3, responseCode);
+            stmt.setTimestamp(4, new Timestamp(System.currentTimeMillis())); // Payment date as current time
+            stmt.setString(5, "COMPLETED"); // Status field
+            stmt.setLong(6, orderCode);
             
             System.out.println("Executing update SQL: " + sql);
             
@@ -221,7 +215,6 @@ public class PaymentDAO {
         payment.setAmount(rs.getDouble("Amount"));
         payment.setPaymentDate(rs.getTimestamp("PaymentDate"));
         payment.setTransactionNo(rs.getString("TransactionNo"));
-        payment.setBankCode(rs.getString("BankCode"));
         payment.setOrderInfo(rs.getString("OrderInfo"));
         payment.setResponseCode(rs.getString("ResponseCode"));
         payment.setTransactionStatus(rs.getString("TransactionStatus"));

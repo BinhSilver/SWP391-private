@@ -73,6 +73,7 @@ public class UploadCertificateServlet extends HttpServlet {
                 String s3Url = S3Util.uploadFile(is, size, key, contentType);
                 certificatePath = key;
                 System.out.println("Upload chứng chỉ thành công: " + s3Url);
+                System.out.println("Certificate path saved: " + certificatePath);
                 
             } catch (Exception e) {
                 System.err.println("Lỗi upload S3: " + e.getMessage());
@@ -89,9 +90,9 @@ public class UploadCertificateServlet extends HttpServlet {
                 certificatePath = "certificates/" + localFileName;
             }
             
-            // Cập nhật user thành teacher pending
+            // Cập nhật user thành teacher pending (vẫn là học sinh, chờ xác nhận)
             UserDAO userDAO = new UserDAO();
-            authUser.setRoleID(3); // Teacher role
+            authUser.setRoleID(1); // Vẫn là học sinh, chờ admin xác nhận
             authUser.setTeacherPending(true);
             authUser.setCertificatePath(certificatePath);
             
