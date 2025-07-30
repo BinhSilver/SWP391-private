@@ -146,6 +146,26 @@ public class UserDAO {
             return false;
         }
     }
+    
+    public boolean createNewUser(String email, String fullName, String password, String gender, String role, boolean isTeacherPending, String certificatePath) {
+        String sql = "INSERT INTO Users (RoleID, Email, FullName, PasswordHash, Gender, IsTeacherPending, CertificatePath) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int roleId = 1; // default user
+            if ("teacher".equals(role)) roleId = 1; // vẫn là user thường, chờ xác nhận
+            if ("student".equals(role)) roleId = 1;
+            pstmt.setInt(1, roleId);
+            pstmt.setString(2, email);
+            pstmt.setString(3, fullName);
+            pstmt.setString(4, password);
+            pstmt.setString(5, gender);
+            pstmt.setBoolean(6, isTeacherPending);
+            pstmt.setString(7, certificatePath);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public static boolean updatePassword(String email, String newPassword) {
         String sql = "UPDATE Users SET PasswordHash = ? WHERE Email = ?";
@@ -441,13 +461,19 @@ public class UserDAO {
     }
 
     public boolean isGoogleUser(String email) {
-        String sql = "SELECT PasswordHash FROM Users WHERE email = ?";
+        String sql = "SELECT PasswordHash, GoogleID FROM Users WHERE email = ?";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String passwordHash = rs.getString("PasswordHash");
-                return passwordHash != null && passwordHash.startsWith("GOOGLE_LOGIN_");
+                String googleID = rs.getString("GoogleID");
+                
+                // Kiểm tra cả PasswordHash và GoogleID
+                boolean isGoogleByPassword = passwordHash != null && passwordHash.startsWith("GOOGLE_LOGIN_");
+                boolean isGoogleByID = googleID != null && !googleID.trim().isEmpty();
+                
+                return isGoogleByPassword || isGoogleByID;
             }
         } catch (SQLException e) {
             e.printStackTrace();

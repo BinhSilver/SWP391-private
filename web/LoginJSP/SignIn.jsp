@@ -7,7 +7,8 @@
         <input type="hidden" name="action" value="signin">
         <h1>Đăng nhập</h1>
         <div class="input-box">
-            <input type="email"id="email" name="email" placeholder="Email" value="${not empty email ? email : ''}"
+            <input type="email" id="email" name="email" placeholder="Email" 
+                   value="${not empty rememberedEmail ? rememberedEmail : (not empty email ? email : '')}"
                    required>
             <i class='bx bxs-user'></i>
         </div>
@@ -20,8 +21,8 @@
         <div class="box-box">
             <div class="checkbox-group">
                 <label for="rememberMe">Lưu tài khoản</label>
-                <input type="checkbox" id="rememberMe" name="rememberMe" ${"on".equals(rememberMe) ? "checked"
-                                                                            : "" } />
+                <input type="checkbox" id="rememberMe" name="rememberMe" 
+                       ${"on".equals(rememberMe) ? "checked" : ""} />
             </div>
             <div class="forgot-link">
                 <a href="#">Quên mật khẩu?</a>

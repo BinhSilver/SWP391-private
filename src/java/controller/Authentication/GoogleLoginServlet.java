@@ -13,7 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
-import java.net.URLEncoder;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 
 @WebServlet("/login-google")
 public class GoogleLoginServlet extends HttpServlet {
@@ -25,20 +25,15 @@ public class GoogleLoginServlet extends HttpServlet {
         try {
             System.out.println("Bắt đầu Google OAuth flow");
             
-            // Tạo URL OAuth thủ công
-            String authUrl = String.format(
-                "https://accounts.google.com/o/oauth2/auth?" +
-                "client_id=%s&" +
-                "redirect_uri=%s&" +
-                "response_type=code&" +
-                "scope=%s",
-                CLIENT_ID,
-                URLEncoder.encode(REDIRECT_URI, "UTF-8"),
-                URLEncoder.encode(SCOPE, "UTF-8")
-            );
+            // Sử dụng Google API Client library để tạo URL OAuth
+            String url = new GoogleAuthorizationCodeRequestUrl(
+                    CLIENT_ID,
+                    REDIRECT_URI,
+                    java.util.Arrays.asList(SCOPE.split(" "))
+            ).build();
 
-            System.out.println("Redirecting to Google OAuth URL: " + authUrl);
-            response.sendRedirect(authUrl);
+            System.out.println("Redirecting to Google OAuth URL: " + url);
+            response.sendRedirect(url);
             
         } catch (Exception e) {
             System.err.println("Lỗi khi tạo Google OAuth URL: " + e.getMessage());

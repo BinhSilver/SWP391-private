@@ -38,6 +38,7 @@ public class VerifyOtpServlet extends HttpServlet {
         }
 
         // Lấy thông tin người dùng đã lưu tạm
+        String fullName = (String) session.getAttribute("pending_fullName");
         String password = (String) session.getAttribute("pending_password");
         String gender = (String) session.getAttribute("pending_gender");
         String role = (String) session.getAttribute("pending_role");
@@ -45,15 +46,16 @@ public class VerifyOtpServlet extends HttpServlet {
         String certificatePath = (String) session.getAttribute("pending_certificatePath");
 
         if (role != null && "teacher".equals(role)) {
-            new UserDAO().createNewUser(email, password, gender, role, isTeacherPending != null && isTeacherPending, certificatePath);
+            new UserDAO().createNewUser(email, fullName, password, gender, role, isTeacherPending != null && isTeacherPending, certificatePath);
         } else {
-            new UserDAO().createNewUser(email, password, gender, role, false, null);
+            new UserDAO().createNewUser(email, fullName, password, gender, role, false, null);
         }
 
         // Xóa dữ liệu tạm
         session.removeAttribute("otp_" + email);
         session.removeAttribute("otp_time_" + email);
         session.removeAttribute("pending_email");
+        session.removeAttribute("pending_fullName");
         session.removeAttribute("pending_password");
         session.removeAttribute("pending_gender");
         session.removeAttribute("pending_role");

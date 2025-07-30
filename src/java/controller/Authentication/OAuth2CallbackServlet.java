@@ -5,15 +5,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
+import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+
+import com.google.api.services.oauth2.Oauth2;
+import com.google.api.services.oauth2.model.Userinfo;
 import Dao.UserDAO;
 import model.User;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @WebServlet("/oauth2callback")
 public class OAuth2CallbackServlet extends HttpServlet {
@@ -41,22 +40,37 @@ public class OAuth2CallbackServlet extends HttpServlet {
         try {
             System.out.println("Bắt đầu xử lý Google OAuth callback với code: " + code.substring(0, Math.min(code.length(), 10)) + "...");
             
-            // Bước 1: Đổi code lấy access token
-            String tokenResponse = exchangeCodeForToken(code);
-            String accessToken = extractAccessToken(tokenResponse);
-            
-            if (accessToken == null) {
-                System.err.println("Không thể lấy access token");
-                response.sendRedirect(request.getContextPath() + "/login?error=token_exchange_failed");
-                return;
-            }
-            
-            // Bước 2: Lấy thông tin user từ Google
-            String userInfo = getUserInfoFromGoogle(accessToken);
-            String email = extractEmail(userInfo);
-            String name = extractName(userInfo);
-            String googleId = extractGoogleId(userInfo);
-            
+            // Bước 1: Exchange code for access token sử dụng Google API Client
+            GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance(),
+                    CLIENT_ID,
+                    CLIENT_SECRET,
+                    code,
+                    REDIRECT_URI
+            ).execute();
+
+            // Bước 2: Tạo credential
+            GoogleCredential credential = new GoogleCredential.Builder()
+                    .setTransport(GoogleNetHttpTransport.newTrustedTransport())
+                    .setJsonFactory(JacksonFactory.getDefaultInstance())
+                    .setClientSecrets(CLIENT_ID, CLIENT_SECRET)
+                    .build()
+                    .setAccessToken(tokenResponse.getAccessToken());
+
+            // Bước 3: Lấy thông tin user từ Google
+            Oauth2 oauth2 = new Oauth2.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance(),
+                    credential)
+                    .setApplicationName("Wasabii")
+                    .build();
+
+            Userinfo userInfo = oauth2.userinfo().get().execute();
+            String email = userInfo.getEmail();
+            String name = userInfo.getName();
+            String googleId = userInfo.getId();
+
             System.out.println("Thông tin user từ Google - Email: " + email + ", Name: " + name + ", GoogleID: " + googleId);
 
             // Kiểm tra user đã có trong DB chưa, nếu chưa thì thêm mới
@@ -139,74 +153,5 @@ public class OAuth2CallbackServlet extends HttpServlet {
             System.err.println("Lỗi đăng nhập Google: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/login?error=google_login_failed");
         }
-    }
-    
-    private String exchangeCodeForToken(String code) throws IOException, InterruptedException {
-        String tokenUrl = "https://oauth2.googleapis.com/token";
-        String postData = String.format(
-            "client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s",
-            CLIENT_ID, CLIENT_SECRET, code, URLEncoder.encode(REDIRECT_URI, "UTF-8")
-        );
-        
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(tokenUrl))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .POST(HttpRequest.BodyPublishers.ofString(postData))
-            .build();
-            
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
-    }
-    
-    private String getUserInfoFromGoogle(String accessToken) throws IOException, InterruptedException {
-        String userInfoUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-        
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(userInfoUrl))
-            .header("Authorization", "Bearer " + accessToken)
-            .GET()
-            .build();
-            
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
-    }
-    
-    private String extractAccessToken(String tokenResponse) {
-        // Parse JSON response để lấy access_token
-        Pattern pattern = Pattern.compile("\"access_token\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(tokenResponse);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-    
-    private String extractEmail(String userInfo) {
-        Pattern pattern = Pattern.compile("\"email\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(userInfo);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-    
-    private String extractName(String userInfo) {
-        Pattern pattern = Pattern.compile("\"name\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(userInfo);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-    
-    private String extractGoogleId(String userInfo) {
-        Pattern pattern = Pattern.compile("\"id\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(userInfo);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
     }
 }
