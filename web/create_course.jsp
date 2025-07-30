@@ -20,13 +20,7 @@
         <%@ include file="/Home/nav.jsp" %>
 
         <section class="container py-5">
-            <!-- Debug info -->
-            <div class="alert alert-info">
-                <strong>Debug:</strong> Trang create_course.jsp đã load thành công.
-                <br>User: ${sessionScope.authUser != null ? sessionScope.authUser.fullName : 'Chưa đăng nhập'}
-                <br>Role: ${sessionScope.authUser != null ? sessionScope.authUser.roleID : 'N/A'}
-            </div>
-            
+                       
             <h2 class="text-danger fw-bold text-center mb-4">Tạo Khóa Học Mới</h2>
             <form id="wizardForm" method="post" action="CreateCourseServlet" enctype="multipart/form-data"
                   class="bg-white p-4 rounded-4 shadow-sm">

@@ -54,13 +54,7 @@
                             <i class="fas fa-edit"></i> Chỉnh sửa
                         </a>
                     </c:if>
-                    <c:if test="${authUser.userID ne flashcard.userID}">
-                        <div class="debug-info">
-                            <small>
-                                User ID: ${authUser.userID} | Flashcard User ID: ${flashcard.userID}
-                            </small>
-                        </div>
-                    </c:if>
+
                 </div>
             </div>
         </div>

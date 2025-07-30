@@ -304,18 +304,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="quiz-preview">
-                                                    <h5><i class="fas fa-eye me-2"></i>Xem trước câu hỏi</h5>
-                                                    <div class="quiz-questions-preview">
-                                                        <c:forEach var="q" items="${quiz}" varStatus="loop">
-                                                            <div class="question-preview-item">
-                                                                <div class="question-number">${loop.index + 1}</div>
-                                                                <div class="question-text">${q.question}</div>
-                                                                <div class="question-time">${q.timeLimit}s</div>
-                                                            </div>
-                                                        </c:forEach>
-                                                    </div>
-                                                </div>
+
 
                                                 <div class="quiz-actions">
                                                     <a href="doQuiz?lessonId=${lesson.lessonID}" class="btn btn-primary" style="color: white;">
