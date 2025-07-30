@@ -41,8 +41,8 @@ public class TeacherApprovalServlet extends HttpServlet {
                 userDAO.approveTeacher(userId);
                 request.getSession().setAttribute("success", "Đã xác nhận giáo viên thành công!");
             } else if ("reject".equals(action)) {
-                // Từ chối giáo viên - cần thêm phương thức này vào UserDAO
-                // userDAO.rejectTeacher(userId);
+                // Từ chối giáo viên
+                userDAO.rejectTeacher(userId);
                 request.getSession().setAttribute("success", "Đã từ chối giáo viên!");
             }
             

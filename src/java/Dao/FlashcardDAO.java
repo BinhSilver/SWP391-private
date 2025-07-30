@@ -3,6 +3,7 @@ package Dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import model.Flashcard;
 import model.FlashcardItem;
 
@@ -19,19 +20,22 @@ public class FlashcardDAO {
 
     // Tạo flashcard mới
     public int createFlashcard(Flashcard flashcard) throws SQLException {
-        String sql = "INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage) VALUES (?, ?, GETDATE(), GETDATE(), ?, ?, ?)";
+        String sql = "INSERT INTO Flashcards (UserID, Title, CreatedAt, UpdatedAt, IsPublic, Description, CoverImage, CourseID) VALUES (?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, flashcard.getUserID());
             ps.setString(2, flashcard.getTitle());
             ps.setBoolean(3, flashcard.isPublicFlag());
             ps.setString(4, flashcard.getDescription());
             ps.setString(5, flashcard.getCoverImage());
-            
+            if (flashcard.getCourseID() == 0) {
+                ps.setNull(6, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(6, flashcard.getCourseID());
+            }
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating flashcard failed, no rows affected.");
             }
-
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1);
@@ -185,5 +189,129 @@ public class FlashcardDAO {
         }
         System.out.println("[FlashcardDAO] Trả về " + flashcards.size() + " flashcard từ khóa học cho userID=" + userID);
         return flashcards;
+    }
+
+    // Lấy tất cả flashcard mà user có thể truy cập (của mình và của các khóa học đã join, chỉ public)
+    public List<Flashcard> getAllAccessibleFlashcards(int userID) throws SQLException {
+        List<Flashcard> flashcards = new ArrayList<>();
+        
+        // Lấy flashcard của chính user
+        String userFlashcardsSql = "SELECT * FROM Flashcards WHERE UserID = ?";
+        List<Flashcard> userFlashcards = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(userFlashcardsSql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Flashcard flashcard = new Flashcard();
+                    flashcard.setFlashcardID(rs.getInt("FlashcardID"));
+                    flashcard.setUserID(rs.getInt("UserID"));
+                    flashcard.setTitle(rs.getString("Title"));
+                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                    flashcard.setCreatedAt(createdAt != null ? createdAt : new Timestamp(System.currentTimeMillis()));
+                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                    flashcard.setUpdatedAt(updatedAt != null ? updatedAt : new Timestamp(System.currentTimeMillis()));
+                    Object isPublicObj = rs.getObject("IsPublic");
+                    flashcard.setPublicFlag(isPublicObj != null ? rs.getBoolean("IsPublic") : false);
+                    flashcard.setDescription(rs.getString("Description"));
+                    flashcard.setCoverImage(rs.getString("CoverImage"));
+                    flashcard.setCourseID(rs.getObject("CourseID") != null ? rs.getInt("CourseID") : null);
+                    userFlashcards.add(flashcard);
+                }
+            }
+        }
+        
+        // Lấy flashcard public từ các khóa học user đã join
+        String courseFlashcardsSql = "SELECT * FROM Flashcards WHERE IsPublic = 1 AND CourseID IN (SELECT CourseID FROM Enrollment WHERE UserID = ?) AND UserID <> ?";
+        List<Flashcard> courseFlashcards = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(courseFlashcardsSql)) {
+            ps.setInt(1, userID);
+            ps.setInt(2, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Flashcard flashcard = new Flashcard();
+                    flashcard.setFlashcardID(rs.getInt("FlashcardID"));
+                    flashcard.setUserID(rs.getInt("UserID"));
+                    flashcard.setTitle(rs.getString("Title"));
+                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                    flashcard.setCreatedAt(createdAt != null ? createdAt : new Timestamp(System.currentTimeMillis()));
+                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                    flashcard.setUpdatedAt(updatedAt != null ? updatedAt : new Timestamp(System.currentTimeMillis()));
+                    Object isPublicObj = rs.getObject("IsPublic");
+                    flashcard.setPublicFlag(isPublicObj != null ? rs.getBoolean("IsPublic") : false);
+                    flashcard.setDescription(rs.getString("Description"));
+                    flashcard.setCoverImage(rs.getString("CoverImage"));
+                    flashcard.setCourseID(rs.getObject("CourseID") != null ? rs.getInt("CourseID") : null);
+                    courseFlashcards.add(flashcard);
+                }
+            }
+        }
+        
+        // Gộp danh sách và sắp xếp
+        flashcards.addAll(userFlashcards);
+        flashcards.addAll(courseFlashcards);
+        flashcards.sort((f1, f2) -> f2.getCreatedAt().compareTo(f1.getCreatedAt()));
+        
+        // Log chi tiết
+        System.out.println("=== [FlashcardDAO] LOG CHI TIẾT CHO USER " + userID + " ===");
+        System.out.println("[FlashcardDAO] Số flashcard của user: " + userFlashcards.size());
+        for (Flashcard f : userFlashcards) {
+            System.out.println("  - Flashcard ID: " + f.getFlashcardID() + ", Title: " + f.getTitle() + 
+                             ", IsPublic: " + f.isPublicFlag() + ", CourseID: " + f.getCourseID());
+        }
+        
+        System.out.println("[FlashcardDAO] Số flashcard từ khóa học đã join: " + courseFlashcards.size());
+        for (Flashcard f : courseFlashcards) {
+            System.out.println("  - Flashcard ID: " + f.getFlashcardID() + ", Title: " + f.getTitle() + 
+                             ", Owner UserID: " + f.getUserID() + ", CourseID: " + f.getCourseID());
+        }
+        
+        // Kiểm tra enrollment
+        String enrollmentSql = "SELECT CourseID FROM Enrollment WHERE UserID = ?";
+        List<Integer> enrolledCourses = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(enrollmentSql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    enrolledCourses.add(rs.getInt("CourseID"));
+                }
+            }
+        }
+        System.out.println("[FlashcardDAO] User đã join các khóa học: " + enrolledCourses);
+        
+        // Kiểm tra flashcard public của các khóa học đã join
+        if (!enrolledCourses.isEmpty()) {
+            String publicFlashcardsSql = "SELECT FlashcardID, Title, CourseID, UserID, IsPublic FROM Flashcards WHERE CourseID IN (" + 
+                                        enrolledCourses.stream().map(String::valueOf).collect(Collectors.joining(",")) + ")";
+            System.out.println("[FlashcardDAO] Tất cả flashcard của các khóa học đã join:");
+            try (PreparedStatement ps = connection.prepareStatement(publicFlashcardsSql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        System.out.println("  - Flashcard ID: " + rs.getInt("FlashcardID") + 
+                                         ", Title: " + rs.getString("Title") + 
+                                         ", CourseID: " + rs.getInt("CourseID") + 
+                                         ", Owner UserID: " + rs.getInt("UserID") + 
+                                         ", IsPublic: " + rs.getBoolean("IsPublic"));
+                    }
+                }
+            }
+        }
+        
+        System.out.println("[FlashcardDAO] Tổng số flashcard có thể truy cập: " + flashcards.size());
+        System.out.println("=== [FlashcardDAO] KẾT THÚC LOG ===");
+        
+        return flashcards;
+    }
+
+    // Xóa tất cả flashcard theo courseId
+    public void deleteFlashcardsByCourseId(int courseId) throws SQLException {
+        String sql = "SELECT FlashcardID FROM Flashcards WHERE CourseID = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, courseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    deleteFlashcard(rs.getInt("FlashcardID"));
+                }
+            }
+        }
     }
 } 

@@ -17,8 +17,8 @@
     <body>
 
         <div class="page-wrapper">
-            <%@ include file="Home/nav.jsp" %>
-
+            <%@ include file="Home/nav.jsp" %>  
+            <%@ include file="ads.jsp"%>
             <%@ include file="chatBoxjsp/chatBox.jsp" %>
             <!-- Hero Section -->
             <section class="hero">

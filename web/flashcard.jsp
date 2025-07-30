@@ -82,22 +82,15 @@
             </div>
         </c:if>
 
-        <!-- Debug info -->
-        <div class="alert alert-info">
-            <p>Debug: userFlashcards size = ${userFlashcards.size()}</p>
-            <p>Debug: courseFlashcards size = ${courseFlashcards.size()}</p>
-        </div>
-
-        <!-- My Flashcards Section -->
+        <!-- All Accessible Flashcards Section -->
         <div class="row mb-5">
             <div class="col-12">
                 <h2 class="section-title">
-                    <i class="fas fa-user text-primary"></i>
-                    Flashcard của tôi
+                    <i class="fas fa-layer-group text-primary"></i>
+                    Tất cả Flashcard bạn có thể truy cập
                 </h2>
-                
                 <c:choose>
-                    <c:when test="${empty userFlashcards}">
+                    <c:when test="${empty allFlashcards}">
                         <div class="empty-state">
                             <div class="empty-icon">
                                 <i class="fas fa-layer-group"></i>
@@ -112,7 +105,7 @@
                     </c:when>
                     <c:otherwise>
                         <div class="row">
-                            <c:forEach var="flashcard" items="${userFlashcards}">
+                            <c:forEach var="flashcard" items="${allFlashcards}">
                                 <div class="col-md-4 col-lg-3 mb-4">
                                     <div class="flashcard-card">
                                         <div class="flashcard-image">
@@ -132,10 +125,12 @@
                                                        class="btn btn-sm btn-light" title="Xem">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-danger" 
-                                                            onclick="deleteFlashcard(${flashcard.flashcardID})" title="Xóa">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+                                                    <c:if test="${authUser.userID eq flashcard.userID}">
+                                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                                onclick="deleteFlashcard(${flashcard.flashcardID})" title="Xóa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </c:if>
                                                 </div>
                                             </div>
                                         </div>
@@ -176,60 +171,6 @@
                 </c:choose>
             </div>
         </div>
-
-        <!-- Course Flashcards Section -->
-        <c:if test="${not empty courseFlashcards}">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="section-title">
-                        <i class="fas fa-graduation-cap text-primary"></i>
-                        Flashcard từ khóa học
-                    </h2>
-                    
-                    <div class="row">
-                        <c:forEach var="flashcard" items="${courseFlashcards}">
-                            <div class="col-md-4 col-lg-3 mb-4">
-                                <div class="flashcard-card course-flashcard">
-                                    <div class="flashcard-image">
-                                        <c:choose>
-                                            <c:when test="${not empty flashcard.coverImage}">
-                                                <img src="${flashcard.coverImage}" alt="${flashcard.title}" class="img-fluid">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="default-image">
-                                                    <i class="fas fa-graduation-cap"></i>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <div class="flashcard-overlay">
-                                            <a href="<c:url value='/view-flashcard?id=${flashcard.flashcardID}'/>" 
-                                               class="btn btn-sm btn-light" title="Xem">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="flashcard-content">
-                                        <h5 class="flashcard-title">${flashcard.title}</h5>
-                                        <c:if test="${not empty flashcard.description}">
-                                            <p class="flashcard-description">${flashcard.description}</p>
-                                        </c:if>
-                                        <div class="flashcard-meta">
-                                            <span class="badge bg-info">
-                                                <i class="fas fa-graduation-cap"></i>
-                                                Khóa học
-                                            </span>
-                                            <small class="text-muted">
-                                                <fmt:formatDate value="${flashcard.createdAt}" pattern="dd/MM/yyyy"/>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </div>
-            </div>
-        </c:if>
     </div>
 
     <%@ include file="Home/footer.jsp" %>
@@ -260,30 +201,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <script>
-        function deleteFlashcard(flashcardID) {
-            document.getElementById('flashcardID').value = flashcardID;
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
-        }
-
-        // Ẩn popup xóa flashcard sau 5s
-        setTimeout(function() {
-            var alert = document.getElementById('deleteSuccessAlert');
-            if(alert) {
-                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                bsAlert.close();
-            }
-        }, 5000);
-
-        // Ẩn popup tạo flashcard sau 5s
-        setTimeout(function() {
-            var alert = document.getElementById('createSuccessAlert');
-            if(alert) {
-                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-                bsAlert.close();
-            }
-        }, 5000);
-    </script>
+    <script src="<c:url value='/js/flashcard.js'/>"></script>
     </div>
 </body>
 </html> 

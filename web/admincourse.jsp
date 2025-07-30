@@ -124,6 +124,10 @@
                                     <td class="p-2">
                                         <a href="${pageContext.request.contextPath}/CourseDetailServlet?id=${course.courseID}"
                                            class="view-details-btn mr-2">Xem chi tiết</a>
+                                        <form action="${pageContext.request.contextPath}/Delete" method="post" style="display:inline;">
+                                            <input type="hidden" name="courseId" value="${course.courseID}">
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này?');">Xóa</button>
+                                        </form>
                                         <form action="${pageContext.request.contextPath}/courseManagement" method="post" style="display:inline;">
                                             <input type="hidden" name="courseId" value="${course.courseID}">
                                             <c:choose>

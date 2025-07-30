@@ -74,6 +74,13 @@ public class CourseDetailServlet extends HttpServlet {
         // 4. Lấy danh sách bài học
         List<Lesson> lessons = lessonDAO.getLessonsByCourseID(courseID);
 
+        // Nếu là vào trang làm quiz (doQuiz), lưu thời điểm bắt đầu vào session
+        String quizParam = request.getParameter("doQuiz");
+        if (quizParam != null && quizParam.equals("1")) {
+            HttpSession quizSession = request.getSession();
+            quizSession.setAttribute("quizStartTime", System.currentTimeMillis());
+        }
+
         // 5. Lấy tài liệu của từng bài học
         Map<Integer, List<LessonMaterial>> lessonMaterialsMap = materialDAO.getAllMaterialsGroupedByLesson(courseID);
 

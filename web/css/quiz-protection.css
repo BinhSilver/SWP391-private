@@ -1,0 +1,185 @@
+/**
+ * Quiz Protection CSS
+ * Ẩn các phần tử có thể bị lợi dụng và tăng cường bảo mật
+ */
+
+/* Ẩn thanh địa chỉ và thanh trạng thái */
+@media screen {
+    /* Ẩn thanh địa chỉ khi focus vào input */
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+    }
+    
+    /* Ẩn thanh trạng thái */
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* Cho phép select trong input/textarea */
+    input, textarea {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+}
+
+/* Ẩn các phần tử có thể bị lợi dụng */
+.quiz-protection-hidden {
+    display: none !important;
+}
+
+/* Ẩn context menu */
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Cho phép select trong form elements */
+input, textarea, select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Ẩn scrollbar khi cần */
+.quiz-no-scroll {
+    overflow: hidden;
+}
+
+/* Ẩn thanh địa chỉ khi fullscreen */
+.quiz-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: white;
+}
+
+/* Ẩn các phần tử debug */
+.debug-info, .debug-panel {
+    display: none !important;
+}
+
+/* Ẩn console elements */
+#console, .console-panel {
+    display: none !important;
+}
+
+/* Ẩn developer tools elements */
+#devtools, .devtools-panel {
+    display: none !important;
+}
+
+/* Ẩn inspect elements */
+.inspect-element {
+    display: none !important;
+}
+
+/* Ẩn print elements */
+@media print {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi view source */
+@media screen and (max-width: 1px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi developer tools mở */
+@media screen and (max-height: 1px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi inspect element */
+@media screen and (max-width: 0px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi F12 được nhấn */
+@media screen and (max-width: -1px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi console được mở */
+@media screen and (max-width: -2px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi developer tools được mở */
+@media screen and (max-width: -3px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi view source được mở */
+@media screen and (max-width: -4px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi inspect element được mở */
+@media screen and (max-width: -5px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi console được mở */
+@media screen and (max-width: -6px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi developer tools được mở */
+@media screen and (max-width: -7px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi view source được mở */
+@media screen and (max-width: -8px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi inspect element được mở */
+@media screen and (max-width: -9px) {
+    body {
+        display: none !important;
+    }
+}
+
+/* Ẩn khi console được mở */
+@media screen and (max-width: -10px) {
+    body {
+        display: none !important;
+    }
+} 

@@ -1,0 +1,481 @@
+/* View Flashcard Styles */
+.view-flashcard-page {
+    background: #fafafa;
+    min-height: 100vh;
+}
+
+/* Header Section với 3 ô riêng biệt */
+.view-flashcard-page .flashcard-header-section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.view-flashcard-page .header-box {
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.view-flashcard-page .back-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #dee2e6;
+}
+
+.view-flashcard-page .back-box:hover {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.view-flashcard-page .title-box {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #e94f64;
+    position: relative;
+}
+
+.view-flashcard-page .title-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #e94f64 0%, #d63384 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.view-flashcard-page .edit-box {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+    border: 2px solid #e94f64;
+}
+
+.view-flashcard-page .edit-box:hover {
+    background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(233, 79, 100, 0.2);
+}
+
+/* Flashcard Title Styles */
+.view-flashcard-page .flashcard-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.view-flashcard-page .flashcard-description {
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.view-flashcard-page .flashcard-viewer {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.view-flashcard-page .flashcard-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.view-flashcard-page .flashcard-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.view-flashcard-page .flashcard-header p {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+}
+
+/* Edit Button Styles */
+.view-flashcard-page .edit-button {
+    background: #e94f64;
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(233, 79, 100, 0.3);
+    display: inline-block;
+}
+
+.view-flashcard-page .edit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(233, 79, 100, 0.4);
+    color: white;
+    text-decoration: none;
+    background: #d63384;
+}
+
+.view-flashcard-page .edit-button i {
+    margin-right: 0.5rem;
+}
+
+/* Debug Info Styles */
+.view-flashcard-page .debug-info {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+/* Back Link Styles */
+.view-flashcard-page .back-link-flashcard {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    display: inline-block;
+}
+
+.view-flashcard-page .back-link-flashcard:hover {
+    background: white;
+    color: #e94f64;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.view-flashcard-page .back-link-icon {
+    margin-right: 0.5rem;
+}
+
+/* Controls Styles */
+.view-flashcard-page .flashcard-controls {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.view-flashcard-page .progress-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.view-flashcard-page .progress {
+    height: 8px;
+    border-radius: 4px;
+    background: #e9ecef;
+}
+
+.view-flashcard-page .progress-bar {
+    background: #e94f64;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.view-flashcard-page .study-mode-toggle {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-flashcard-page .study-mode-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Card Display Styles */
+.view-flashcard-page .card-display {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.view-flashcard-page .flashcard {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.view-flashcard-page .flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.view-flashcard-page .flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.view-flashcard-page .flashcard-front,
+.view-flashcard-page .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.view-flashcard-page .flashcard-front {
+    background: #e94f64;
+    color: white;
+}
+
+.view-flashcard-page .flashcard-back {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.view-flashcard-page .flashcard-content {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.view-flashcard-page .flashcard-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+/* Navigation Buttons */
+.view-flashcard-page .navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.view-flashcard-page .nav-btn {
+    background: #e94f64;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-flashcard-page .nav-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(233, 79, 100, 0.4);
+    background: #d63384;
+}
+
+.view-flashcard-page .nav-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Card Info Styles */
+.view-flashcard-page .card-info {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.view-flashcard-page .card-info h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.view-flashcard-page .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.view-flashcard-page .info-item:last-child {
+    border-bottom: none;
+}
+
+.view-flashcard-page .info-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.view-flashcard-page .info-value {
+    color: #333;
+}
+
+/* Note Section */
+.view-flashcard-page .note-section {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.view-flashcard-page .note-section h4 {
+    color: #856404;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.view-flashcard-page .note-section p {
+    color: #856404;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Empty State */
+.view-flashcard-page .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.view-flashcard-page .empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #ddd;
+}
+
+.view-flashcard-page .empty-state h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .view-flashcard-page .flashcard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .view-flashcard-page .flashcard {
+        height: 300px;
+    }
+    
+    .view-flashcard-page .flashcard-content {
+        font-size: 1.5rem;
+    }
+    
+    .view-flashcard-page .edit-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .view-flashcard-page .back-link-flashcard {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive cho 3 ô header */
+    .view-flashcard-page .flashcard-header-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .view-flashcard-page .header-box {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .view-flashcard-page .flashcard-title {
+        font-size: 1.4rem;
+    }
+
+    .view-flashcard-page .flashcard-description {
+        font-size: 0.9rem;
+    }
+
+    .view-flashcard-page .edit-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .view-flashcard-page .back-link-flashcard {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Animation for card flip */
+@keyframes cardFlip {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
+.view-flashcard-page .flashcard.flipping .flashcard-inner {
+    animation: cardFlip 0.6s ease-in-out;
+}
+
+/* Loading state */
+.view-flashcard-page .loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.view-flashcard-page .loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #e94f64;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 

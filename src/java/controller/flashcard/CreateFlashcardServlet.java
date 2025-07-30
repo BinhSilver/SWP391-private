@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.io.InputStream;
-import com.cloudinary.Cloudinary;
 
 @WebServlet(name = "CreateFlashcardServlet", urlPatterns = {"/create-flashcard"})
 @MultipartConfig(
@@ -54,48 +53,25 @@ public class CreateFlashcardServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         User authUser = (User) session.getAttribute("authUser");
+        System.out.println("[CreateFlashcardServlet] authUser: " + (authUser != null ? authUser.getUserID() : "null"));
 
         if (authUser == null) {
+            System.out.println("[CreateFlashcardServlet] Chưa đăng nhập, chuyển hướng login");
             response.sendRedirect("login");
             return;
         }
 
         try {
-            // Lấy thông tin flashcard
+            // Lấy thông tin flashcard từ form
             String title = request.getParameter("title");
             String description = request.getParameter("description");
-            boolean isPublic = "on".equals(request.getParameter("isPublic"));
-
-            // Upload ảnh cover nếu có
-            String coverImageUrl = null;
-            Part coverPart = request.getPart("coverImage");
-            if (coverPart != null && coverPart.getSize() > 0) {
-                try {
-                    java.io.InputStream is = coverPart.getInputStream();
-                    long size = coverPart.getSize();
-                    String originalFileName = coverPart.getSubmittedFileName();
-                    String key = "flashcards/flashcard_cover_" + java.util.UUID.randomUUID();
-                    if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
-                        key += ".jpg";
-                    } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
-                        key += ".png";
-                    }
-                    String contentType = coverPart.getContentType();
-                    String s3Url = config.S3Util.uploadFile(is, size, key, contentType);
-                    coverImageUrl = s3Url;
-                    System.out.println("[FlashcardUpload] Cover upload thành công S3: " + coverImageUrl);
-                } catch (Exception e) {
-                    System.err.println("[FlashcardUpload] Lỗi upload cover S3: " + e.getMessage());
-                }
-            }
-
-            // Log toàn bộ các part nhận được từ request để debug
-            System.out.println("[FlashcardUpload] Danh sách các part nhận được:");
-            for (Part part : request.getParts()) {
-                System.out.println("  Part name: " + part.getName() + ", filename: " + part.getSubmittedFileName() + ", size: " + part.getSize());
-            }
+            boolean isPublic = true; // Mặc định là công khai
+            
+            System.out.println("[CreateFlashcardServlet] Thông tin flashcard: title=" + title + 
+                            ", description=" + description + ", isPublic=" + isPublic);
 
             // Tạo flashcard mới
             Flashcard flashcard = new Flashcard();
@@ -103,99 +79,179 @@ public class CreateFlashcardServlet extends HttpServlet {
             flashcard.setTitle(title);
             flashcard.setDescription(description);
             flashcard.setPublicFlag(isPublic);
+
+            // Xử lý ảnh bìa nếu có
+            Part coverImagePart = request.getPart("coverImage");
+            String coverImageUrl = null;
+            if (coverImagePart != null && coverImagePart.getSize() > 0) {
+                coverImageUrl = uploadFlashcardCoverImage(coverImagePart);
+                System.out.println("[CreateFlashcardServlet] Cover image URL: " + coverImageUrl);
+            }
             flashcard.setCoverImage(coverImageUrl);
 
-            int flashcardID = flashcardDAO.createFlashcard(flashcard);
+            // Lưu flashcard và lấy ID
+            int flashcardId = flashcardDAO.createFlashcard(flashcard);
+            System.out.println("[CreateFlashcardServlet] Đã tạo flashcard mới với ID: " + flashcardId);
 
-            // Xử lý các flashcard items
-            String[] frontContents = request.getParameterValues("frontContent");
-            String[] backContents = request.getParameterValues("backContent");
-            String[] notes = request.getParameterValues("note");
+            // Xử lý các flashcard item
+            String itemCountStr = request.getParameter("itemCount");
+            int itemCount = 1;
+            try {
+                itemCount = Integer.parseInt(itemCountStr);
+            } catch (Exception ignore) {}
+            System.out.println("[CreateFlashcardServlet] Số lượng item: " + itemCount);
 
-            if (frontContents != null && backContents != null) {
-                for (int i = 0; i < frontContents.length; i++) {
-                    if (frontContents[i] != null && !frontContents[i].trim().isEmpty() &&
-                        backContents[i] != null && !backContents[i].trim().isEmpty()) {
-                        
-                        FlashcardItem item = new FlashcardItem();
-                        item.setFlashcardID(flashcardID);
-                        item.setFrontContent(frontContents[i].trim());
-                        item.setBackContent(backContents[i].trim());
-                        item.setNote(notes != null && i < notes.length ? notes[i] : "");
-                        item.setOrderIndex(i + 1);
-
-                        // Upload ảnh front nếu có
-                        Part frontImagePart = request.getPart("frontImage-" + (i + 1));
-                        if (frontImagePart != null && frontImagePart.getSize() > 0 && frontImagePart.getSubmittedFileName() != null && !frontImagePart.getSubmittedFileName().isEmpty()) {
-                            try {
-                                String fileName = frontImagePart.getSubmittedFileName();
-                                System.out.println("[FlashcardUpload] Đang upload frontImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + frontImagePart.getSize());
-                                java.io.InputStream is = frontImagePart.getInputStream();
-                                long size = frontImagePart.getSize();
-                                String originalFileName = frontImagePart.getSubmittedFileName();
-                                String key = "flashcards/flashcard_" + flashcardID + "_front_" + i + "_" + java.util.UUID.randomUUID();
-                                if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
-                                    key += ".jpg";
-                                } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
-                                    key += ".png";
-                                }
-                                String contentType = frontImagePart.getContentType();
-                                String frontImageUrl = config.S3Util.uploadFile(is, size, key, contentType);
-                                System.out.println("[FlashcardUpload] Front image upload thành công: " + frontImageUrl);
-                                item.setFrontImage(frontImageUrl);
-                            } catch (Exception e) {
-                                System.err.println("[FlashcardUpload] Lỗi upload frontImage cho card " + (i + 1) + ": " + e.getMessage());
-                            }
-                        } else {
-                            System.out.println("[FlashcardUpload] Không nhận được frontImage cho card " + (i + 1) + " (part null hoặc không có file)");
-                        }
-                        // Upload ảnh back nếu có
-                        Part backImagePart = request.getPart("backImage-" + (i + 1));
-                        if (backImagePart != null && backImagePart.getSize() > 0 && backImagePart.getSubmittedFileName() != null && !backImagePart.getSubmittedFileName().isEmpty()) {
-                            try {
-                                String fileName = backImagePart.getSubmittedFileName();
-                                System.out.println("[FlashcardUpload] Đang upload backImage cho card " + (i + 1) + ", file: " + fileName + ", size: " + backImagePart.getSize());
-                                java.io.InputStream is = backImagePart.getInputStream();
-                                long size = backImagePart.getSize();
-                                String originalFileName = backImagePart.getSubmittedFileName();
-                                String key = "flashcards/flashcard_" + flashcardID + "_back_" + i + "_" + java.util.UUID.randomUUID();
-                                if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
-                                    key += ".jpg";
-                                } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
-                                    key += ".png";
-                                }
-                                String contentType = backImagePart.getContentType();
-                                String backImageUrl = config.S3Util.uploadFile(is, size, key, contentType);
-                                System.out.println("[FlashcardUpload] Back image upload thành công: " + backImageUrl);
-                                item.setBackImage(backImageUrl);
-                            } catch (Exception e) {
-                                System.err.println("[FlashcardUpload] Lỗi upload backImage cho card " + (i + 1) + ": " + e.getMessage());
-                            }
-                        } else {
-                            System.out.println("[FlashcardUpload] Không nhận được backImage cho card " + (i + 1) + " (part null hoặc không có file)");
-                        }
-
-                        // Log giá trị trước khi lưu vào DB
-                        System.out.println("[FlashcardUpload] Sắp lưu item: frontImage=" + item.getFrontImage() + ", backImage=" + item.getBackImage() + ", frontContent=" + item.getFrontContent() + ", backContent=" + item.getBackContent());
-                        flashcardItemDAO.createFlashcardItem(item);
-                    }
-                }
+            // Debug: In ra tất cả parameters
+            System.out.println("[CreateFlashcardServlet] All parameters:");
+            java.util.Enumeration<String> paramNames = request.getParameterNames();
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                String paramValue = request.getParameter(paramName);
+                System.out.println("  " + paramName + " = " + paramValue);
             }
 
-            response.sendRedirect("flashcard?success=true");
+            for (int i = 1; i <= itemCount; i++) {
+                String frontContent = request.getParameter("frontContent" + (i > 1 ? "-" + i : ""));
+                String backContent = request.getParameter("backContent" + (i > 1 ? "-" + i : ""));
+                String note = request.getParameter("note" + (i > 1 ? "-" + i : ""));
+                
+                // Debug: In ra tên parameter để kiểm tra
+                System.out.println("[CreateFlashcardServlet] Looking for parameters:");
+                System.out.println("  frontContent param: frontContent" + (i > 1 ? "-" + i : ""));
+                System.out.println("  backContent param: backContent" + (i > 1 ? "-" + i : ""));
+                System.out.println("  note param: note" + (i > 1 ? "-" + i : ""));
+                
+                System.out.println("[CreateFlashcardServlet] Item " + i + ": frontContent=" + frontContent + 
+                                ", backContent=" + backContent + ", note=" + note);
 
-        } catch (SQLException e) {
+                // Xử lý ảnh mặt trước và mặt sau - Sửa logic tên file
+                Part frontImagePart = null;
+                Part backImagePart = null;
+                
+                try {
+                    frontImagePart = request.getPart("frontImage" + (i > 1 ? "-" + i : ""));
+                } catch (Exception e) {
+                    System.out.println("[CreateFlashcardServlet] Không tìm thấy frontImage cho item " + i);
+                }
+                
+                try {
+                    backImagePart = request.getPart("backImage" + (i > 1 ? "-" + i : ""));
+                } catch (Exception e) {
+                    System.out.println("[CreateFlashcardServlet] Không tìm thấy backImage cho item " + i);
+                }
+                
+                String frontImageUrl = null;
+                String backImageUrl = null;
+                
+                if (frontImagePart != null && frontImagePart.getSize() > 0) {
+                    frontImageUrl = uploadFlashcardItemImage(frontImagePart);
+                    System.out.println("[CreateFlashcardServlet] Front image URL for item " + i + ": " + frontImageUrl);
+                }
+                
+                if (backImagePart != null && backImagePart.getSize() > 0) {
+                    backImageUrl = uploadFlashcardItemImage(backImagePart);
+                    System.out.println("[CreateFlashcardServlet] Back image URL for item " + i + ": " + backImageUrl);
+                }
+
+                // Tạo flashcard item
+                FlashcardItem item = new FlashcardItem();
+                item.setFlashcardID(flashcardId);
+                item.setFrontContent(frontContent);
+                item.setBackContent(backContent);
+                item.setNote(note);
+                item.setFrontImage(frontImageUrl);
+                item.setBackImage(backImageUrl);
+                item.setOrderIndex(i);
+                
+                // Debug: In ra giá trị trước khi lưu vào database
+                System.out.println("[CreateFlashcardServlet] Lưu item: " +
+                                "frontContent=" + (frontContent != null ? frontContent : "null") + 
+                                ", backContent=" + (backContent != null ? backContent : "null") + 
+                                ", frontImage=" + (frontImageUrl != null ? frontImageUrl : "null") + 
+                                ", backImage=" + (backImageUrl != null ? backImageUrl : "null") + 
+                                ", note=" + (note != null ? note : "null") + 
+                                ", orderIndex=" + i);
+
+                // Lưu flashcard item
+                flashcardItemDAO.createFlashcardItem(item);
+            }
+
+            // Chuyển hướng đến trang xem flashcard
+            response.sendRedirect("view-flashcard?id=" + flashcardId);
+            
+        } catch (Exception e) {
+            System.out.println("[CreateFlashcardServlet] Error: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra khi tạo flashcard: " + e.getMessage());
             request.getRequestDispatcher("/create-flashcard.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            String errorMessage = "Có lỗi xảy ra: " + e.getMessage();
-            if (e.getMessage().contains("Cloudinary")) {
-                errorMessage = "Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại với ảnh khác hoặc bỏ qua việc upload ảnh.";
-            }
-            request.setAttribute("error", errorMessage);
-            request.getRequestDispatcher("/create-flashcard.jsp").forward(request, response);
         }
+    }
+
+    private String uploadFlashcardCoverImage(Part coverImagePart) {
+        try {
+            java.io.InputStream is = coverImagePart.getInputStream();
+            long size = coverImagePart.getSize();
+            String originalFileName = coverImagePart.getSubmittedFileName();
+            String key = "flashcards/flashcard_cover_" + java.util.UUID.randomUUID();
+            if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                key += ".jpg";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                key += ".png";
+            }
+            String contentType = coverImagePart.getContentType();
+            String s3Url = config.S3Util.uploadFile(is, size, key, contentType);
+            return s3Url;
+        } catch (Exception e) {
+            System.err.println("[CreateFlashcardServlet] Lỗi upload cover S3: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String uploadFlashcardItemImage(Part imagePart) {
+        try {
+            java.io.InputStream is = imagePart.getInputStream();
+            long size = imagePart.getSize();
+            String originalFileName = imagePart.getSubmittedFileName();
+            String key = "flashcards/flashcard_" + imagePart.getSubmittedFileName() + "_" + java.util.UUID.randomUUID();
+            if (originalFileName != null && originalFileName.toLowerCase().endsWith(".jpg")) {
+                key += ".jpg";
+            } else if (originalFileName != null && originalFileName.toLowerCase().endsWith(".png")) {
+                key += ".png";
+            }
+            String contentType = imagePart.getContentType();
+            String s3Url = config.S3Util.uploadFile(is, size, key, contentType);
+            return s3Url;
+        } catch (Exception e) {
+            System.err.println("[CreateFlashcardServlet] Lỗi upload image S3: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private int getItemCount(HttpServletRequest request) {
+        // Kiểm tra các tham số frontContent, frontContent-2, frontContent-3, ...
+        int count = 0;
+        
+        // Kiểm tra tham số frontContent (không có số) - item đầu tiên
+        if (request.getParameter("frontContent") != null) {
+            count = 1;
+        }
+        
+        // Kiểm tra các tham số frontContent-2, frontContent-3, ...
+        int i = 2;
+        while (request.getParameter("frontContent-" + i) != null) {
+            count++;
+            i++;
+        }
+        
+        // Debug: In ra tất cả các tham số để kiểm tra
+        System.out.println("[CreateFlashcardServlet] Debug - Tất cả parameters:");
+        java.util.Enumeration<String> paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            System.out.println("  " + paramName + " = " + request.getParameter(paramName));
+        }
+        
+        System.out.println("[CreateFlashcardServlet] Đếm được " + count + " flashcard items");
+        return count;
     }
 } 

@@ -41,6 +41,13 @@ public class DoQuizServlet extends HttpServlet {
 
         int courseId = QuizService.getCourseIdByLessonId(lessonId);
 
+        // Tính tổng thời gian quiz dựa trên tổng timeLimit của từng câu hỏi
+        int totalTime = 0;
+        for (QuizQuestion q : questions) {
+            totalTime += q.getTimeLimit();
+        }
+        request.setAttribute("totalTime", totalTime);
+
         request.setAttribute("questions", questions);
         request.setAttribute("lessonId", lessonId);
         request.setAttribute("courseId", courseId);

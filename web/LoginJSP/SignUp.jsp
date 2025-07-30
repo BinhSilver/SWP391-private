@@ -8,9 +8,15 @@
         <h1>Đăng kí</h1>
 
         <div class="input-box">
-            <input type="email" name="email" id="email" placeholder="Email"
-                   value="<c:out value='${email}' default='' />" required>
+            <input type="text" name="fullName" id="fullName" placeholder="User name"
+                   value="<c:out value='${fullName}' default='' />" required>
             <i class='bx bxs-user'></i>
+        </div>
+
+        <div class="input-box">
+            <input type="email" name="email" id="registerEmail" placeholder="Email"
+                   value="<c:out value='${not empty registerActive ? email : ""}' default='' />" required>
+            <i class='bx bxs-envelope'></i>
         </div>
 
         <div class="input-box">
@@ -48,8 +54,14 @@
 
         <!-- Upload file nếu là giáo viên -->
         <div class="input-box" id="certificateBox" style="display: none;">
-            <label for="certificate" style="color: #e74c3c;">Chứng chỉ giảng dạy:</label>
-            <input type="file" name="certificate" id="certificate" accept="application/pdf">
+            <label for="certificate" style="color: #e74c3c;">
+                <i class="fas fa-certificate"></i> Chứng chỉ giảng dạy: <span style="color: #e74c3c;">*</span>
+            </label>
+            <input type="file" name="certificate" id="certificate" accept="application/pdf" required>
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                <i class="fas fa-info-circle"></i> 
+                Yêu cầu: File PDF, tối đa 10MB, chứng chỉ phải còn hiệu lực
+            </small>
         </div>
 
 
@@ -64,7 +76,10 @@
         </div>
 
         <c:if test="${not empty message_signup}">
-            <p class="error-message" style="color: red">${message_signup}</p>
+            <div class="alert alert-danger" style="margin-top: 15px; padding: 10px; border-radius: 5px; background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Lỗi:</strong> ${message_signup}
+            </div>
         </c:if>
     </form>
 
@@ -72,6 +87,7 @@
     <form id="otpForm" action="${pageContext.request.contextPath}/verifyOtp" method="post" style="display: none;">
         <input type="hidden" name="email" value="${email}">
         <input type="hidden" name="password" value="${password}">
+        <input type="hidden" name="fullName" value="${fullName}">
         <input type="hidden" name="gender" value="${gender}">
         <input type="hidden" name="role" value="${role}">
         <h1 style="margin-top: 5px;">Xác minh Email</h1>
@@ -100,18 +116,18 @@
         const veriBtn = document.getElementById("verifyBtn");
         const otpMessage = document.getElementById("otpMessage");
         const otpInput = document.getElementById("otp");
-        const emailInput = document.getElementById("email");
+        const emailInput = document.getElementById("registerEmail");
         const otpForm = document.getElementById("otpForm");
         const registerForm = document.getElementById("registerForm");
         const email = emailInput ? emailInput.value : "";
         const otpEmail = document.getElementById("otpEmail") ? document.getElementById("otpEmail").value : "";
 
-        if (email && !email.includes('@')) {
-            alert("Email không hợp lệ.");
-            return;
-        }
-
-        if (registerForm && otpForm && email) {
+        // Chỉ chuyển sang form OTP khi có session data từ server (sau khi submit form)
+        const hasSessionData = "${not empty email}" === "true";
+        const isFromFormSubmit = "${not empty registerActive}" === "true";
+        
+        // Chỉ chuyển sang OTP khi thực sự submit form đăng ký
+        if (hasSessionData && isFromFormSubmit && registerForm && otpForm && email && email.trim() !== "") {
             registerForm.style.display = "none";
             otpForm.style.display = "block";
 
@@ -229,11 +245,59 @@
     document.addEventListener("DOMContentLoaded", function () {
         const roleSelect = document.getElementById("role");
         const certificateBox = document.getElementById("certificateBox");
+        const certificateInput = document.getElementById("certificate");
+        const registerForm = document.getElementById("registerForm");
+        
         roleSelect.addEventListener("change", function () {
             if (this.value === "teacher") {
                 certificateBox.style.display = "block";
+                certificateInput.required = true;
             } else {
                 certificateBox.style.display = "none";
+                certificateInput.required = false;
+            }
+        });
+        
+        // Validation cho file certificate
+        certificateInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (file) {
+                // Kiểm tra kích thước file (10MB)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    alert("❌ File quá lớn! Kích thước tối đa là 10MB. File hiện tại: " + 
+                        (file.size / (1024 * 1024)).toFixed(2) + "MB");
+                    this.value = "";
+                    return;
+                }
+                
+                // Kiểm tra định dạng file
+                if (!file.name.toLowerCase().endsWith('.pdf')) {
+                    alert("❌ Chỉ chấp nhận file PDF! File hiện tại: " + file.name);
+                    this.value = "";
+                    return;
+                }
+                
+                // Kiểm tra content type
+                if (file.type !== 'application/pdf') {
+                    alert("❌ File không phải định dạng PDF hợp lệ!");
+                    this.value = "";
+                    return;
+                }
+                
+                console.log("✅ File hợp lệ:", file.name, "Size:", (file.size / 1024).toFixed(2) + "KB");
+            }
+        });
+        
+        // Validation khi submit form
+        registerForm.addEventListener("submit", function(e) {
+            if (roleSelect.value === "teacher") {
+                const file = certificateInput.files[0];
+                if (!file) {
+                    e.preventDefault();
+                    alert("❌ Vui lòng chọn file chứng chỉ để đăng ký làm giáo viên!");
+                    return false;
+                }
             }
         });
     });

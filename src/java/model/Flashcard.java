@@ -11,6 +11,7 @@ public class Flashcard {
     private boolean publicFlag;
     private String description;
     private String coverImage;
+    private int courseID;
 
     public Flashcard() {
     }
@@ -88,5 +89,12 @@ public class Flashcard {
 
     public void setCoverImage(String coverImage) {
         this.coverImage = coverImage;
+    }
+
+    public int getCourseID() {
+        return courseID;
+    }
+    public void setCourseID(int courseID) {
+        this.courseID = courseID;
     }
 } 

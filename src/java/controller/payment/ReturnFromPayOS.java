@@ -67,7 +67,6 @@ public class ReturnFromPayOS extends HttpServlet {
                         orderCode, 
                         "Success", 
                         id, // Use PayOS transaction ID
-                        null, // BankCode (may be provided by PayOS in some cases)
                         code  // Response code from PayOS
                     );
                 } else {
@@ -78,7 +77,6 @@ public class ReturnFromPayOS extends HttpServlet {
                         orderCode, 
                         failedStatus, 
                         id, 
-                        null, 
                         code
                     );
                 }
@@ -123,10 +121,15 @@ public class ReturnFromPayOS extends HttpServlet {
                      model.User user = userDAO.getUserById(payment.getUserID());
                     
                     if (user != null) {
-                        user.setRoleID(2); // Premium role
-                        userService.updateUserWithConnection(user, conn);
-                        
-                        System.out.println("User role updated to Premium for UserID: " + payment.getUserID());
+                        // Chỉ cập nhật role thành Premium nếu user hiện tại là Free user (role 1)
+                        // Teacher (role 3) và Admin (role 4) sẽ giữ nguyên role của họ
+                        if (user.getRoleID() == 1) { // Free user
+                            user.setRoleID(2); // Premium role
+                            userService.updateUserWithConnection(user, conn);
+                            System.out.println("User role updated to Premium for UserID: " + payment.getUserID());
+                        } else {
+                            System.out.println("User role unchanged - UserID: " + payment.getUserID() + " (Current role: " + user.getRoleID() + ")");
+                        }
                         
                         // Get plan duration
                         PremiumPlanDAO planDAO = new PremiumPlanDAO();

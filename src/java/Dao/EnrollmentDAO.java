@@ -10,11 +10,17 @@ public class EnrollmentDAO {
 
     public void add(Enrollment e) throws SQLException {
         String sql = "INSERT INTO Enrollment (UserID, CourseID) VALUES (?, ?)";
+        System.out.println("=== [EnrollmentDAO] USER " + e.getUserID() + " JOIN KHÓA HỌC " + e.getCourseID() + " ===");
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, e.getUserID());
             stmt.setInt(2, e.getCourseID());
-            stmt.executeUpdate();
+            int result = stmt.executeUpdate();
+            System.out.println("[EnrollmentDAO] Kết quả thêm enrollment: " + result + " bản ghi");
+            System.out.println("[EnrollmentDAO] User " + e.getUserID() + " đã join thành công khóa học " + e.getCourseID());
+        } catch (SQLException ex) {
+            System.out.println("[EnrollmentDAO] Lỗi khi thêm enrollment: " + ex.getMessage());
+            throw ex;
         }
     }
 
@@ -58,5 +64,28 @@ public class EnrollmentDAO {
             e.printStackTrace();
         }
         return jsonArray;
+    }
+
+    // Kiểm tra user đã join vào khóa học chưa
+    public boolean isUserEnrolled(int userID, int courseID) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Enrollment WHERE UserID = ? AND CourseID = ?";
+        System.out.println("=== [EnrollmentDAO] KIỂM TRA USER " + userID + " ĐÃ JOIN KHÓA HỌC " + courseID + " ===");
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, courseID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    boolean isEnrolled = rs.getInt(1) > 0;
+                    System.out.println("[EnrollmentDAO] User " + userID + " đã " + (isEnrolled ? "đã" : "chưa") + " join khóa học " + courseID);
+                    return isEnrolled;
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println("[EnrollmentDAO] Lỗi khi kiểm tra enrollment: " + ex.getMessage());
+            throw ex;
+        }
+        System.out.println("[EnrollmentDAO] User " + userID + " chưa join khóa học " + courseID);
+        return false;
     }
 }

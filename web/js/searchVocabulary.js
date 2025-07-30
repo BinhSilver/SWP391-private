@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const vocab = data[i];
                 const resultHtml = `
                     <div class="search-result">
-                        ${vocab.imagePath ? `<img src="${getResourceUrl(RESOURCE_CONFIG.VOCAB_IMAGE_PATH + vocab.imagePath)}" alt="${vocab.word}">` : ''}
+                        ${vocab.imagePath ? `<img src="${vocab.imagePath}" alt="${vocab.word}">` : ''}
                         <div class="vocab-details">
                             <div><span class="label">Tiếng Nhật:</span> <span class="value">${vocab.word || 'Không có'}</span></div>
                             <div><span class="label">Tiếng Việt:</span> <span class="value">${vocab.meaning || 'Không có'}</span></div>

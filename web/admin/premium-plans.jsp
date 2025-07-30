@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
-    <title>Premium Plan Management</title>
+    <title>Quản Lý Gói Premium</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -16,18 +16,18 @@
 <body>
     <%@ include file="navofadmin.jsp" %>
     <div class="container mt-5">
-        <h2>Premium Plan Management</h2>
-        <a href="${pageContext.request.contextPath}/admin/premium-plans?action=add" class="btn btn-primary mb-3">Add New Plan</a>
-      <a href="${pageContext.request.contextPath}/revenue_stats.jsp" class="btn btn-primary mb-3">Thống kê</a>   
+        <h2>Quản Lý Gói Premium</h2>
+        <a href="${pageContext.request.contextPath}/admin/premium-plans?action=add" class="btn btn-primary mb-3">Thêm Gói Mới</a>
+        <a href="${pageContext.request.contextPath}/revenue_stats.jsp" class="btn btn-primary mb-3">Thống Kê Doanh Thu</a>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Plan Name</th>
-                    <th>Price</th>
-                    <th>Duration (Months)</th>
-                    <th>Description</th>
-                    <th>Actions</th>
+                    <th>Tên Gói</th>
+                    <th>Giá (VNĐ)</th>
+                    <th>Thời Gian (Tháng)</th>
+                    <th>Mô Tả</th>
+                    <th>Hành Động</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,11 +39,11 @@
                         <td>${plan.durationInMonths}</td>
                         <td>${plan.description}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/admin/premium-plans?action=edit&planId=${plan.planID}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="${pageContext.request.contextPath}/admin/premium-plans?action=edit&planId=${plan.planID}" class="btn btn-sm btn-warning">Sửa</a>
                             <form action="${pageContext.request.contextPath}/admin/premium-plans" method="post" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="planId" value="${plan.planID}">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this plan?')">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa gói này không?')">Xóa</button>
                             </form>
                         </td>
                     </tr>
