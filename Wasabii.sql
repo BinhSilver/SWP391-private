@@ -180,7 +180,6 @@ CREATE TABLE Quizzes (
 CREATE TABLE Questions (
     QuestionID INT PRIMARY KEY IDENTITY,
     QuizID INT NULL FOREIGN KEY REFERENCES Quizzes(QuizID),
-    TestID INT NULL FOREIGN KEY REFERENCES Tests(TestID),
     QuestionText NVARCHAR(MAX),
     TimeLimit INT DEFAULT 30
 );
@@ -314,20 +313,21 @@ INSERT INTO LessonMaterials (LessonID, MaterialType, FileType, Title, FilePath, 
 VALUES (@LessonID1, N'Từ vựng', N'PDF', N'Từ vựng Bài 1', N'files/courseN5/vocabN5/Lesson1.pdf', 0),
        (@LessonID1, N'Kanji', N'PDF', N'Kanji Bài 1', N'files/courseN5/kanjiN5/Lesson8.pdf', 0),
        (@LessonID1, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 1', N'files/courseN5/grammarN5/Lesson1.pdf', 0),
-       (@LessonID1, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'web/files/lesson27_grammarVideo_1752087643271', 0),
+       (@LessonID1, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 1', N'files/lesson8_grammarVideo_1752740459670.mp4', 0),
        (@LessonID2, N'Từ vựng', N'PDF', N'Từ vựng Bài 2', N'files/courseN5/vocabN5/Lesson2.pdf', 0),
        (@LessonID2, N'Kanji', N'PDF', N'Kanji Bài 2', N'files/courseN5/kanjiN5/Lesson2.pdf', 0),
        (@LessonID2, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 2', N'files/courseN5/grammarN5/Lesson2.pdf', 0),
-       (@LessonID2, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'web/files/lesson27_grammarVideo_1752087643271', 0),
+       (@LessonID2, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 2', N'files/lesson8_grammarVideo_1752740459670.mp4', 0),
        (@LessonID3, N'Từ vựng', N'PDF', N'Từ vựng Bài 3', N'files/courseN5/vocabN5/Lesson3.pdf', 0),
        (@LessonID3, N'Kanji', N'PDF', N'Kanji Bài 3', N'files/courseN5/kanjiN5/Lesson3.pdf', 0),
        (@LessonID3, N'Ngữ pháp', N'PDF', N'Ngữ pháp Bài 3', N'files/courseN5/grammarN5/Lesson3.pdf', 0),
-       (@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'web/files/lesson27_grammarVideo_1752087643271', 0);
+       (@LessonID3, N'Ngữ pháp', N'Video', N'Video Ngữ pháp Bài 3', N'files/lesson8_grammarVideo_1752740459670.mp4', 0);
+
 
 INSERT INTO Vocabulary ([Word], [Meaning], [Reading], [Example], [LessonID], [imagePath])
-VALUES (N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'mizu.png'),
-       (N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', @LessonID1, N'taberu.png'),
-       (N'学生', N'học sinh, sinh viên', N'がくせい (gakusei)', N'私は学生です。', @LessonID1, N'gakusei.jpeg');
+VALUES (N'水', N'nước', N'みず (mizu)', N'水を飲みます。', @LessonID1, N'imgvocab/mizu.png'),
+       (N'食べる', N'ăn', N'たべる (taberu)', N'パンを食べます。', @LessonID1, N'imgvocab/taberu.png'),
+       (N'学生', N'học sinh, sinh viên', N'がくせい (gakusei)', N'私は学生です。', @LessonID1, N'imgvocab/gakusei.jpeg');
 
 INSERT INTO Quizzes (LessonID, Title)
 VALUES (@LessonID1, N'Quiz Bài 1');
@@ -537,3 +537,100 @@ DEALLOCATE user_cursor;
 
 -- Xóa bảng tạm
 DROP TABLE #TempUsers;
+
+
+-- =========================
+-- ADD 30 USER PREMIUM AND PAYMENTS FOR JULY 2025
+-- =========================
+
+DECLARE @StartDate DATETIME = '2025-07-01';
+DECLARE @EndDate DATETIME = '2025-08-20';
+DECLARE @DaysDiff INT = DATEDIFF(DAY, @StartDate, @EndDate);
+DECLARE @RecordCount INT = 30;
+DECLARE @Counter INT = 1;
+DECLARE @UserID INT;
+DECLARE @PlanID INT;
+DECLARE @StartDateRecord DATETIME;
+DECLARE @EndDateRecord DATETIME;
+DECLARE @Amount FLOAT;
+DECLARE @PaymentDate DATETIME;
+DECLARE @CreatedAt DATETIME;
+
+-- Tạo bảng tạm để lưu 30 người dùng Premium được chọn ngẫu nhiên
+CREATE TABLE #TempPremiumUsers (UserID INT, RowNum INT);
+
+-- Chọn 30 người dùng, ưu tiên RoleID = 2 (Premium), nếu không đủ thì lấy thêm từ các role khác
+INSERT INTO #TempPremiumUsers (UserID, RowNum)
+SELECT UserID, ROW_NUMBER() OVER (ORDER BY NEWID()) AS RowNum
+FROM Users
+WHERE RoleID = 2
+UNION
+SELECT UserID, ROW_NUMBER() OVER (ORDER BY NEWID()) AS RowNum
+FROM Users
+WHERE RoleID != 2
+ORDER BY RowNum
+OFFSET 0 ROWS FETCH NEXT 30 ROWS ONLY;
+
+-- Cursor để duyệt qua 30 người dùng được chọn
+DECLARE premium_cursor CURSOR FOR 
+SELECT UserID
+FROM #TempPremiumUsers
+ORDER BY RowNum;
+
+OPEN premium_cursor;
+FETCH NEXT FROM premium_cursor INTO @UserID;
+
+WHILE @Counter <= @RecordCount
+BEGIN
+    -- Chọn ngẫu nhiên PlanID (1: Gói Tháng, 2: Gói Năm)
+    SET @PlanID = CASE WHEN RAND() > 0.5 THEN 1 ELSE 2 END;
+
+    -- Tính CreatedAt, StartDate, và PaymentDate trải đều từ 01/07/2025 đến 30/07/2025
+    SET @CreatedAt = DATEADD(DAY, (@DaysDiff * (@Counter - 1)) / @RecordCount, @StartDate);
+    SET @StartDateRecord = @CreatedAt;
+    SET @PaymentDate = @CreatedAt;
+
+    -- Lấy thông tin giá và thời hạn từ PremiumPlans
+    SELECT @Amount = Price, 
+           @EndDateRecord = DATEADD(MONTH, DurationInMonths, @StartDateRecord)
+    FROM PremiumPlans
+    WHERE PlanID = @PlanID;
+
+    -- Thêm bản ghi vào UserPremium
+    INSERT INTO UserPremium (UserID, PlanID, StartDate, EndDate)
+    VALUES (@UserID, @PlanID, @StartDateRecord, @EndDateRecord);
+
+    -- Thêm bản ghi vào Payments
+    INSERT INTO Payments (
+        UserID, 
+        PlanID, 
+        Amount, 
+        PaymentDate, 
+        TransactionNo, 
+        OrderInfo, 
+        TransactionStatus, 
+        Status, 
+        CreatedAt
+    )
+    VALUES (
+        @UserID, 
+        @PlanID, 
+        @Amount, 
+        @PaymentDate, 
+        'TXN' + RIGHT('000000' + CAST(@Counter AS NVARCHAR(6)), 6), 
+        N'Thanh toán ' + (SELECT PlanName FROM PremiumPlans WHERE PlanID = @PlanID), 
+        'SUCCESS', 
+        'COMPLETED', 
+        @CreatedAt
+    );
+
+    FETCH NEXT FROM premium_cursor INTO @UserID;
+    SET @Counter = @Counter + 1;
+END;
+
+-- Dọn dẹp
+CLOSE premium_cursor;
+DEALLOCATE premium_cursor;
+
+
+DROP TABLE #TempPremiumUsers;

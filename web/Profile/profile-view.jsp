@@ -194,11 +194,7 @@
         </style>
         <script>
             function goBack() {
-                if (document.referrer && document.referrer !== window.location.href) {
-                    window.history.back();
-                } else {
-                    window.location.href = '${pageContext.request.contextPath}/HomeServlet';
-                }
+                window.location.href = '${pageContext.request.contextPath}/HomeServlet';
             }
         </script>
     </head>
