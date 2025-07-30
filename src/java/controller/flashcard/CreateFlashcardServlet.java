@@ -100,7 +100,7 @@ public class CreateFlashcardServlet extends HttpServlet {
                 itemCount = Integer.parseInt(itemCountStr);
             } catch (Exception ignore) {}
             System.out.println("[CreateFlashcardServlet] Số lượng item: " + itemCount);
-            
+
             // Debug: In ra tất cả parameters
             System.out.println("[CreateFlashcardServlet] All parameters:");
             java.util.Enumeration<String> paramNames = request.getParameterNames();

@@ -35,10 +35,10 @@ public class PremiumCheckFilter implements Filter {
                     // nhưng chỉ cập nhật role về Free nếu user hiện tại là Premium (role 2)
                     if (userPremiumDAO.checkPremiumExpired(user.getUserID())) {
                         if (user.getRoleID() == 2) { // Chỉ Premium user mới bị downgrade về Free
-                            // Nếu đã hết hạn, cập nhật role về free user (1)
-                            user.setRoleID(1);
-                            new UserService().updateUser(user);
-                            session.setAttribute("authUser", user);
+                        // Nếu đã hết hạn, cập nhật role về free user (1)
+                        user.setRoleID(1);
+                        new UserService().updateUser(user);
+                        session.setAttribute("authUser", user);
                             session.removeAttribute("userPremium"); // Remove premium info from session
                             System.out.println("Premium expired for user: " + user.getUserID() + ", role updated to Free");
                         } else {

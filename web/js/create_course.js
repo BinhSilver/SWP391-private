@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const thumbnailPreview = document.getElementById("thumbnailPreview");
 
     // --- CONTEXT PATH ---
-    const contextPath = window.contextPath || '/SWP_HUY'; // Lấy từ JSP: ${pageContext.request.contextPath}
+    const contextPath = window.contextPath || '/Wasabii'; // Lấy từ JSP: ${pageContext.request.contextPath}
 
     // --- INITIALIZE QUIZ MODAL ---
     if (quizModalEl) {
@@ -311,14 +311,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Thêm vocabulary vào giao diện
-                const lessonBlock = document.querySelector(`.lesson-block[data-lesson-index="${lessonIndex}"] .vocab-entry-container`);
-                if (!lessonBlock) {
-                    console.error('Không tìm thấy lessonBlock cho lessonIndex:', lessonIndex);
+                const lessonBlock = document.querySelector(`.lesson-block[data-lesson-index="${lessonIndex}"]`);
+                const vocabContainer = lessonBlock ? lessonBlock.querySelector('.vocab-entry-container') : null;
+                if (!vocabContainer) {
+                    console.error('Không tìm thấy vocabContainer cho lessonIndex:', lessonIndex);
                     alert('Lỗi: Không tìm thấy container từ vựng!');
                     return;
                 }
 
-                let vocabIndex = lessonBlock.querySelectorAll('.input-group').length;
+                let vocabIndex = vocabContainer.querySelectorAll('.input-group').length;
                 data.vocabulary.forEach(vocab => {
                     const inputGroup = document.createElement('div');
                     inputGroup.className = 'input-group mb-2';
@@ -328,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button type="button" class="btn btn-outline-success btn-add-vocab ms-2">+</button>
                         <button type="button" class="btn btn-outline-danger btn-remove-vocab ms-1">-</button>
                     `;
-                    lessonBlock.appendChild(inputGroup);
+                    vocabContainer.appendChild(inputGroup);
                     vocabIndex++;
                 });
 
