@@ -37,8 +37,19 @@ public class FlashcardServlet extends HttpServlet {
         }
 
         try {
+            System.out.println("=== [FlashcardServlet] USER " + authUser.getUserID() + " TRUY CẬP TRANG FLASHCARD ===");
             List<Flashcard> allFlashcards = flashcardDAO.getAllAccessibleFlashcards(authUser.getUserID());
             System.out.println("[FlashcardServlet] allFlashcards count: " + allFlashcards.size());
+            
+            // Log chi tiết từng flashcard
+            for (Flashcard f : allFlashcards) {
+                System.out.println("  - Flashcard: ID=" + f.getFlashcardID() + 
+                                 ", Title=" + f.getTitle() + 
+                                 ", Owner=" + f.getUserID() + 
+                                 ", IsPublic=" + f.isPublicFlag() + 
+                                 ", CourseID=" + f.getCourseID());
+            }
+            
             request.setAttribute("allFlashcards", allFlashcards);
             System.out.println("[FlashcardServlet] Forwarding to flashcard.jsp");
             request.getRequestDispatcher("/flashcard.jsp").forward(request, response);

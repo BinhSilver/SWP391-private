@@ -2,6 +2,7 @@ package controller.flashcard;
 
 import Dao.FlashcardDAO;
 import Dao.FlashcardItemDAO;
+import Dao.EnrollmentDAO;
 import model.Flashcard;
 import model.FlashcardItem;
 import model.User;
@@ -20,11 +21,13 @@ import java.util.List;
 public class ViewFlashcardServlet extends HttpServlet {
     private FlashcardDAO flashcardDAO;
     private FlashcardItemDAO flashcardItemDAO;
+    private EnrollmentDAO enrollmentDAO;
 
     @Override
     public void init() throws ServletException {
         flashcardDAO = new FlashcardDAO();
         flashcardItemDAO = new FlashcardItemDAO();
+        enrollmentDAO = new EnrollmentDAO();
     }
 
     @Override
@@ -60,6 +63,15 @@ public class ViewFlashcardServlet extends HttpServlet {
                 System.out.println("[ViewFlashcardServlet] Không có quyền truy cập flashcard này");
                 response.sendRedirect("flashcard?error=unauthorized");
                 return;
+            }
+            // Nếu là flashcard public của khóa học, chỉ cho xem nếu user đã join khóa học đó
+            if (flashcard.isPublicFlag() && flashcard.getCourseID() > 0 && flashcard.getUserID() != authUser.getUserID()) {
+                boolean enrolled = enrollmentDAO.isUserEnrolled(authUser.getUserID(), flashcard.getCourseID());
+                if (!enrolled) {
+                    System.out.println("[ViewFlashcardServlet] User chưa join khóa học này, không cho xem flashcard public của khóa học");
+                    response.sendRedirect("flashcard?error=unauthorized");
+                    return;
+                }
             }
             List<FlashcardItem> items = flashcardItemDAO.getFlashcardItemsByFlashcardID(flashcardID);
             System.out.println("[ViewFlashcardServlet] Số lượng items: " + (items != null ? items.size() : 0));

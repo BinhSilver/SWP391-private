@@ -251,42 +251,40 @@ public class GenerateVocabularyServlet extends HttpServlet {
         String meaningRegex = "[\\p{L}\\p{N}\\s]+";
 
         for (String line : lines) {
+            // Làm sạch dòng: thay tab, full-width space thành space chuẩn
+            line = line.replaceAll("[\\u3000\\t]+", " ").trim();
             // Bỏ qua dòng trống hoặc đã xử lý
             if (line.trim().isEmpty() || processedLines.contains(line)) {
                 continue;
             }
-
             // Kiểm tra dòng có định dạng từ vựng: Word:Meaning:Reading:Example
             if (line.matches("^[^:]+:[^:]+:[^:]+:[^:]+.*$")) {
                 String[] parts = line.split(":", 4);
                 if (parts.length >= 4) {
                     // Làm sạch các phần tử
-                    String word = parts[0].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (お)
-                    String meaning = parts[1].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (thêm お->tên bạn)
-                    String reading = parts[2].trim().replaceAll("\\(.*?\\)", ""); // Loại bỏ (おなまえ), (おくに)
-                    String example = parts[3].trim().replace("。", "。\n");
-
-                    // Kiểm tra tính hợp lệ của các trường
-                    if (word.isEmpty() || !word.matches(japaneseTextRegex)) {
-                        System.out.println("[WARN] Invalid word format for line: " + line);
+                    String word = parts[0].trim();
+                    String meaning = parts[1].trim();
+                    String reading = parts[2].trim();
+                    String example = parts[3].trim();
+                    // Chỉ kiểm tra word không rỗng (nới lỏng)
+                    if (word.isEmpty()) {
+                        System.out.println("[WARN] Empty word for line: " + line);
                         continue;
                     }
-                    if (meaning.isEmpty() || !meaning.matches(meaningRegex)) {
-                        System.out.println("[WARN] Invalid meaning format for line: " + line);
+                    if (meaning.isEmpty()) {
+                        System.out.println("[WARN] Empty meaning for line: " + line);
                         continue;
                     }
-                    if (reading.isEmpty() || !reading.matches(japaneseTextRegex)) {
-                        System.out.println("[WARN] Invalid reading format for line: " + line);
+                    if (reading.isEmpty()) {
+                        System.out.println("[WARN] Empty reading for line: " + line);
                         continue;
                     }
                     if (example.isEmpty()) {
                         System.out.println("[WARN] Empty example for line: " + line);
                         continue;
                     }
-
                     // Thêm dòng vào processedLines để tránh trùng lặp
                     processedLines.add(line);
-
                     Vocabulary vocab = new Vocabulary();
                     vocab.setVocabID(0); // ID sẽ được set sau khi lưu vào database
                     vocab.setLessonID(lessonId);

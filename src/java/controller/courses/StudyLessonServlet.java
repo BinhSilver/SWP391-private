@@ -6,6 +6,7 @@ import Dao.LessonMaterialsDAO;
 import Dao.ProgressDAO;
 import Dao.QuizDAO;
 import Dao.VocabularyDAO;
+import Dao.EnrollmentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -14,6 +15,7 @@ import model.LessonMaterial;
 import model.QuizQuestion;
 import model.User;
 import model.Vocabulary;
+import model.Enrollment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +50,22 @@ public class StudyLessonServlet extends HttpServlet {
             LOGGER.log(Level.WARNING, "Unauthenticated user attempting to access lesson");
             response.sendRedirect("LoginServlet");
             return;
+        }
+        
+        // Tự động join user vào khóa học nếu chưa join
+        EnrollmentDAO enrollmentDAO = new EnrollmentDAO();
+        try {
+            boolean isEnrolled = enrollmentDAO.isUserEnrolled(user.getUserID(), courseId);
+            if (!isEnrolled) {
+                System.out.println("=== [StudyLessonServlet] TỰ ĐỘNG JOIN USER " + user.getUserID() + " VÀO KHÓA HỌC " + courseId + " ===");
+                Enrollment enrollment = new Enrollment(0, user.getUserID(), courseId, null);
+                enrollmentDAO.add(enrollment);
+                System.out.println("[StudyLessonServlet] User " + user.getUserID() + " đã được tự động join vào khóa học " + courseId);
+            } else {
+                System.out.println("[StudyLessonServlet] User " + user.getUserID() + " đã join khóa học " + courseId + " trước đó");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error checking/creating enrollment for user " + user.getUserID() + " in course " + courseId, e);
         }
         
         // Get lessons for the course to check progression
