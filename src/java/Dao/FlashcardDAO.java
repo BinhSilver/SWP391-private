@@ -190,6 +190,40 @@ public class FlashcardDAO {
         return flashcards;
     }
 
+    // Lấy tất cả flashcard mà user có thể truy cập (của mình và của các khóa học đã join, chỉ public)
+    public List<Flashcard> getAllAccessibleFlashcards(int userID) throws SQLException {
+        List<Flashcard> flashcards = new ArrayList<>();
+        String sql = "SELECT * FROM Flashcards WHERE UserID = ? " +
+                "UNION " +
+                "SELECT * FROM Flashcards WHERE IsPublic = 1 AND CourseID IN (SELECT CourseID FROM Enrollment WHERE UserID = ?) AND UserID <> ? " +
+                "ORDER BY CreatedAt DESC";
+        System.out.println("[FlashcardDAO] SQL: " + sql + ", userID=" + userID);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            ps.setInt(2, userID);
+            ps.setInt(3, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Flashcard flashcard = new Flashcard();
+                    flashcard.setFlashcardID(rs.getInt("FlashcardID"));
+                    flashcard.setUserID(rs.getInt("UserID"));
+                    flashcard.setTitle(rs.getString("Title"));
+                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                    flashcard.setCreatedAt(createdAt != null ? createdAt : new Timestamp(System.currentTimeMillis()));
+                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                    flashcard.setUpdatedAt(updatedAt != null ? updatedAt : new Timestamp(System.currentTimeMillis()));
+                    Object isPublicObj = rs.getObject("IsPublic");
+                    flashcard.setPublicFlag(isPublicObj != null ? rs.getBoolean("IsPublic") : false);
+                    flashcard.setDescription(rs.getString("Description"));
+                    flashcard.setCoverImage(rs.getString("CoverImage"));
+                    flashcards.add(flashcard);
+                }
+            }
+        }
+        System.out.println("[FlashcardDAO] Trả về " + flashcards.size() + " flashcard cho userID=" + userID);
+        return flashcards;
+    }
+
     // Xóa tất cả flashcard theo courseId
     public void deleteFlashcardsByCourseId(int courseId) throws SQLException {
         String sql = "SELECT FlashcardID FROM Flashcards WHERE CourseID = ?";

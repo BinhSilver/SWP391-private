@@ -95,15 +95,6 @@
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="col-3 d-flex justify-content-end search-container">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="search" class="form-control" id="searchCourseInput" placeholder="Tìm kiếm khóa học..." aria-label="Tìm kiếm khóa học">
-                </div>
-                <div id="searchResults"></div>
-            </div>
-
             <!-- Auth Links -->
             <div class="col-2 d-flex justify-content-end align-items-center gap-2">
                 <c:choose>
@@ -145,57 +136,3 @@
 </nav>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#searchCourseInput').on('input', function () {
-            const query = $(this).val().trim();
-            const $searchResults = $('#searchResults');
-            $searchResults.empty().removeClass('show');
-
-            if (query.length > 0) {
-                $.ajax({
-                    url: '<c:url value="/SearchCourse" />',
-                    type: 'GET',
-                    data: {query: query},
-                    dataType: 'json',
-                    success: function (data) {
-                        console.log('Raw search response:', data);
-                        if (data && Array.isArray(data) && data.length > 0) {
-                            const $ul = $('<ul>').addClass('list-group');
-                            $.each(data, function (_, course) {
-                                if (course.isHidden === false) {
-                                    const courseTitle = course.title ? String(course.title) : 'Không có tiêu đề';
-                                    const courseDesc = course.description ? String(course.description) : 'Không có mô tả';
-                                    const courseId = course.courseID ? String(course.courseID) : '';
-
-                                    const $li = $('<li>').addClass('list-group-item')
-                                            .append($('<h5>').text(courseTitle))
-                                            .append($('<p>').text(courseDesc))
-                                            .append($('<a>')
-                                                    .addClass('btn btn-sm btn-wasabii')
-                                                    .attr('href', '${pageContext.request.contextPath}/CourseDetailServlet?id=' + encodeURIComponent(courseId))
-                                                    .text('Xem chi tiết'));
-                                    $ul.append($li);
-                                }
-                            });
-                            if ($ul.children().length > 0) {
-                                $searchResults.append($ul).addClass('show');
-                            } else {
-                                $searchResults.append('<div class="alert alert-info m-0">Không tìm thấy khóa học nào.</div>').addClass('show');
-                            }
-                        } else {
-                            $searchResults.append('<div class="alert alert-info m-0">Không tìm thấy khóa học nào.</div>').addClass('show');
-                        }
-                        console.log('Rendered HTML:', $searchResults.html());
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error:', status, error, xhr.responseText);
-                        $searchResults.append('<div class="alert alert-danger m-0">Đã xảy ra lỗi khi tìm kiếm: ' + error + '</div>').addClass('show');
-                    }
-                });
-            }
-        });
-
-
-    });
-</script>

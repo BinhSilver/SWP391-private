@@ -37,13 +37,9 @@ public class FlashcardServlet extends HttpServlet {
         }
 
         try {
-            List<Flashcard> userFlashcards = flashcardDAO.getFlashcardsByUserID(authUser.getUserID());
-            System.out.println("[FlashcardServlet] userFlashcards count: " + userFlashcards.size());
-            List<Flashcard> courseFlashcards = flashcardDAO.getFlashcardsFromEnrolledCourses(authUser.getUserID());
-            System.out.println("[FlashcardServlet] courseFlashcards count: " + courseFlashcards.size());
-
-            request.setAttribute("userFlashcards", userFlashcards);
-            request.setAttribute("courseFlashcards", courseFlashcards);
+            List<Flashcard> allFlashcards = flashcardDAO.getAllAccessibleFlashcards(authUser.getUserID());
+            System.out.println("[FlashcardServlet] allFlashcards count: " + allFlashcards.size());
+            request.setAttribute("allFlashcards", allFlashcards);
             System.out.println("[FlashcardServlet] Forwarding to flashcard.jsp");
             request.getRequestDispatcher("/flashcard.jsp").forward(request, response);
         } catch (SQLException e) {

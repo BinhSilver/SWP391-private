@@ -392,20 +392,20 @@
     .view-flashcard-page .flashcard-header h1 {
         font-size: 2rem;
     }
-
+    
     .view-flashcard-page .flashcard {
         height: 300px;
     }
-
+    
     .view-flashcard-page .flashcard-content {
         font-size: 1.5rem;
     }
-
+    
     .view-flashcard-page .edit-button {
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
     }
-
+    
     .view-flashcard-page .back-link-flashcard {
         padding: 0.5rem 0.75rem;
         font-size: 0.9rem;

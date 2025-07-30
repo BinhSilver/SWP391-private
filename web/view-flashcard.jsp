@@ -32,45 +32,35 @@
 
         <!-- Header Section với 3 ô riêng biệt -->
         <div class="flashcard-header-section">
-            <div class="row">
+            <div class="row align-items-center">
                 <!-- Ô 1: Quay lại danh sách -->
-                <div class="col-md-4">
-                    <div class="header-box back-box">
-                        <a href="<c:url value='/flashcard'/>" class="back-link-flashcard">
-                            <i class="fas fa-arrow-left back-link-icon"></i>
-                            Quay lại danh sách
+                <div class="col-md-4 text-start">
+                    <a href="<c:url value='/flashcard'/>" class="back-link-flashcard">
+                        <i class="fas fa-arrow-left back-link-icon"></i>
+                        Quay lại danh sách
+                    </a>
+                </div>
+                <!-- Ô 2: Tiêu đề và mô tả -->
+                <div class="col-md-4 text-center">
+                    <h1 class="flashcard-title mb-1">${flashcard.title}</h1>
+                    <c:if test="${not empty flashcard.description}">
+                        <p class="flashcard-description">${flashcard.description}</p>
+                    </c:if>
+                </div>
+                <!-- Ô 3: Nút chỉnh sửa -->
+                <div class="col-md-4 text-end">
+                    <c:if test="${authUser.userID eq flashcard.userID}">
+                        <a href="edit-flashcard?id=${flashcard.flashcardID}" class="edit-button">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
                         </a>
-                    </div>
-                </div>
-                
-                <!-- Ô 2: Tên flashcard -->
-                <div class="col-md-4">
-                    <div class="header-box title-box">
-                        <h1 class="flashcard-title">${flashcard.title}</h1>
-                        <c:if test="${not empty flashcard.description}">
-                            <p class="flashcard-description">${flashcard.description}</p>
-                        </c:if>
-                    </div>
-                </div>
-                
-                <!-- Ô 3: Chỉnh sửa -->
-                <div class="col-md-4">
-                    <div class="header-box edit-box">
-                        <c:if test="${authUser.userID eq flashcard.userID}">
-                            <a href="edit-flashcard?id=${flashcard.flashcardID}" class="edit-button">
-                                <i class="fas fa-edit"></i> Chỉnh sửa
-                            </a>
-                        </c:if>
-                        
-                        <!-- Debug info (remove in production) -->
-                        <c:if test="${authUser.userID ne flashcard.userID}">
-                            <div class="debug-info">
-                                <small>
-                                    User ID: ${authUser.userID} | Flashcard User ID: ${flashcard.userID}
-                                </small>
-                            </div>
-                        </c:if>
-                    </div>
+                    </c:if>
+                    <c:if test="${authUser.userID ne flashcard.userID}">
+                        <div class="debug-info">
+                            <small>
+                                User ID: ${authUser.userID} | Flashcard User ID: ${flashcard.userID}
+                            </small>
+                        </div>
+                    </c:if>
                 </div>
             </div>
         </div>

@@ -125,11 +125,6 @@ CREATE TABLE Tags (
     TagName NVARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE VocabularyTags (
-    VocabID INT FOREIGN KEY REFERENCES Vocabulary(VocabID),
-    TagID INT FOREIGN KEY REFERENCES Tags(TagID),
-    PRIMARY KEY (VocabID, TagID)
-);
 
 CREATE TABLE UserVocabulary (
     UserVocabID INT PRIMARY KEY IDENTITY,
@@ -149,18 +144,6 @@ CREATE TABLE Kanji (
     LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID)
 );
 
-CREATE TABLE VocabularyKanji (
-    VocabID INT FOREIGN KEY REFERENCES Vocabulary(VocabID),
-    KanjiID INT FOREIGN KEY REFERENCES Kanji(KanjiID),
-    PRIMARY KEY (VocabID, KanjiID)
-);
-
-CREATE TABLE GrammarPoints (
-    GrammarID INT PRIMARY KEY IDENTITY,
-    LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
-    Title NVARCHAR(255),
-    Explanation NVARCHAR(MAX)
-);
 
 CREATE TABLE Flashcards (
     FlashcardID INT PRIMARY KEY IDENTITY,
@@ -187,18 +170,10 @@ CREATE TABLE FlashcardItems (
     OrderIndex INT DEFAULT 0
 );
 
-
-
+-- Bảng Test tổng hợp
 CREATE TABLE Quizzes (
     QuizID INT PRIMARY KEY IDENTITY,
     LessonID INT FOREIGN KEY REFERENCES Lessons(LessonID),
-    Title NVARCHAR(255)
-);
-
--- Bảng Test tổng hợp
-CREATE TABLE Tests (
-    TestID INT PRIMARY KEY IDENTITY,
-    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
     Title NVARCHAR(255)
 );
 
@@ -227,31 +202,7 @@ CREATE TABLE QuizResults (
     TakenAt DATETIME DEFAULT GETDATE()
 );
 
--- Quản lý phòng học, chat, gọi video
-CREATE TABLE Rooms (
-    RoomID INT PRIMARY KEY IDENTITY,
-    HostUserID INT FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE,
-    LanguageLevel NVARCHAR(50) NOT NULL,
-    GenderPreference NVARCHAR(20) DEFAULT N'Không yêu cầu',
-    MinAge INT CHECK (MinAge >= 0),
-    MaxAge INT,
-    AllowApproval BIT DEFAULT 0,
-    IsActive BIT DEFAULT 1,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT CK_Rooms_GenderPreference CHECK (
-        GenderPreference IN (N'Nam', N'Nữ', N'Không yêu cầu')
-    )
-);
-
-CREATE TABLE RoomParticipants (
-    RoomID INT,
-    UserID INT,
-    JoinedAt DATETIME DEFAULT GETDATE(),
-    PRIMARY KEY (RoomID, UserID),
-    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE NO ACTION
-);
-
+-- Quản lý chat, gọi video
 CREATE TABLE Conversations (
     ConversationID INT PRIMARY KEY IDENTITY(1,1),
     User1ID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
@@ -275,14 +226,6 @@ CREATE TABLE Blocks (
     BlockedID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     CreatedAt DATETIME DEFAULT GETDATE(),
     PRIMARY KEY (BlockerID, BlockedID)
-);
-
-CREATE TABLE VideoCalls (
-    CallID INT PRIMARY KEY IDENTITY,
-    CallerID INT FOREIGN KEY REFERENCES Users(UserID),
-    ReceiverID INT FOREIGN KEY REFERENCES Users(UserID),
-    CallStart DATETIME,
-    CallEnd DATETIME
 );
 
 -- Các bảng phụ trợ khác

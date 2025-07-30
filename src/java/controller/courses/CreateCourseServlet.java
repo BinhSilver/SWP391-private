@@ -121,7 +121,7 @@ public class CreateCourseServlet extends HttpServlet {
             flashcard.setUserID(user.getUserID());
             flashcard.setTitle("Flashcard cho khóa học: " + course.getTitle());
             flashcard.setDescription(course.getDescription()); // Lấy description từ khóa học
-            flashcard.setPublicFlag(false);
+            flashcard.setPublicFlag(true); // Đặt mặc định là public để học viên join vào sẽ thấy
             flashcard.setCourseID(courseId); // Gán courseID cho flashcard
             flashcard.setCoverImage(course.getImageUrl()); // Lấy thumbnail của khóa học làm cover image cho flashcard
             int flashcardId = flashcardDAO.createFlashcard(flashcard);
