@@ -5,7 +5,7 @@
     <!-- Form Đăng ký -->
     <form id="registerForm" action="${pageContext.request.contextPath}/login" method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="signup">
-        <input type="hidden" id="registerActive" name="registerActive" value="${param.registerActive}" />
+        <input type="hidden" id="registerActive" name="registerActive" value="${registerActive}" />
         <h1>Đăng kí</h1>
 
         <div class="input-box">
@@ -124,8 +124,17 @@
         const otpEmail = document.getElementById("otpEmail") ? document.getElementById("otpEmail").value : "";
         const email = emailInput ? emailInput.value : otpEmail;
 
+        // Debug: Log các giá trị để kiểm tra
+        console.log("=== [SignUp.jsp] Debug ===");
+        console.log("registerActive:", registerActive);
+        console.log("registerForm:", registerForm);
+        console.log("otpForm:", otpForm);
+        console.log("email:", email);
+        console.log("email.trim():", email ? email.trim() : "null");
+        
         // Chỉ chuyển sang OTP khi thực sự submit form đăng ký
         if (registerActive === "true" && registerForm && otpForm && email && email.trim() !== "") {
+            console.log("✅ [SignUp.jsp] Chuyển sang form OTP");
             registerForm.style.display = "none";
             otpForm.style.display = "block";
             const container = document.querySelector(".container");
@@ -133,6 +142,13 @@
                 container.classList.add('active');
                 container.classList.remove('active-change');
             }
+        } else {
+            console.log("❌ [SignUp.jsp] KHÔNG chuyển sang form OTP");
+            console.log("- registerActive === 'true':", registerActive === "true");
+            console.log("- registerForm exists:", !!registerForm);
+            console.log("- otpForm exists:", !!otpForm);
+            console.log("- email exists:", !!email);
+            console.log("- email.trim() !== '':", email ? email.trim() !== "" : false);
         }
 
         let otpTimeout;

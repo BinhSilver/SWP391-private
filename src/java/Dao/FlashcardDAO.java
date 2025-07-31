@@ -288,12 +288,22 @@ public class FlashcardDAO {
      * @throws SQLException nếu có lỗi database
      */
     public void deleteFlashcardsByCourseId(int courseId) throws SQLException {
-        // SQL query để xóa flashcards theo CourseID
-        String sql = "DELETE FROM Flashcards WHERE CourseID = ?";
+        // 1. Xóa FlashcardItems trước (vì có foreign key đến Flashcards)
+        String deleteItemsSql = "DELETE FROM FlashcardItems WHERE FlashcardID IN (SELECT FlashcardID FROM Flashcards WHERE CourseID = ?)";
         
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, courseId);  // Set CourseID parameter
+        try (PreparedStatement ps = connection.prepareStatement(deleteItemsSql)) {
+            ps.setInt(1, courseId);
             ps.executeUpdate();
+            System.out.println("[FlashcardDAO] Đã xóa FlashcardItems cho course " + courseId);
+        }
+        
+        // 2. Sau đó xóa Flashcards
+        String deleteFlashcardsSql = "DELETE FROM Flashcards WHERE CourseID = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(deleteFlashcardsSql)) {
+            ps.setInt(1, courseId);
+            ps.executeUpdate();
+            System.out.println("[FlashcardDAO] Đã xóa Flashcards cho course " + courseId);
         }
     }
 } 
