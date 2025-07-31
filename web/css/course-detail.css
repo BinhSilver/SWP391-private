@@ -564,3 +564,758 @@ iframe.pdf-frame {
     color: #d43e55;
     text-decoration: underline solid;
 }
+
+/* Course Detail Styles */
+.course-card-container {
+    background: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.course-title {
+    color: #e94f64;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.course-description {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.progress-section {
+    margin: 1.5rem 0;
+}
+
+.progress-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.progress {
+    height: 25px;
+    border-radius: 15px;
+    background-color: #f0f0f0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(45deg, #e94f64, #ff6b7a);
+    border-radius: 15px;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.3s ease;
+}
+
+.course-status {
+    display: flex;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.course-status p {
+    margin: 0;
+    color: #555;
+    font-weight: 500;
+}
+
+.course-status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.course-status-item i {
+    color: #e94f64;
+}
+
+.course-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-continue, .btn-back {
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-continue {
+    background: linear-gradient(45deg, #e94f64, #ff6b7a);
+    color: white;
+}
+
+.btn-continue:hover {
+    background: linear-gradient(45deg, #d13d4f, #e94f64);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 79, 100, 0.3);
+}
+
+.btn-back {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #e9ecef;
+}
+
+.btn-back:hover {
+    background: #e9ecef;
+    color: #333;
+    transform: translateY(-2px);
+}
+
+/* Lesson List Styles */
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.lesson-item {
+    background: #fff;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 2px solid #f8f9fa;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.lesson-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #e94f64;
+}
+
+.lesson-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.lesson-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #e94f64, #ff6b7a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.lesson-title {
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+}
+
+.lesson-status {
+    margin-left: auto;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-in-progress {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-locked {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.lesson-content {
+    margin-bottom: 1rem;
+}
+
+.lesson-description {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.5rem 0;
+    background: transparent;
+}
+
+.list-group-item a {
+    color: #e94f64;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.list-group-item a:hover {
+    color: #d13d4f;
+    text-decoration: underline;
+}
+
+.lesson-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+/* Locked Overlay */
+.locked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    z-index: 10;
+}
+
+.locked-message {
+    text-align: center;
+    color: #666;
+}
+
+.locked-icon {
+    color: #e94f64;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Feedback Section Styles */
+.feedback-section {
+    background: #fff;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 2px solid #f8f9fa;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.feedback-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.feedback-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+}
+
+.feedback-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.feedback-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.star {
+    font-size: 12px;
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.star.filled {
+    color: #ffb400;
+}
+
+.star.empty {
+    color: #ddd;
+}
+
+.rating-text {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 600;
+}
+
+.feedback-date {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.feedback-content {
+    margin: 0.75rem 0;
+}
+
+.feedback-content p {
+    color: #555;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.btn-like, .btn-dislike {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-like:hover {
+    background: #e8f5e8;
+    color: #28a745;
+}
+
+.btn-dislike:hover {
+    background: #ffe8e8;
+    color: #dc3545;
+}
+
+.no-feedback {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+}
+
+.no-feedback i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Pagination Styles */
+.pagination {
+    margin-top: 1rem;
+}
+
+.page-link {
+    color: #e94f64;
+    border-color: #e94f64;
+}
+
+.page-item.active .page-link {
+    background-color: #e94f64;
+    border-color: #e94f64;
+}
+
+.page-link:hover {
+    color: #d13d4f;
+    border-color: #d13d4f;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .col-lg-8 {
+        margin-bottom: 2rem;
+    }
+    
+    .feedback-section {
+        position: static;
+    }
+}
+
+/* Show More/Less Button Styles */
+.show-more-container {
+    margin: 2rem 0;
+}
+
+.btn-show-more, .btn-show-less {
+    background: linear-gradient(45deg, #e94f64, #ff6b7a);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-show-more:hover, .btn-show-less:hover {
+    background: linear-gradient(45deg, #d13d4f, #e94f64);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 79, 100, 0.3);
+    color: white;
+}
+
+.btn-show-less {
+    background: #6c757d;
+}
+
+.btn-show-less:hover {
+    background: #5a6268;
+}
+
+@media (max-width: 768px) {
+    .course-title {
+        font-size: 2rem;
+    }
+    
+    .course-actions {
+        flex-direction: column;
+    }
+    
+    .btn-continue, .btn-back {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .lesson-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .lesson-status {
+        margin-left: 0;
+    }
+}
+
+/* ===== User Feedback Actions ===== */
+.user-feedback-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-edit, .btn-delete {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+    color: #212529;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+.btn-edit i, .btn-delete i {
+    font-size: 0.75rem;
+}
+
+/* ===== Feedback Edit Modal ===== */
+.feedback-edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h4 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+
+.rating-input {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.rating-input .star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.rating-input .star.filled {
+    color: #ffc107;
+}
+
+.rating-input .star:hover {
+    color: #ffc107;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn-cancel, .btn-save {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+.btn-save {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+}
+
+/* ===== Add Feedback Form ===== */
+.add-feedback-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 2rem;
+}
+
+.add-feedback-section h5 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.add-feedback-section .form-group {
+    margin-bottom: 1rem;
+}
+
+.add-feedback-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.add-feedback-section textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+
+.add-feedback-section .rating-input {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.add-feedback-section .rating-input .star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.add-feedback-section .rating-input .star.filled {
+    color: #ffc107;
+}
+
+.add-feedback-section .rating-input .star:hover {
+    color: #ffc107;
+}
+
+.btn-add-feedback {
+    background: linear-gradient(45deg, #e94f64, #ff6b7a);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-feedback:hover {
+    background: linear-gradient(45deg, #d13d4f, #e94f64);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(233, 79, 100, 0.3);
+}
+
+.user-feedback-notice {
+    margin-bottom: 1.5rem;
+}
+
+.user-feedback-notice .alert {
+    border: none;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.user-feedback-notice .alert i {
+    margin-right: 0.5rem;
+}
