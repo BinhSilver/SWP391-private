@@ -19,6 +19,9 @@
         <div class="page-wrapper">
             <%@ include file="Home/nav.jsp" %>
 
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+
             <!-- Hero Section -->
             <section class="hero bg-light py-5">
                 <div class="container d-flex align-items-center justify-content-between flex-wrap">

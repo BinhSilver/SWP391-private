@@ -2,8 +2,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!-- ===== ADVERTISEMENT COMPONENT ===== -->
-<!-- Điều kiện hiển thị: Chỉ hiển thị cho Free users (roleID = 1) -->
-<c:if test="${not empty authUser && authUser.roleID == 1}">
+<!-- Điều kiện hiển thị: Chỉ hiển thị cho Free users (không phải teacher, premium, admin) -->
+<c:if test="${not empty authUser}">
+    <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
+    <c:set var="isPremium" value="${premiumService.isUserPremium(authUser.userID)}" />
+    <c:set var="isTeacherOrAdmin" value="${authUser.roleID == 3 || authUser.roleID == 4}" />
+    
+    <c:if test="${!isPremium && !isTeacherOrAdmin}">
 
 <!-- ===== CSS STYLES FOR PROMO BAR ===== -->
 <style>
@@ -147,5 +152,6 @@
     });
 </script>
 
+    </c:if>
 </c:if>
 <!-- ===== END ADVERTISEMENT COMPONENT ===== -->

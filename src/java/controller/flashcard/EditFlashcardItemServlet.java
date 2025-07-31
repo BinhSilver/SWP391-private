@@ -5,6 +5,7 @@ import Dao.FlashcardItemDAO;
 import model.Flashcard;
 import model.FlashcardItem;
 import model.User;
+import service.PremiumService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,11 +31,13 @@ public class EditFlashcardItemServlet extends HttpServlet {
 
     private FlashcardDAO flashcardDAO;
     private FlashcardItemDAO flashcardItemDAO;
+    private PremiumService premiumService;
 
     @Override
     public void init() throws ServletException {
         flashcardDAO = new FlashcardDAO();
         flashcardItemDAO = new FlashcardItemDAO();
+        premiumService = new PremiumService();
     }
 
     @Override
@@ -55,6 +58,18 @@ public class EditFlashcardItemServlet extends HttpServlet {
         String orderIndexParam = request.getParameter("orderIndex");
         String oldFrontImage = request.getParameter("oldFrontImage");
         String oldBackImage = request.getParameter("oldBackImage");
+        
+        // Kiểm tra giới hạn item cho flashcard (chỉ khi tạo item mới)
+        if (itemIdParam == null || itemIdParam.trim().isEmpty()) {
+            int flashcardId = Integer.parseInt(flashcardIdParam);
+            if (!premiumService.canAddFlashcardItem(user.getUserID(), flashcardId)) {
+                String limitInfo = premiumService.getItemLimitInfo(user.getUserID(), flashcardId);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"success\": false, \"message\": \"Bạn đã đạt giới hạn item trong flashcard này. " + limitInfo + "\"}");
+                return;
+            }
+        }
         
         // Handle front image upload
         String frontImage = oldFrontImage != null ? oldFrontImage : "";

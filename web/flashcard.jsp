@@ -28,6 +28,9 @@
         <!-- Navigation -->
         <%@ include file="Home/nav.jsp" %>
 
+    <!-- Advertisement Banner -->
+    <%@ include file="ads.jsp"%>
+
         <%@ include file="chatBoxjsp/chatBox.jsp" %>
 
         <!-- Main Content -->

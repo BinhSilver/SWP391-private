@@ -19,6 +19,9 @@
     <body>
         <%@ include file="/Home/nav.jsp" %>
 
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+
         <section class="container py-5">
                        
             <h2 class="text-danger fw-bold text-center mb-4">Tạo Khóa Học Mới</h2>

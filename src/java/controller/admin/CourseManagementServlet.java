@@ -143,8 +143,8 @@ public class CourseManagementServlet extends HttpServlet {
 
     private Map<Integer, Double> getAverageRatings(List<Course> courses) throws SQLException {
         Map<Integer, Double> ratings = new HashMap<>();
-        String sql = "SELECT CourseID, AVG(CAST(Rating AS FLOAT)) as AvgRating " +
-                     "FROM [dbo].[CourseRatings] WHERE CourseID = ? GROUP BY CourseID";
+                String sql = "SELECT CourseID, AVG(CAST(Rating AS FLOAT)) as AvgRating " +
+                    "FROM [dbo].[Feedbacks] WHERE CourseID = ? GROUP BY CourseID";
 
         try (Connection conn = DB.JDBCConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

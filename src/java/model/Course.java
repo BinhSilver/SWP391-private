@@ -21,6 +21,8 @@ public class Course {
     private boolean isSuggested;            // Có được đề xuất không
     private int createdBy;                  // ID người tạo khóa học
     private String imageUrl;                // URL ảnh đại diện khóa học
+    private double averageRating;           // Điểm đánh giá trung bình
+    private int ratingCount;                // Số lượng đánh giá
 
     // ===== CONSTRUCTORS =====
     
@@ -97,6 +99,8 @@ public class Course {
                 + ", isSuggested=" + isSuggested
                 + ", createdBy=" + createdBy
                 + ", imageUrl='" + imageUrl + '\''
+                + ", averageRating=" + averageRating
+                + ", ratingCount=" + ratingCount
                 + '}';
     }
 
@@ -219,5 +223,39 @@ public class Course {
      */
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    // ===== AVERAGE RATING GETTER/SETTER =====
+    /**
+     * Lấy điểm đánh giá trung bình của khóa học
+     * @return Điểm đánh giá trung bình
+     */
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    /**
+     * Đặt điểm đánh giá trung bình cho khóa học
+     * @param averageRating Điểm đánh giá trung bình mới
+     */
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    // ===== RATING COUNT GETTER/SETTER =====
+    /**
+     * Lấy số lượng đánh giá của khóa học
+     * @return Số lượng đánh giá
+     */
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    /**
+     * Đặt số lượng đánh giá cho khóa học
+     * @param ratingCount Số lượng đánh giá mới
+     */
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
     }
 }

@@ -28,7 +28,7 @@
             <%@ include file="Home/nav.jsp" %>  
             
             <!-- ===== ADVERTISEMENT BANNER ===== -->
-            <!-- Include quảng cáo cho Free users (roleID = 1) -->
+            <!-- Include quảng cáo cho Free users (không phải teacher, premium, admin) -->
             <%@ include file="ads.jsp"%>
             
             <!-- ===== CHAT BOX ===== -->

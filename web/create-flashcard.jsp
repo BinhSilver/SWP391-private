@@ -18,6 +18,9 @@
     <!-- Navigation -->
     <%@ include file="Home/nav.jsp" %>
 
+    <!-- Advertisement Banner -->
+    <%@ include file="ads.jsp"%>
+
     <!-- Main Content -->
     <div class="container mt-4 create-flashcard-page">
         <!-- Header -->
@@ -39,6 +42,43 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
+        
+        <!-- Limit Information -->
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle"></i>
+            <strong>Thông tin giới hạn:</strong>
+            <c:choose>
+                <c:when test="${sessionScope.authUser != null}">
+                    <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
+                    <c:set var="userID" value="${sessionScope.authUser.userID}" />
+                    <c:set var="isPremium" value="${premiumService.isUserPremium(userID)}" />
+                    <c:set var="canCreate" value="${premiumService.canCreateFlashcard(userID)}" />
+                    <c:set var="limitInfo" value="${premiumService.getLimitInfo(userID)}" />
+                    
+                    <c:choose>
+                        <c:when test="${sessionScope.authUser.roleID == 3}">
+                            <span class="text-success">Teacher - Không giới hạn</span>
+                        </c:when>
+                        <c:when test="${sessionScope.authUser.roleID == 4}">
+                            <span class="text-success">Admin - Không giới hạn</span>
+                        </c:when>
+                        <c:when test="${isPremium}">
+                            <span class="text-success">Premium User - Không giới hạn</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="text-warning">${limitInfo}</span>
+                            <c:if test="${!canCreate}">
+                                <br><span class="text-danger">Bạn đã đạt giới hạn tạo flashcard trong tuần này!</span>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <span>Vui lòng đăng nhập để xem thông tin giới hạn</span>
+                </c:otherwise>
+            </c:choose>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
 
         <form action="<c:url value='/create-flashcard'/>" method="post" enctype="multipart/form-data" id="flashcardForm">
             <!-- Hidden input for item count -->

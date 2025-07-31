@@ -17,6 +17,9 @@
     <body>
         <%@ include file="../Home/nav.jsp" %>
 
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+
         <div class="page-wrapper">
             <section class="featured-courses">
                 <div class="container">

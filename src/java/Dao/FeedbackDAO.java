@@ -103,4 +103,49 @@ public class FeedbackDAO {
         }
         return 0;
     }
+
+    public int getFeedbackCountByCourseId(int courseId) throws SQLException {
+        String sql = "SELECT COUNT(*) AS total FROM Feedbacks WHERE CourseID = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, courseId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("total");
+        }
+        return 0;
+    }
+
+    public List<Feedback> getFeedbacksByCourseIdWithPagination(int courseId, int offset, int pageSize) throws SQLException {
+        String sql = "SELECT f.*, u.fullName, u.avatar, " +
+                "SUM(CASE WHEN v.VoteType = 1 THEN 1 ELSE 0 END) AS totalLikes, " +
+                "SUM(CASE WHEN v.VoteType = -1 THEN 1 ELSE 0 END) AS totalDislikes " +
+                "FROM Feedbacks f " +
+                "JOIN Users u ON f.UserID = u.UserID " +
+                "LEFT JOIN FeedbackVotes v ON f.FeedbackID = v.FeedbackID " +
+                "WHERE f.CourseID = ? " +
+                "GROUP BY f.FeedbackID, f.UserID, f.CourseID, f.Content, f.Rating, f.CreatedAt, u.fullName, u.avatar " +
+                "ORDER BY f.CreatedAt DESC " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, courseId);
+        ps.setInt(2, offset);
+        ps.setInt(3, pageSize);
+        ResultSet rs = ps.executeQuery();
+        List<Feedback> list = new ArrayList<>();
+        while (rs.next()) {
+            Feedback f = new Feedback();
+            f.setFeedbackID(rs.getInt("FeedbackID"));
+            f.setUserID(rs.getInt("UserID"));
+            f.setCourseID(rs.getInt("CourseID"));
+            f.setContent(rs.getString("Content"));
+            f.setRating(rs.getInt("Rating"));
+            f.setCreatedAt(rs.getTimestamp("CreatedAt"));
+            f.setUserName(rs.getString("fullName"));
+            f.setUserAvatar(rs.getString("avatar"));
+            f.setTotalLikes(rs.getInt("totalLikes"));
+            f.setTotalDislikes(rs.getInt("totalDislikes"));
+            list.add(f);
+        }
+        return list;
+    }
 } 

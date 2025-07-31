@@ -40,6 +40,9 @@
 <body>
     <%@ include file="Home/nav.jsp" %>
 
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+
     <c:if test="${empty param.roomUrl or empty param.token}">
         <c:redirect url="/test/videocall.jsp"/>
     </c:if>

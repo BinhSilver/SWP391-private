@@ -16,6 +16,9 @@
         <div class="page-wrapper">
             <%@ include file="../Home/nav.jsp" %>
 
+            <!-- Advertisement Banner -->
+            <%@ include file="ads.jsp"%>
+
             <!-- Danh sách khóa học -->
             <section class="course-list container my-5">
                 <h2 class="text-danger fw-bold text-center mb-4">Danh Sách Khóa Học</h2>
@@ -41,6 +44,18 @@
                                     <a class="course-title-link" href="<c:url value='/CourseDetailServlet'/>?id=${course.courseID}">
                                         ${course.title}
                                     </a>
+                                    <!-- Rating Display -->
+                                    <div class="course-rating">
+                                        <div class="stars">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <span class="star ${i <= course.averageRating ? 'filled' : 'empty'}">★</span>
+                                            </c:forEach>
+                                        </div>
+                                        <div class="rating-info">
+                                            <span class="average-rating">${course.averageRating > 0 ? String.format('%.1f', course.averageRating) : '0.0'}</span>
+                                            <span class="rating-count">(${course.ratingCount} đánh giá)</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </c:forEach>

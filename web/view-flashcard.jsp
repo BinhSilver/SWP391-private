@@ -19,6 +19,9 @@
     <!-- Navigation -->
     <%@ include file="Home/nav.jsp" %>
 
+    <!-- Advertisement Banner -->
+    <%@ include file="ads.jsp"%>
+
     <!-- Main Content -->
     <div class="container mt-4 view-flashcard-page">
         <!-- Error Messages -->

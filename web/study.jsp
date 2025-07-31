@@ -17,6 +17,9 @@
         <div class="page-wrapper">
             <%@ include file="../Home/nav.jsp" %>
 
+            <!-- Advertisement Banner -->
+            <%@ include file="ads.jsp"%>
+
             <div class="custom-layout">
                 <!-- MAIN CONTENT -->
                 <main class="main-study-area" id="mainContent">

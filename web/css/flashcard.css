@@ -16,6 +16,17 @@ body {
     font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
+/* Layout for footer positioning */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.footer {
+    margin-top: auto;
+}
+
 /* Header Styles */
 .flashcard-title {
     color: var(--primary-color);

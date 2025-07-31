@@ -6,10 +6,12 @@ import Dao.LessonMaterialsDAO;
 import Dao.QuizDAO;
 import Dao.LessonAccessDAO;
 import Dao.ProgressDAO;
+import Dao.FeedbackDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.*;
+import model.Feedback;
 
 import java.io.IOException;
 import java.util.*;
@@ -60,6 +62,11 @@ public class CourseDetailServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("authUser");
         request.setAttribute("currentUser", currentUser);
+        
+        // 7.5. Xử lý parameter showAllLessons
+        String showAllLessonsParam = request.getParameter("showAllLessons");
+        boolean showAllLessons = "true".equals(showAllLessonsParam);
+        request.setAttribute("showAllLessons", showAllLessons);
 
         // Kiểm tra quyền truy cập khóa học
         if (currentUser != null && currentUser.getRoleID() == 3) {
@@ -123,11 +130,43 @@ public class CourseDetailServlet extends HttpServlet {
         request.setAttribute("accessedLessons", accessedLessons);
         request.setAttribute("hasAccessedCourse", hasAccessedCourse);
 
-        // 11. Lấy danh sách feedback cho khóa học
+        // 11. Lấy danh sách feedback cho khóa học với phân trang
         try (java.sql.Connection conn = DB.JDBCConnection.getConnection()) {
-            Dao.FeedbackDAO feedbackDAO = new Dao.FeedbackDAO(conn);
-            List<model.Feedback> feedbacks = feedbackDAO.getFeedbacksByCourseId(courseID);
+            FeedbackDAO feedbackDAO = new FeedbackDAO(conn);
+            
+            // Lấy tham số phân trang
+            String pageParam = request.getParameter("page");
+            int currentPage = 1;
+            if (pageParam != null && !pageParam.trim().isEmpty()) {
+                try {
+                    currentPage = Integer.parseInt(pageParam);
+                    if (currentPage < 1) currentPage = 1;
+                } catch (NumberFormatException e) {
+                    currentPage = 1;
+                }
+            }
+            
+            int pageSize = 5; // Hiển thị 5 feedback mỗi trang
+            int offset = (currentPage - 1) * pageSize;
+            
+            // Lấy tổng số feedback
+            int totalFeedbacks = feedbackDAO.getFeedbackCountByCourseId(courseID);
+            int totalPages = (int) Math.ceil((double) totalFeedbacks / pageSize);
+            
+            // Lấy feedback với phân trang
+            List<Feedback> feedbacks = feedbackDAO.getFeedbacksByCourseIdWithPagination(courseID, offset, pageSize);
+            
+            // Kiểm tra xem user hiện tại đã viết feedback cho khóa học này chưa
+            Feedback userFeedback = null;
+            if (currentUser != null) {
+                userFeedback = feedbackDAO.getFeedbackByUserAndCourse(currentUser.getUserID(), courseID);
+            }
+            
             request.setAttribute("feedbacks", feedbacks);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalFeedbacks", totalFeedbacks);
+            request.setAttribute("userFeedback", userFeedback);
         } catch (Exception e) {
             e.printStackTrace();
         }
