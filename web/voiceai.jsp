@@ -19,8 +19,8 @@
     <c:if test="${empty sessionScope.authUser}">
         <c:redirect url="/LoginJSP/LoginIndex.jsp"/>
     </c:if>
-            <%@ include file="Home/nav.jsp" %>
-        
+    <%@ include file="Home/nav.jsp" %>
+
         <!-- Advertisement Banner -->
         <%@ include file="ads.jsp"%>
     
@@ -64,17 +64,17 @@
         </c:if>
         
         <c:if test="${canUseAICall}">
-            <div class="container">
-                <h1 class="chat-title">Chatbot với giọng nói</h1>
-                <div class="chat-container">
-                    <div id="chatOutput"></div>
-                </div>
-                <div class="button-container">
-                    <button id="toggleButton" onclick="toggleRecognition()" class="control-icon mic-icon">
-                        <img src="${pageContext.request.contextPath}/image/microphone.png" width="24" height="24" alt="Toggle Mic">
-                    </button>
-                </div>
-            </div>
+    <div class="container">
+        <h1 class="chat-title">Chatbot với giọng nói</h1>
+        <div class="chat-container">
+            <div id="chatOutput"></div>
+        </div>
+        <div class="button-container">
+            <button id="toggleButton" onclick="toggleRecognition()" class="control-icon mic-icon">
+                <img src="${pageContext.request.contextPath}/image/microphone.png" width="24" height="24" alt="Toggle Mic">
+            </button>
+        </div>
+    </div>
         </c:if>
     </c:if>
 

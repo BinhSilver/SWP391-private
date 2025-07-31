@@ -142,6 +142,15 @@
                 container.classList.add('active');
                 container.classList.remove('active-change');
             }
+            
+            // Hiển thị thông báo ban đầu và bắt đầu countdown timer
+            otpMessage.textContent = "Mã OTP đã được gửi thành công. Vui lòng kiểm tra email của bạn.";
+            otpMessage.style.color = "green";
+            
+            // Tự động bắt đầu countdown timer khi chuyển sang form OTP
+            setTimeout(function() {
+                startOtpTimeout();
+            }, 2000); // Đợi 2 giây để người dùng đọc thông báo trước
         } else {
             console.log("❌ [SignUp.jsp] KHÔNG chuyển sang form OTP");
             console.log("- registerActive === 'true':", registerActive === "true");
@@ -155,16 +164,17 @@
         function startOtpTimeout() {
             let countdown = 60;
             sendBtn.disabled = true;
-            otpMessage.textContent = "Vui lòng đợi " + countdown + " giây trước khi gửi lại mã OTP.";
+            otpMessage.textContent = "⏰ Vui lòng đợi " + countdown + " giây trước khi gửi lại mã OTP.";
             otpMessage.style.color = "orange";
 
             otpTimeout = setInterval(function () {
                 countdown--;
-                otpMessage.textContent = "Vui lòng đợi " + countdown + " giây trước khi gửi lại mã OTP.";
-                if (countdown <= 0) {
+                if (countdown > 0) {
+                    otpMessage.textContent = "⏰ Vui lòng đợi " + countdown + " giây trước khi gửi lại mã OTP.";
+                } else {
                     clearInterval(otpTimeout);
                     sendBtn.disabled = false;
-                    otpMessage.textContent = "Bạn có thể gửi lại mã OTP.";
+                    otpMessage.textContent = "✅ Bạn có thể gửi lại mã OTP.";
                     otpMessage.style.color = "green";
                 }
             }, 1000);
@@ -172,21 +182,25 @@
 
         sendBtn.addEventListener("click", function () {
             if (!email || email.length === 0) {
-                otpMessage.textContent = "Email không hợp lệ. Vui lòng nhập email trước.";
+                otpMessage.textContent = "❌ Email không hợp lệ. Vui lòng nhập email trước.";
                 otpMessage.style.color = "red";
                 return;
             }
+            
+            // Hiển thị thông báo đang gửi
+            otpMessage.textContent = "📧 Đang gửi mã OTP...";
+            otpMessage.style.color = "blue";
 
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "${pageContext.request.contextPath}/send-otp", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.onload = function () {
                 if (xhr.responseText.trim() === "ok") {
-                    otpMessage.textContent = "Mã OTP đã được gửi thành công.";
+                    otpMessage.textContent = "✅ Mã OTP đã được gửi lại thành công.";
                     otpMessage.style.color = "green";
                     startOtpTimeout();
                 } else {
-                    otpMessage.textContent = "Gửi OTP thất bại.";
+                    otpMessage.textContent = "❌ Gửi OTP thất bại. Vui lòng thử lại.";
                     otpMessage.style.color = "red";
                 }
             };

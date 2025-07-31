@@ -294,6 +294,50 @@ margin-bottom: 2rem;
   color: #fff;
 }
 
+/* Course Rating Styles */
+.course-rating {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 14px;
+  color: #ddd;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #ffb400;
+}
+
+.star.empty {
+  color: #ddd;
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.average-rating {
+  font-weight: 600;
+  color: #333;
+}
+
+.rating-count {
+  color: #888;
+}
+
 /* Footer */
 .footer {
   background-color: #2d3a4b;

@@ -17,12 +17,16 @@
 
         body {
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            background: linear-gradient(135deg, #e94f64 0%, #d63384 100%);
+            background: #ffe6e9;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .container {
@@ -30,8 +34,10 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 40px;
-            max-width: 600px;
-            width: 100%;
+            max-width: 1200px;
+            width: 90%;
+            margin: 40px auto;
+            flex: 1;
         }
 
         .header {
@@ -85,8 +91,8 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
         }
 
@@ -197,6 +203,55 @@
             background: #d63384;
         }
 
+        /* Footer positioning */
+        .footer {
+            margin-top: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .status-card {
+                padding: 20px;
+            }
+
+
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 98%;
+                padding: 15px;
+                margin: 10px auto;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .status-card {
+                padding: 15px;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+        }
+
         .limit-info {
             background: #fff5f6;
             padding: 20px;
@@ -255,7 +310,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <%@ include file="Home/nav.jsp" %>
+        
+        <div class="container">
         <div class="header">
             <h1><i class="fas fa-chart-line"></i> Thông tin giới hạn</h1>
             <p>Xem trạng thái tài khoản và các tính năng có sẵn</p>
@@ -423,6 +482,10 @@
                 <i class="fas fa-home"></i> Về trang chủ
             </a>
         </div>
+        </div>
+
+        <!-- Footer -->
+        <%@ include file="Home/footer.jsp" %>
     </div>
 
     <script>

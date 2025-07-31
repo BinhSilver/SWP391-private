@@ -38,8 +38,8 @@
     </style>
 </head>
 <body>
-            <%@ include file="Home/nav.jsp" %>
-        
+    <%@ include file="Home/nav.jsp" %>
+
         <!-- Advertisement Banner -->
         <%@ include file="ads.jsp"%>
 

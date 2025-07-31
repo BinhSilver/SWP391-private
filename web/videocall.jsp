@@ -47,7 +47,7 @@
         <c:if test="${empty sessionScope.authUser}">
             <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>
-        
+
         <!-- Kiểm tra quyền sử dụng video call -->
         <c:if test="${not empty sessionScope.authUser}">
             <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
@@ -88,15 +88,15 @@
             </c:if>
             
             <c:if test="${canUseVideoCall}">
-                <div class="video-call-container">
-                    <h2>Video Call</h2>
-                    <button onclick="createRoom()" style="padding: 10px 20px; background: #FA9DC8; color: white; border: none; border-radius: 5px; margin-right: 10px;">Tạo Phòng</button>
-                    <div style="display: inline-block;">
-                        <input type="text" id="roomCode" placeholder="Nhập mã phòng" style="padding: 5px; margin-bottom: 10px;">
-                        <button onclick="joinRoom()" style="padding: 10px 20px; background: #f488ad; color: white; border: none; border-radius: 5px;">Tham Gia</button>
-                    </div>
-                    <div id="videoCallContent"></div>
-                </div>
+        <div class="video-call-container">
+            <h2>Video Call</h2>
+            <button onclick="createRoom()" style="padding: 10px 20px; background: #FA9DC8; color: white; border: none; border-radius: 5px; margin-right: 10px;">Tạo Phòng</button>
+            <div style="display: inline-block;">
+                <input type="text" id="roomCode" placeholder="Nhập mã phòng" style="padding: 5px; margin-bottom: 10px;">
+                <button onclick="joinRoom()" style="padding: 10px 20px; background: #f488ad; color: white; border: none; border-radius: 5px;">Tham Gia</button>
+            </div>
+            <div id="videoCallContent"></div>
+        </div>
             </c:if>
         </c:if>
 

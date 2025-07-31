@@ -432,7 +432,12 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
 
     public List<Course> getAllCourses() throws SQLException {
         List<Course> courses = new ArrayList<>();
-        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy FROM [dbo].[Courses]";
+        String sql = "SELECT c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy, " +
+                    "COALESCE(AVG(f.Rating), 0) as AverageRating, " +
+                    "COUNT(f.Rating) as RatingCount " +
+                    "FROM [dbo].[Courses] c " +
+                    "LEFT JOIN [dbo].[Feedbacks] f ON c.CourseID = f.CourseID " +
+                    "GROUP BY c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Course c = new Course(
@@ -444,6 +449,8 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
                         rs.getInt("CreatedBy")
                 );
                 c.setImageUrl(rs.getString("imageUrl"));
+                c.setAverageRating(rs.getDouble("AverageRating"));
+                c.setRatingCount(rs.getInt("RatingCount"));
                 courses.add(c);
             }
         }
@@ -452,8 +459,14 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
 
     public List<Course> getSuggestedCourses() {
         List<Course> list = new ArrayList<>();
-        String sql = "SELECT TOP 4 CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
-                + "FROM Courses WHERE IsHidden = 0 AND IsSuggested = 1 ORDER BY NEWID()";
+        String sql = "SELECT TOP 4 c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy, " +
+                    "COALESCE(AVG(f.Rating), 0) as AverageRating, " +
+                    "COUNT(f.Rating) as RatingCount " +
+                    "FROM Courses c " +
+                    "LEFT JOIN Feedbacks f ON c.CourseID = f.CourseID " +
+                    "WHERE c.IsHidden = 0 AND c.IsSuggested = 1 " +
+                    "GROUP BY c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy " +
+                    "ORDER BY NEWID()";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Course c = new Course(
@@ -465,6 +478,8 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
                         rs.getInt("CreatedBy")
                 );
                 c.setImageUrl(rs.getString("imageUrl"));
+                c.setAverageRating(rs.getDouble("AverageRating"));
+                c.setRatingCount(rs.getInt("RatingCount"));
                 list.add(c);
             }
         } catch (Exception e) {
@@ -475,8 +490,13 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
 
     public List<Course> getCoursesByTeacher(int teacherID) throws SQLException {
         List<Course> list = new ArrayList<>();
-        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
-                + "FROM Courses WHERE CreatedBy = ?";
+        String sql = "SELECT c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy, " +
+                    "COALESCE(AVG(f.Rating), 0) as AverageRating, " +
+                    "COUNT(f.Rating) as RatingCount " +
+                    "FROM Courses c " +
+                    "LEFT JOIN Feedbacks f ON c.CourseID = f.CourseID " +
+                    "WHERE c.CreatedBy = ? " +
+                    "GROUP BY c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, teacherID);
             try (ResultSet rs = ps.executeQuery()) {
@@ -489,6 +509,8 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
                     c.setSuggested(rs.getBoolean("IsSuggested"));
                     c.setImageUrl(rs.getString("imageUrl"));
                     c.setCreatedBy(rs.getInt("CreatedBy"));
+                    c.setAverageRating(rs.getDouble("AverageRating"));
+                    c.setRatingCount(rs.getInt("RatingCount"));
                     list.add(c);
                 }
             }
@@ -497,8 +519,13 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
     }
 
     public Course getCourseByID(int courseID) {
-        String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
-                + "FROM Courses WHERE CourseID = ?";
+        String sql = "SELECT c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy, " +
+                    "COALESCE(AVG(f.Rating), 0) as AverageRating, " +
+                    "COUNT(f.Rating) as RatingCount " +
+                    "FROM Courses c " +
+                    "LEFT JOIN Feedbacks f ON c.CourseID = f.CourseID " +
+                    "WHERE c.CourseID = ? " +
+                    "GROUP BY c.CourseID, c.Title, c.Description, c.IsHidden, c.IsSuggested, c.imageUrl, c.CreatedBy";
         try (Connection conn = JDBCConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, courseID);
             try (ResultSet rs = ps.executeQuery()) {
@@ -512,6 +539,8 @@ private void deleteByQuery(Connection conn, String query, int parameter) throws 
                             rs.getInt("CreatedBy")
                     );
                     c.setImageUrl(rs.getString("imageUrl"));
+                    c.setAverageRating(rs.getDouble("AverageRating"));
+                    c.setRatingCount(rs.getInt("RatingCount"));
                     return c;
                 }
             }

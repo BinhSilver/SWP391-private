@@ -25,9 +25,9 @@
 </head>
 <body>
     <div class="page-wrapper">
-            <!-- Navigation -->
-    <%@ include file="Home/nav.jsp" %>
-    
+        <!-- Navigation -->
+        <%@ include file="Home/nav.jsp" %>
+
     <!-- Advertisement Banner -->
     <%@ include file="ads.jsp"%>
 
