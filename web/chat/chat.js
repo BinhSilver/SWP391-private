@@ -12,7 +12,7 @@ console.log("Current User ID parsed:", currentUserId);
 let currentChatUserId = null;
 let currentChatUserName = null;
 
-    const ws = new WebSocket("ws://" + location.host + getApiUrl(API_CONFIG.CHAT_WEBSOCKET));
+    const ws = new WebSocket("wss://" + location.host + getApiUrl(API_CONFIG.CHAT_WEBSOCKET));
 ws.onopen = function () {
     console.log("WebSocket connected");
 };

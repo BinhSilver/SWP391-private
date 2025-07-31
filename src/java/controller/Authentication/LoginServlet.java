@@ -264,97 +264,82 @@ public class LoginServlet extends HttpServlet {
      */
     private void handleSignUp(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        System.out.println("[SignUp] ===== BẮT ĐẦU XỬ LÝ ĐĂNG KÝ =====");
         // ===== GET FORM PARAMETERS =====
-        // Lấy thông tin từ form đăng ký
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         String fullName = request.getParameter("fullName");
         String gender = request.getParameter("gender");
         String role = request.getParameter("role");
-        
+        System.out.println("[SignUp] Input: email=" + email + ", password=" + (password != null ? "***" : "null") + ", confirmPassword=" + (confirmPassword != null ? "***" : "null") + ", fullName=" + fullName + ", gender=" + gender + ", role=" + role);
         // ===== INPUT VALIDATION =====
-        // Kiểm tra input có hợp lệ không
         if (email == null || email.trim().isEmpty() || 
             password == null || password.trim().isEmpty() ||
             confirmPassword == null || confirmPassword.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty()) {
+            System.out.println("[SignUp][ERROR] Thiếu thông tin bắt buộc!");
             request.setAttribute("message", "❌ Vui lòng nhập đầy đủ thông tin!");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
-        
         // ===== PASSWORD VALIDATION =====
-        // Kiểm tra password và confirm password có khớp không
         if (!password.equals(confirmPassword)) {
+            System.out.println("[SignUp][ERROR] Mật khẩu xác nhận không khớp!");
             request.setAttribute("message", "❌ Mật khẩu xác nhận không khớp!");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
-        
         // ===== PASSWORD LENGTH VALIDATION =====
-        // Kiểm tra độ dài password
         if (password.length() < 6) {
+            System.out.println("[SignUp][ERROR] Mật khẩu quá ngắn!");
             request.setAttribute("message", "❌ Mật khẩu phải có ít nhất 6 ký tự!");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
-        
         // ===== FULL NAME VALIDATION =====
-        // Kiểm tra độ dài full name
         if (fullName.length() < 2) {
+            System.out.println("[SignUp][ERROR] Họ tên quá ngắn!");
             request.setAttribute("message", "❌ Họ và tên phải có ít nhất 2 ký tự!");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
-        
         try {
             // ===== DATABASE OPERATIONS =====
-            // Kiểm tra email đã tồn tại chưa
             UserDAO userDAO = new UserDAO();
             User existingUser = userDAO.getUserByEmail(email);
-            
             if (existingUser != null) {
-                // ===== GOOGLE USER CHECK =====
-                // Kiểm tra nếu email đã được tạo bằng Google
                 if (userDAO.isGoogleUser(email)) {
+                    System.out.println("[SignUp][ERROR] Email đã đăng ký bằng Google!");
                     request.setAttribute("message", "❌ Tài khoản này được tạo bằng Google. Vui lòng đăng nhập bằng Google.");
                 } else {
+                    System.out.println("[SignUp][ERROR] Email đã tồn tại!");
                     request.setAttribute("message", "❌ Email đã tồn tại trong hệ thống!");
                 }
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
-            
             // ===== TEACHER REGISTRATION VALIDATION =====
-            // Xử lý đăng ký giáo viên
             boolean isTeacherPending = false;
             String certificatePath = null;
-            
             if ("teacher".equals(role)) {
-                // ===== CERTIFICATE FILE VALIDATION =====
-                // Kiểm tra file chứng chỉ cho giáo viên
                 Part certificatePart = request.getPart("certificate");
-                
+                System.out.println("[SignUp] Đăng ký giáo viên - kiểm tra file chứng chỉ: " + (certificatePart != null ? certificatePart.getSubmittedFileName() : "null"));
                 if (certificatePart == null || certificatePart.getSize() == 0) {
+                    System.out.println("[SignUp][ERROR] Chưa upload file chứng chỉ!");
                     request.setAttribute("message", "❌ Vui lòng upload file chứng chỉ khi đăng ký làm giáo viên!");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
-                
-                // ===== FILE TYPE VALIDATION =====
-                // Kiểm tra loại file có phải PDF không
                 String fileName = certificatePart.getSubmittedFileName();
                 if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
+                    System.out.println("[SignUp][ERROR] File chứng chỉ không phải PDF!");
                     request.setAttribute("message", "❌ File chứng chỉ phải là định dạng PDF!");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
-                
-                // ===== FILE SIZE VALIDATION =====
-                // Kiểm tra kích thước file
-                if (certificatePart.getSize() > 10 * 1024 * 1024) { // 10MB
+                if (certificatePart.getSize() > 10 * 1024 * 1024) {
+                    System.out.println("[SignUp][ERROR] File chứng chỉ quá lớn!");
                     request.setAttribute("message", "❌ File chứng chỉ không được lớn hơn 10MB!");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
