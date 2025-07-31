@@ -1,5 +1,24 @@
 package model;
 
+/**
+ * FlashcardItem - Entity model cho bảng FlashcardItems trong database
+ * Đại diện cho một item trong flashcard (mặt trước/sau của thẻ)
+ *
+ * Các thuộc tính:
+ * - itemID: ID duy nhất của flashcard item
+ * - flashcardID: ID của flashcard chứa item này
+ * - frontContent: Nội dung mặt trước (câu hỏi/từ tiếng Nhật)
+ * - backContent: Nội dung mặt sau (đáp án/nghĩa tiếng Việt)
+ * - itemType: Loại item (text, image, audio)
+ * - orderIndex: Thứ tự hiển thị trong flashcard
+ * - isActive: Trạng thái hoạt động
+ *
+ * Sử dụng để:
+ * - Quản lý nội dung chi tiết của flashcard
+ * - Hiển thị mặt trước/sau của thẻ
+ * - Hỗ trợ nhiều loại nội dung (text, image, audio)
+ * - Sắp xếp thứ tự các item trong flashcard
+ */
 public class FlashcardItem {
     private int flashcardItemID;
     private int flashcardID;

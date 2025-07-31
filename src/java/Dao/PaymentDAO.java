@@ -15,6 +15,27 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+// ===== PAYMENT DATA ACCESS OBJECT =====
+/**
+ * PaymentDAO - Data Access Object cho bảng Payments
+ * Quản lý tất cả các thao tác CRUD với bảng Payments trong database
+ * 
+ * Chức năng chính:
+ * - Thêm mới giao dịch thanh toán
+ * - Cập nhật trạng thái giao dịch
+ * - Lấy thông tin giao dịch theo nhiều tiêu chí (OrderCode, UserID, trạng thái, thời gian)
+ * - Thống kê doanh thu, trạng thái thanh toán, xu hướng thanh toán
+ * - Hỗ trợ transaction cho các thao tác cập nhật
+ * 
+ * Sử dụng JDBC để kết nối và thao tác với SQL Server
+ * 
+ * Các nhóm phương thức chính:
+ * - insertPayment: Thêm mới giao dịch
+ * - updatePaymentStatus: Cập nhật trạng thái giao dịch
+ * - getPaymentByOrderCode, getPaymentsByUser, getAllPayments: Lấy thông tin giao dịch
+ * - getRevenueStatsByPeriod, getPaymentStatsByStatus, getPaymentTrendsByMonth: Thống kê
+ * - extractPaymentFromResultSet: Chuyển đổi ResultSet thành đối tượng Payment
+ */
 public class PaymentDAO {
 
     /**

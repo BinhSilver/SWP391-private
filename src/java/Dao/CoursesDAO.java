@@ -1,30 +1,52 @@
 package Dao;
 
-import java.sql.*;
-import DB.JDBCConnection;
-import java.util.ArrayList;
-import java.util.List;
-import model.Course;
+// ===== IMPORT STATEMENTS =====
+import java.sql.*;                          // SQL database operations
+import DB.JDBCConnection;                   // Database connection utility
+import java.util.ArrayList;                 // ArrayList collection
+import java.util.List;                      // List collection
+import model.Course;                        // Course model
 
+// ===== COURSES DATA ACCESS OBJECT =====
+/**
+ * CoursesDAO - Data Access Object cho Courses
+ * Quản lý tất cả các thao tác CRUD với bảng Courses trong database
+ * Bao gồm: thêm, sửa, xóa, tìm kiếm, lấy danh sách khóa học
+ */
 public class CoursesDAO {
 
+    // ===== SEARCH COURSES =====
+    /**
+     * Tìm kiếm khóa học theo từ khóa
+     * @param keyword Từ khóa tìm kiếm
+     * @return ArrayList các khóa học phù hợp
+     */
     public static ArrayList<Course> searchCourse(String keyword) {
         ArrayList<Course> list = new ArrayList<>();
+        
+        // SQL query để tìm kiếm khóa học theo title
         String sql = "SELECT CourseID, Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy "
                 + "FROM [dbo].[Courses] WHERE Title LIKE ?";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Set tham số tìm kiếm với wildcard
             stmt.setString(1, "%" + keyword + "%");
+            
+            // Thực thi query và xử lý kết quả
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    // Tạo Course object từ ResultSet
                     Course c = new Course(
-                            rs.getInt("CourseID"),
-                            rs.getString("Title"),
-                            rs.getString("Description"),
-                            rs.getBoolean("IsHidden"),
-                            rs.getBoolean("IsSuggested"),
-                            rs.getInt("CreatedBy")
+                            rs.getInt("CourseID"),           // ID khóa học
+                            rs.getString("Title"),           // Tiêu đề
+                            rs.getString("Description"),     // Mô tả
+                            rs.getBoolean("IsHidden"),       // Có ẩn không
+                            rs.getBoolean("IsSuggested"),    // Có đề xuất không
+                            rs.getInt("CreatedBy")           // ID người tạo
                     );
-                    c.setImageUrl(rs.getString("imageUrl"));
+                    c.setImageUrl(rs.getString("imageUrl")); // URL ảnh
                     list.add(c);
                 }
             }
@@ -34,36 +56,66 @@ public class CoursesDAO {
         return list;
     }
 
+    // ===== ADD COURSE =====
+    /**
+     * Thêm khóa học mới vào database
+     * @param c Course object cần thêm
+     * @throws SQLException nếu có lỗi database
+     */
     public void add(Course c) throws SQLException {
+        // SQL query để insert khóa học mới
         String sql = "INSERT INTO [dbo].[Courses] "
                 + "(Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, c.getTitle());
-            stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested());
-            stmt.setString(5, c.getImageUrl());
-            stmt.setInt(6, c.getCreatedBy());
+        
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Set các tham số cho prepared statement
+            stmt.setString(1, c.getTitle());        // Tiêu đề
+            stmt.setString(2, c.getDescription());  // Mô tả
+            stmt.setBoolean(3, c.getHidden());      // Có ẩn không
+            stmt.setBoolean(4, c.isSuggested());    // Có đề xuất không
+            stmt.setString(5, c.getImageUrl());     // URL ảnh
+            stmt.setInt(6, c.getCreatedBy());       // ID người tạo
+            
+            // Thực thi query
             stmt.executeUpdate();
         }
     }
 
+    // ===== ADD COURSE AND RETURN ID =====
+    /**
+     * Thêm khóa học mới và trả về ID được generate
+     * @param c Course object cần thêm
+     * @return ID của khóa học vừa tạo
+     * @throws SQLException nếu có lỗi database
+     */
     public int addAndReturnID(Course c) throws SQLException {
+        // SQL query để insert khóa học mới với RETURN_GENERATED_KEYS
         String sql = "INSERT INTO [dbo].[Courses] "
                 + "(Title, Description, IsHidden, IsSuggested, imageUrl, CreatedBy, CreatedAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, c.getTitle());
-            stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested());
-            stmt.setString(5, c.getImageUrl());
-            stmt.setInt(6, c.getCreatedBy());
+        
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            // Set các tham số cho prepared statement
+            stmt.setString(1, c.getTitle());        // Tiêu đề
+            stmt.setString(2, c.getDescription());  // Mô tả
+            stmt.setBoolean(3, c.getHidden());      // Có ẩn không
+            stmt.setBoolean(4, c.isSuggested());    // Có đề xuất không
+            stmt.setString(5, c.getImageUrl());     // URL ảnh
+            stmt.setInt(6, c.getCreatedBy());       // ID người tạo
+            
+            // Thực thi query và lấy số rows bị ảnh hưởng
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating course failed, no rows affected.");
             }
+            
+            // ===== GET GENERATED ID =====
+            // Lấy ID được generate tự động
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
@@ -72,9 +124,12 @@ public class CoursesDAO {
                     }
                 }
             }
+            
+            // ===== FALLBACK METHOD =====
             // Nếu không lấy được ID tự sinh, truy vấn lại DB lấy MAX(CourseID)
             System.err.println("[WARN] addAndReturnID: Không lấy được ID tự sinh, sẽ lấy MAX(CourseID) từ DB!");
-            try (PreparedStatement maxStmt = conn.prepareStatement("SELECT MAX(CourseID) FROM Courses"); ResultSet maxRs = maxStmt.executeQuery()) {
+            try (PreparedStatement maxStmt = conn.prepareStatement("SELECT MAX(CourseID) FROM Courses"); 
+                 ResultSet maxRs = maxStmt.executeQuery()) {
                 if (maxRs.next()) {
                     int maxId = maxRs.getInt(1);
                     if (maxId > 0) {
@@ -86,17 +141,30 @@ public class CoursesDAO {
         }
     }
 
+    // ===== UPDATE COURSE =====
+    /**
+     * Cập nhật thông tin khóa học
+     * @param c Course object cần cập nhật
+     * @throws SQLException nếu có lỗi database
+     */
     public void update(Course c) throws SQLException {
+        // SQL query để update khóa học
         String sql = "UPDATE [dbo].[Courses] "
                 + "SET Title=?, Description=?, IsHidden=?, IsSuggested=?, imageUrl=? "
                 + "WHERE CourseID=?";
-        try (Connection conn = JDBCConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, c.getTitle());
-            stmt.setString(2, c.getDescription());
-            stmt.setBoolean(3, c.getHidden());
-            stmt.setBoolean(4, c.isSuggested());
-            stmt.setString(5, c.getImageUrl());
-            stmt.setInt(6, c.getCourseID());
+        
+        try (Connection conn = JDBCConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            // Set các tham số cho prepared statement
+            stmt.setString(1, c.getTitle());        // Tiêu đề
+            stmt.setString(2, c.getDescription());  // Mô tả
+            stmt.setBoolean(3, c.getHidden());      // Có ẩn không
+            stmt.setBoolean(4, c.isSuggested());    // Có đề xuất không
+            stmt.setString(5, c.getImageUrl());     // URL ảnh
+            stmt.setInt(6, c.getCourseID());        // ID khóa học
+            
+            // Thực thi query
             stmt.executeUpdate();
         }
     }

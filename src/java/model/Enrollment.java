@@ -2,6 +2,22 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Enrollment - Entity model cho bảng Enrollment trong database
+ * Đại diện cho việc đăng ký tham gia khóa học của user
+ *
+ * Các thuộc tính:
+ * - enrollmentID: ID duy nhất của enrollment
+ * - userID: ID của user đăng ký
+ * - courseID: ID của khóa học được đăng ký
+ * - enrolledAt: Thời gian đăng ký tham gia
+ *
+ * Sử dụng để:
+ * - Theo dõi user nào đã tham gia khóa học nào
+ * - Kiểm tra quyền truy cập khóa học
+ * - Tính số lượng học viên của khóa học
+ * - Hiển thị danh sách khóa học đã đăng ký cho user
+ */
 public class Enrollment {
     private int enrollmentID;
     private int userID;

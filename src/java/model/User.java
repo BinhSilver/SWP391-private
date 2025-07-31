@@ -4,32 +4,69 @@
  */
 package model;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
+// ===== IMPORT STATEMENTS =====
+import java.time.LocalDate;                 // Local date utility
+import java.time.Period;                    // Period calculation
+import java.time.ZoneId;                    // Zone ID utility
+import java.util.Date;                      // Date utility
 
+// ===== USER ENTITY MODEL =====
+/**
+ * User - Entity model cho bảng Users trong database
+ * Đại diện cho một user trong hệ thống Wasabii
+ * 
+ * Các thuộc tính chính:
+ * - Thông tin cơ bản: ID, email, password, fullName
+ * - Vai trò: roleID (1=Free, 2=Premium, 3=Teacher, 4=Admin)
+ * - Trạng thái: isActive, isLocked, isTeacherPending
+ * - Thông tin cá nhân: birthDate, phoneNumber, address, country
+ * - Hỗ trợ Google OAuth: googleID
+ * - Teacher features: certificatePath
+ */
 public class User {
 
-    private int userID;
-    private int roleID;
-    private String email;
-    private String passwordHash;
-    private String googleID;
-    private String fullName;
-    private Date createdAt;
-    private boolean isActive;
-    private boolean isLocked;
-    private Date birthDate;
-    private String phoneNumber;
-    private String japaneseLevel;
-    private String address;
-    private String country;
-    private String avatar;
-    private String gender;
-    private boolean isTeacherPending;
-    private String certificatePath;
+    // ===== INSTANCE VARIABLES =====
+    private int userID;                     // ID duy nhất của user
+    private int roleID;                     // Vai trò: 1=Free, 2=Premium, 3=Teacher, 4=Admin
+    private String email;                   // Email đăng nhập
+    private String passwordHash;            // Password đã hash
+    private String googleID;                // ID từ Google OAuth (có thể null)
+    private String fullName;                // Họ và tên đầy đủ
+    private Date createdAt;                 // Ngày tạo tài khoản
+    private boolean isActive;               // Trạng thái hoạt động
+    private boolean isLocked;               // Trạng thái khóa tài khoản
+    private Date birthDate;                 // Ngày sinh
+    private String phoneNumber;             // Số điện thoại
+    private String japaneseLevel;           // Trình độ tiếng Nhật (N5, N4, N3, N2, N1)
+    private String address;                 // Địa chỉ
+    private String country;                 // Quốc gia
+    private String avatar;                  // URL avatar
+    private String gender;                  // Giới tính
+    private boolean isTeacherPending;       // Đang chờ xác nhận làm giáo viên
+    private String certificatePath;         // Đường dẫn file chứng chỉ (cho teacher)
 
+    // ===== CONSTRUCTORS =====
+    
+    // ===== FULL CONSTRUCTOR =====
+    /**
+     * Constructor đầy đủ với tất cả thông tin
+     * @param userID ID của user
+     * @param roleID Vai trò của user
+     * @param email Email của user
+     * @param passwordHash Password đã hash
+     * @param googleID ID từ Google OAuth
+     * @param fullName Họ và tên đầy đủ
+     * @param createdAt Ngày tạo tài khoản
+     * @param isActive Trạng thái hoạt động
+     * @param isLocked Trạng thái khóa tài khoản
+     * @param birthDate Ngày sinh
+     * @param phoneNumber Số điện thoại
+     * @param japaneseLevel Trình độ tiếng Nhật
+     * @param address Địa chỉ
+     * @param country Quốc gia
+     * @param avatar URL avatar
+     * @param gender Giới tính
+     */
     public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked, Date birthDate, String phoneNumber, String japaneseLevel, String address, String country, String avatar, String gender) {
         this.userID = userID;
         this.roleID = roleID;
@@ -49,6 +86,19 @@ public class User {
         this.gender = gender;
     }
 
+    // ===== BASIC CONSTRUCTOR =====
+    /**
+     * Constructor cơ bản với thông tin tối thiểu
+     * @param userID ID của user
+     * @param roleID Vai trò của user
+     * @param email Email của user
+     * @param passwordHash Password đã hash
+     * @param googleID ID từ Google OAuth
+     * @param fullName Họ và tên đầy đủ
+     * @param createdAt Ngày tạo tài khoản
+     * @param isActive Trạng thái hoạt động
+     * @param isLocked Trạng thái khóa tài khoản
+     */
     public User(int userID, int roleID, String email, String passwordHash, String googleID, String fullName, Date createdAt, boolean isActive, boolean isLocked) {
         this.userID = userID;
         this.roleID = roleID;
@@ -60,8 +110,26 @@ public class User {
         this.isActive = isActive;
         this.isLocked = isLocked;
     }
-// Thêm vào constructor đầy đủ nếu cần
 
+    // ===== EXTENDED CONSTRUCTOR =====
+    /**
+     * Constructor mở rộng với thông tin cá nhân
+     * @param userID ID của user
+     * @param roleID Vai trò của user
+     * @param email Email của user
+     * @param passwordHash Password đã hash
+     * @param googleID ID từ Google OAuth
+     * @param fullName Họ và tên đầy đủ
+     * @param createdAt Ngày tạo tài khoản
+     * @param isActive Trạng thái hoạt động
+     * @param isLocked Trạng thái khóa tài khoản
+     * @param birthDate Ngày sinh
+     * @param phoneNumber Số điện thoại
+     * @param japaneseLevel Trình độ tiếng Nhật
+     * @param address Địa chỉ
+     * @param country Quốc gia
+     * @param avatar URL avatar
+     */
     public User(int userID, int roleID, String email, String passwordHash, String googleID,
             String fullName, Date createdAt, boolean isActive, boolean isLocked,
             Date birthDate, String phoneNumber, String japaneseLevel, String address,
@@ -83,19 +151,37 @@ public class User {
         this.avatar = avatar;
     }
 
-// Getter/setter
+    // ===== GETTERS AND SETTERS =====
+    
+    // ===== BIRTH DATE GETTER/SETTER =====
+    /**
+     * Lấy ngày sinh của user
+     * @return Ngày sinh
+     */
     public Date getBirthDate() {
         return birthDate;
     }
 
+    /**
+     * Lấy giới tính của user
+     * @return Giới tính
+     */
     public String getGender() {
         return gender;
     }
 
+    /**
+     * Đặt giới tính cho user
+     * @param gender Giới tính mới
+     */
     public void setGender(String gender) {
         this.gender = gender;
     }
 
+    /**
+     * Đặt ngày sinh cho user
+     * @param birthDate Ngày sinh mới
+     */
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }

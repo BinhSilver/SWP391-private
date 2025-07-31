@@ -2,6 +2,27 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * LessonMaterial - Entity model cho bảng LessonMaterials trong database
+ * Đại diện cho tài liệu học tập của một bài học
+ *
+ * Các thuộc tính:
+ * - materialID: ID duy nhất của tài liệu
+ * - lessonID: ID của bài học chứa tài liệu này
+ * - title: Tiêu đề tài liệu
+ * - description: Mô tả tài liệu
+ * - fileUrl: URL của file tài liệu (PDF, video, etc.)
+ * - fileType: Loại file (pdf, video, audio, image)
+ * - fileSize: Kích thước file (bytes)
+ * - orderIndex: Thứ tự hiển thị trong bài học
+ * - isActive: Trạng thái hoạt động
+ *
+ * Sử dụng để:
+ * - Quản lý tài liệu học tập cho bài học
+ * - Hiển thị danh sách tài liệu cho user
+ * - Download và xem tài liệu
+ * - Sắp xếp thứ tự tài liệu trong bài học
+ */
 public class LessonMaterial {
 
     private int materialID;

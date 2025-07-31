@@ -10,6 +10,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// ===== QUIZ DATA ACCESS OBJECT =====
+/**
+ * QuizDAO - Data Access Object cho bảng Quizzes, Questions, Answers
+ * Quản lý tất cả các thao tác CRUD với quiz, câu hỏi và đáp án
+ * 
+ * Chức năng chính:
+ * - Tạo và quản lý quiz cho bài học
+ * - Thêm, sửa, xóa câu hỏi và đáp án
+ * - Lấy danh sách câu hỏi theo lesson
+ * - Backup và restore quiz
+ * - Thống kê kết quả quiz
+ * 
+ * Sử dụng JDBC để kết nối và thao tác với SQL Server
+ * 
+ * Các nhóm phương thức chính:
+ * - saveQuestions: Lưu quiz + câu hỏi + đáp án
+ * - getQuestionsByLessonId, getQuestionsWithAnswersByLessonId: Lấy câu hỏi
+ * - updateQuestion, updateAnswer: Cập nhật câu hỏi/đáp án
+ * - deleteQuestion, deleteQuestionsByLessonId: Xóa câu hỏi
+ * - backupQuiz, restoreQuiz: Backup và restore
+ * - getQuizStatsByLessonId: Thống kê quiz
+ */
 public class QuizDAO {
 
     // ✅ Lưu quiz + câu hỏi + đáp án mới (xóa trước nếu đã tồn tại)

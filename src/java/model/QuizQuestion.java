@@ -2,6 +2,24 @@ package model;
 
 import java.util.List;
 
+/**
+ * QuizQuestion - Entity model cho bảng Questions trong database
+ * Đại diện cho một câu hỏi trong bài quiz
+ *
+ * Các thuộc tính:
+ * - questionID: ID duy nhất của câu hỏi
+ * - quizID: ID của quiz chứa câu hỏi này
+ * - question: Nội dung câu hỏi
+ * - correctAnswer: Đáp án đúng (số thứ tự từ 1-4)
+ * - timeLimit: Thời gian giới hạn trả lời (giây)
+ * - answers: Danh sách các đáp án (Answer objects)
+ *
+ * Sử dụng để:
+ * - Tạo và quản lý câu hỏi quiz
+ * - Hiển thị câu hỏi cho user
+ * - Kiểm tra đáp án đúng
+ * - Tính thời gian trả lời
+ */
 public class QuizQuestion {
     private int id; // QuestionID
     private int quizId;

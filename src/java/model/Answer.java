@@ -1,5 +1,22 @@
 package model;
 
+/**
+ * Answer - Entity model cho bảng Answers trong database
+ * Đại diện cho một đáp án của câu hỏi quiz
+ *
+ * Các thuộc tính:
+ * - answerID: ID duy nhất của đáp án
+ * - questionID: ID của câu hỏi chứa đáp án này
+ * - answerText: Nội dung đáp án
+ * - isCorrect: Có phải đáp án đúng không (1: đúng, 0: sai)
+ * - answerNumber: Số thứ tự đáp án (1, 2, 3, 4)
+ *
+ * Sử dụng để:
+ * - Quản lý các đáp án của câu hỏi quiz
+ * - Hiển thị các lựa chọn cho user
+ * - Kiểm tra đáp án đúng khi user trả lời
+ * - Tính điểm và thống kê kết quả quiz
+ */
 public class Answer {
 
     private int id; // AnswerID
