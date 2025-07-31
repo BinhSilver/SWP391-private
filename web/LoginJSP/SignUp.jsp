@@ -225,7 +225,7 @@
                     setTimeout(function () {                 
                         otpMessage.textContent = "✅ Xác thực thành công, tài khoản đã được tạo!";
                         
-                        window.location.href = "${pageContext.request.contextPath}/index.jsp";
+                        window.location.href = "${pageContext.request.contextPath}/HomeServlet";
                     }, 3000);
                 } else {
                     otpMessage.textContent = responseJson.message || "Mã OTP không chính xác.";

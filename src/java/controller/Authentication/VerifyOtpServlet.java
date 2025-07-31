@@ -94,6 +94,9 @@ public class VerifyOtpServlet extends HttpServlet {
             System.out.println("✅ [VerifyOtp] Đã tạo tài khoản thường: " + email);
         }
 
+        User user = new UserDAO().getUserByEmail(email);
+        session.setAttribute("authUser", user);
+
         // ===== SESSION CLEANUP =====
         // Xóa dữ liệu tạm trong session sau khi tạo tài khoản thành công
         session.removeAttribute("otp_" + email);
