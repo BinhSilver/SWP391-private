@@ -11,6 +11,13 @@ body {
 .page-wrapper {
     min-height: 100vh;
     padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Footer positioning */
+.footer {
+    margin-top: auto;
 }
 
 h3 {

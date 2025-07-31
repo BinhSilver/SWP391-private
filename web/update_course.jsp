@@ -19,6 +19,9 @@
     </head>
     <body>
         <%@ include file="/Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
 
         <div class="update-course-page">
             <section class="container py-5">

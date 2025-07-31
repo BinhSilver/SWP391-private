@@ -14,6 +14,9 @@
 
         <div class="page-wrapper">
             <%@ include file="../Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
 
             <div class="container py-5">
                 <h3 class="mb-4 text-primary">📝 Làm bài Quiz</h3>

@@ -6,6 +6,7 @@ import config.S3Util;
 import model.Flashcard;
 import model.FlashcardItem;
 import model.User;
+import service.PremiumService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -31,11 +32,13 @@ import java.io.InputStream;
 public class CreateFlashcardServlet extends HttpServlet {
     private FlashcardDAO flashcardDAO;
     private FlashcardItemDAO flashcardItemDAO;
+    private PremiumService premiumService;
 
     @Override
     public void init() throws ServletException {
         flashcardDAO = new FlashcardDAO();
         flashcardItemDAO = new FlashcardItemDAO();
+        premiumService = new PremiumService();
     }
 
     @Override
@@ -65,6 +68,14 @@ public class CreateFlashcardServlet extends HttpServlet {
         }
 
         try {
+            // Kiểm tra giới hạn tạo flashcard
+            if (!premiumService.canCreateFlashcard(authUser.getUserID())) {
+                String limitInfo = premiumService.getLimitInfo(authUser.getUserID());
+                request.setAttribute("error", "Bạn đã đạt giới hạn tạo flashcard trong tuần này. " + limitInfo);
+                request.getRequestDispatcher("/create-flashcard.jsp").forward(request, response);
+                return;
+            }
+            
             // Lấy thông tin flashcard từ form
             String title = request.getParameter("title");
             String description = request.getParameter("description");

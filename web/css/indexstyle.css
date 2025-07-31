@@ -26,6 +26,8 @@ body {
 .page-wrapper {
     position: relative;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
@@ -310,7 +312,7 @@ body {
     background-color: #2d3a4b;
     color: #eee;
     padding: 3rem 0;
-    margin-top: 3rem;
+    margin-top: auto;
 }
 
 .footer .container {

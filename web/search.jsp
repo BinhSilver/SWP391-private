@@ -17,6 +17,9 @@
     </head>
     <body >
         <%@ include file="../Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
         <div class="search-page">
         <div class="search-container">
             <h2 class="section-title">🔍 Tìm kiếm Từ vựng</h2>

@@ -46,7 +46,10 @@
     </style>
 </head>
 <body>
-    <%@ include file="Home/nav.jsp" %>
+            <%@ include file="Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
     
     <div class="container mt-5 mb-5">
         <h1 class="text-center mb-4">Tạo Flashcard từ Khóa học</h1>

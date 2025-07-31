@@ -41,19 +41,64 @@
     </head>
     <body>
         <%@ include file="Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
         <c:if test="${empty sessionScope.authUser}">
             <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>
-
-        <div class="video-call-container">
-            <h2>Video Call</h2>
-            <button onclick="createRoom()" style="padding: 10px 20px; background: #FA9DC8; color: white; border: none; border-radius: 5px; margin-right: 10px;">Tạo Phòng</button>
-            <div style="display: inline-block;">
-                <input type="text" id="roomCode" placeholder="Nhập mã phòng" style="padding: 5px; margin-bottom: 10px;">
-                <button onclick="joinRoom()" style="padding: 10px 20px; background: #f488ad; color: white; border: none; border-radius: 5px;">Tham Gia</button>
-            </div>
-            <div id="videoCallContent"></div>
-        </div>
+        
+        <!-- Kiểm tra quyền sử dụng video call -->
+        <c:if test="${not empty sessionScope.authUser}">
+            <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
+            <c:set var="canUseVideoCall" value="${premiumService.canUseVideoCall(sessionScope.authUser.userID)}" />
+            
+            <c:if test="${!canUseVideoCall}">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h4><i class="fas fa-exclamation-triangle"></i> Truy cập bị từ chối</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-4">
+                                        <i class="fas fa-video-slash" style="font-size: 4rem; color: #ffc107;"></i>
+                                    </div>
+                                    <h5 class="text-danger mb-3">Tính năng Video Call chỉ dành cho Premium User!</h5>
+                                    <p class="text-muted mb-4">
+                                        Bạn cần nâng cấp tài khoản lên Premium để sử dụng tính năng Video Call.
+                                    </p>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <a href="${pageContext.request.contextPath}/HomeServlet" class="btn btn-secondary">
+                                            <i class="fas fa-home"></i> Về trang chủ
+                                        </a>
+                                        <a href="${pageContext.request.contextPath}/limit-info" class="btn btn-info">
+                                            <i class="fas fa-info-circle"></i> Xem thông tin giới hạn
+                                        </a>
+                                        <a href="${pageContext.request.contextPath}/payment" class="btn btn-warning">
+                                            <i class="fas fa-crown"></i> Nâng cấp Premium
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </c:if>
+            
+            <c:if test="${canUseVideoCall}">
+                <div class="video-call-container">
+                    <h2>Video Call</h2>
+                    <button onclick="createRoom()" style="padding: 10px 20px; background: #FA9DC8; color: white; border: none; border-radius: 5px; margin-right: 10px;">Tạo Phòng</button>
+                    <div style="display: inline-block;">
+                        <input type="text" id="roomCode" placeholder="Nhập mã phòng" style="padding: 5px; margin-bottom: 10px;">
+                        <button onclick="joinRoom()" style="padding: 10px 20px; background: #f488ad; color: white; border: none; border-radius: 5px;">Tham Gia</button>
+                    </div>
+                    <div id="videoCallContent"></div>
+                </div>
+            </c:if>
+        </c:if>
 
         <!-- Khởi tạo biến JavaScript từ session -->
         <script>

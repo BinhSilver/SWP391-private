@@ -18,6 +18,9 @@
     </head>
     <body>
         <%@ include file="../Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
         <c:if test="${empty sessionScope.authUser}">
             <c:redirect url="/test/LoginJSP/LoginIndex.jsp"/>
         </c:if>

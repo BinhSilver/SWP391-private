@@ -19,19 +19,64 @@
     <c:if test="${empty sessionScope.authUser}">
         <c:redirect url="/LoginJSP/LoginIndex.jsp"/>
     </c:if>
-    <%@ include file="Home/nav.jsp" %>
-
-    <div class="container">
-        <h1 class="chat-title">Chatbot với giọng nói</h1>
-        <div class="chat-container">
-            <div id="chatOutput"></div>
-        </div>
-        <div class="button-container">
-            <button id="toggleButton" onclick="toggleRecognition()" class="control-icon mic-icon">
-                <img src="${pageContext.request.contextPath}/image/microphone.png" width="24" height="24" alt="Toggle Mic">
-            </button>
-        </div>
-    </div>
+            <%@ include file="Home/nav.jsp" %>
+        
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+    
+    <!-- Kiểm tra quyền sử dụng AI call -->
+    <c:if test="${not empty sessionScope.authUser}">
+        <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
+        <c:set var="canUseAICall" value="${premiumService.canUseAICall(sessionScope.authUser.userID)}" />
+        
+        <c:if test="${!canUseAICall}">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h4><i class="fas fa-exclamation-triangle"></i> Truy cập bị từ chối</h4>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-4">
+                                    <i class="fas fa-robot" style="font-size: 4rem; color: #ffc107;"></i>
+                                </div>
+                                <h5 class="text-danger mb-3">Tính năng AI Call chỉ dành cho Premium User!</h5>
+                                <p class="text-muted mb-4">
+                                    Bạn cần nâng cấp tài khoản lên Premium để sử dụng tính năng AI Call.
+                                </p>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <a href="${pageContext.request.contextPath}/HomeServlet" class="btn btn-secondary">
+                                        <i class="fas fa-home"></i> Về trang chủ
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/limit-info" class="btn btn-info">
+                                        <i class="fas fa-info-circle"></i> Xem thông tin giới hạn
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/payment" class="btn btn-warning">
+                                        <i class="fas fa-crown"></i> Nâng cấp Premium
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </c:if>
+        
+        <c:if test="${canUseAICall}">
+            <div class="container">
+                <h1 class="chat-title">Chatbot với giọng nói</h1>
+                <div class="chat-container">
+                    <div id="chatOutput"></div>
+                </div>
+                <div class="button-container">
+                    <button id="toggleButton" onclick="toggleRecognition()" class="control-icon mic-icon">
+                        <img src="${pageContext.request.contextPath}/image/microphone.png" width="24" height="24" alt="Toggle Mic">
+                    </button>
+                </div>
+            </div>
+        </c:if>
+    </c:if>
 
     <script>
         // Kiểm tra hỗ trợ SpeechRecognition

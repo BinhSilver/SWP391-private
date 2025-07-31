@@ -16,6 +16,13 @@ body {
 .page-wrapper {
   position: relative;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Footer positioning */
+.footer {
+  margin-top: auto;
 }
 
 .container {

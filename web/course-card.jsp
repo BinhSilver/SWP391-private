@@ -18,6 +18,9 @@
     <div class="page-wrapper">
         <%@ include file="Home/nav.jsp" %>
         
+        <!-- Advertisement Banner -->
+        <%@ include file="ads.jsp"%>
+        
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-10 mx-auto">

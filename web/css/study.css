@@ -14,6 +14,11 @@ body {
     min-height: 100vh;
 }
 
+/* Footer positioning */
+.footer {
+    margin-top: auto;
+}
+
 /* Layout chính */
 .custom-layout {
     display: flex;

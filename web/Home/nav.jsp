@@ -65,10 +65,34 @@
                                     <a class="dropdown-item" href="<c:url value='chatrealtime.jsp'/>">chat</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<c:url value='videocall.jsp'/>">Video Call</a>
+                                    <a class="dropdown-item" href="<c:url value='videocall.jsp'/>" 
+                                       onclick="return checkVideoCallPermission()">
+                                        Video Call
+                                        <c:if test="${not empty authUser}">
+                                            <c:set var="premiumService" value="<%= new service.PremiumService() %>" />
+                                            <c:set var="canUseVideoCall" value="${premiumService.canUseVideoCall(authUser.userID)}" />
+                                            <c:if test="${!canUseVideoCall && authUser.roleID != 3 && authUser.roleID != 4}">
+                                                <span class="badge bg-warning text-dark ms-1">Premium</span>
+                                            </c:if>
+                                        </c:if>
+                                    </a>
                                 </li>
                                  <li>
-                                    <a class="dropdown-item" href="<c:url value='voiceai.jsp'/>">Call With AI</a>
+                                    <a class="dropdown-item" href="<c:url value='voiceai.jsp'/>" 
+                                       onclick="return checkAICallPermission()">
+                                        Call With AI
+                                        <c:if test="${not empty authUser}">
+                                            <c:set var="canUseAICall" value="${premiumService.canUseAICall(authUser.userID)}" />
+                                            <c:if test="${!canUseAICall && authUser.roleID != 3 && authUser.roleID != 4}">
+                                                <span class="badge bg-warning text-dark ms-1">Premium</span>
+                                            </c:if>
+                                        </c:if>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<c:url value='/limit-info'/>">
+                                        <i class="fas fa-chart-line"></i> Thông tin giới hạn
+                                    </a>
                                 </li>
                                 <c:if test="${authUser.roleID == 3}">
                                     <li>
@@ -95,7 +119,38 @@
 </nav>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/premium-check.js"></script>
 <script>
+    // Kiểm tra quyền Video Call
+    function checkVideoCallPermission() {
+        PremiumChecker.handleVideoCallPermission(
+            () => {
+                // Có quyền, cho phép chuyển trang
+                return true;
+            },
+            (error) => {
+                // Không có quyền, chặn chuyển trang
+                return false;
+            }
+        );
+        return false; // Chặn chuyển trang mặc định
+    }
+    
+    // Kiểm tra quyền AI Call
+    function checkAICallPermission() {
+        PremiumChecker.handleAICallPermission(
+            () => {
+                // Có quyền, cho phép chuyển trang
+                return true;
+            },
+            (error) => {
+                // Không có quyền, chặn chuyển trang
+                return false;
+            }
+        );
+        return false; // Chặn chuyển trang mặc định
+    }
+    
     $(document).ready(function () {
         $('#searchCourseInput').on('input', function () {
             const query = $(this).val().trim();
