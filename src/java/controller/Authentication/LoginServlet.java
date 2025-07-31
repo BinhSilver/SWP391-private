@@ -264,104 +264,102 @@ public class LoginServlet extends HttpServlet {
      */
     private void handleSignUp(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        System.out.println("[SignUp] ===== BẮT ĐẦU XỬ LÝ ĐĂNG KÝ =====");
         // ===== GET FORM PARAMETERS =====
-        // Lấy thông tin từ form đăng ký
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         String fullName = request.getParameter("fullName");
         String gender = request.getParameter("gender");
         String role = request.getParameter("role");
+        System.out.println("[SignUp] Input: email=" + email + ", password=" + (password != null ? "***" : "null") + ", confirmPassword=" + (confirmPassword != null ? "***" : "null") + ", fullName=" + fullName + ", gender=" + gender + ", role=" + role);
         
         // ===== INPUT VALIDATION =====
-        // Kiểm tra input có hợp lệ không
         if (email == null || email.trim().isEmpty() || 
             password == null || password.trim().isEmpty() ||
             confirmPassword == null || confirmPassword.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty()) {
-            request.setAttribute("message", "❌ Vui lòng nhập đầy đủ thông tin!");
+            System.out.println("[SignUp][ERROR] Thiếu thông tin bắt buộc!");
+            request.setAttribute("message_signup", "❌ Vui lòng nhập đầy đủ thông tin!");
+            request.setAttribute("registerActive", "true");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
         
         // ===== PASSWORD VALIDATION =====
-        // Kiểm tra password và confirm password có khớp không
         if (!password.equals(confirmPassword)) {
-            request.setAttribute("message", "❌ Mật khẩu xác nhận không khớp!");
+            System.out.println("[SignUp][ERROR] Mật khẩu xác nhận không khớp!");
+            request.setAttribute("message_signup", "❌ Mật khẩu xác nhận không khớp!");
+            request.setAttribute("registerActive", "true");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
         
         // ===== PASSWORD LENGTH VALIDATION =====
-        // Kiểm tra độ dài password
         if (password.length() < 6) {
-            request.setAttribute("message", "❌ Mật khẩu phải có ít nhất 6 ký tự!");
+            System.out.println("[SignUp][ERROR] Mật khẩu quá ngắn!");
+            request.setAttribute("message_signup", "❌ Mật khẩu phải có ít nhất 6 ký tự!");
+            request.setAttribute("registerActive", "true");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
         
         // ===== FULL NAME VALIDATION =====
-        // Kiểm tra độ dài full name
         if (fullName.length() < 2) {
-            request.setAttribute("message", "❌ Họ và tên phải có ít nhất 2 ký tự!");
+            System.out.println("[SignUp][ERROR] Họ tên quá ngắn!");
+            request.setAttribute("message_signup", "❌ Họ và tên phải có ít nhất 2 ký tự!");
+            request.setAttribute("registerActive", "true");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             return;
         }
         
         try {
             // ===== DATABASE OPERATIONS =====
-            // Kiểm tra email đã tồn tại chưa
             UserDAO userDAO = new UserDAO();
             User existingUser = userDAO.getUserByEmail(email);
-            
             if (existingUser != null) {
-                // ===== GOOGLE USER CHECK =====
-                // Kiểm tra nếu email đã được tạo bằng Google
                 if (userDAO.isGoogleUser(email)) {
-                    request.setAttribute("message", "❌ Tài khoản này được tạo bằng Google. Vui lòng đăng nhập bằng Google.");
+                    System.out.println("[SignUp][ERROR] Email đã đăng ký bằng Google!");
+                    request.setAttribute("message_signup", "❌ Tài khoản này được tạo bằng Google. Vui lòng đăng nhập bằng Google.");
                 } else {
-                    request.setAttribute("message", "❌ Email đã tồn tại trong hệ thống!");
+                    System.out.println("[SignUp][ERROR] Email đã tồn tại!");
+                    request.setAttribute("message_signup", "❌ Email đã tồn tại trong hệ thống!");
                 }
+                request.setAttribute("registerActive", "true");
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
             
             // ===== TEACHER REGISTRATION VALIDATION =====
-            // Xử lý đăng ký giáo viên
             boolean isTeacherPending = false;
             String certificatePath = null;
-            
             if ("teacher".equals(role)) {
-                // ===== CERTIFICATE FILE VALIDATION =====
-                // Kiểm tra file chứng chỉ cho giáo viên
                 Part certificatePart = request.getPart("certificate");
-                
+                System.out.println("[SignUp] Đăng ký giáo viên - kiểm tra file chứng chỉ: " + (certificatePart != null ? certificatePart.getSubmittedFileName() : "null"));
                 if (certificatePart == null || certificatePart.getSize() == 0) {
-                    request.setAttribute("message", "❌ Vui lòng upload file chứng chỉ khi đăng ký làm giáo viên!");
+                    System.out.println("[SignUp][ERROR] Chưa upload file chứng chỉ!");
+                    request.setAttribute("message_signup", "❌ Vui lòng upload file chứng chỉ khi đăng ký làm giáo viên!");
+                    request.setAttribute("registerActive", "true");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
-                
-                // ===== FILE TYPE VALIDATION =====
-                // Kiểm tra loại file có phải PDF không
                 String fileName = certificatePart.getSubmittedFileName();
                 if (fileName == null || !fileName.toLowerCase().endsWith(".pdf")) {
-                    request.setAttribute("message", "❌ File chứng chỉ phải là định dạng PDF!");
+                    System.out.println("[SignUp][ERROR] File chứng chỉ không phải PDF!");
+                    request.setAttribute("message_signup", "❌ File chứng chỉ phải là định dạng PDF!");
+                    request.setAttribute("registerActive", "true");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
-                
-                // ===== FILE SIZE VALIDATION =====
-                // Kiểm tra kích thước file
-                if (certificatePart.getSize() > 10 * 1024 * 1024) { // 10MB
-                    request.setAttribute("message", "❌ File chứng chỉ không được lớn hơn 10MB!");
+                if (certificatePart.getSize() > 10 * 1024 * 1024) {
+                    System.out.println("[SignUp][ERROR] File chứng chỉ quá lớn!");
+                    request.setAttribute("message_signup", "❌ File chứng chỉ không được lớn hơn 10MB!");
+                    request.setAttribute("registerActive", "true");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
                 
                 // ===== UPLOAD CERTIFICATE =====
-                // Upload file chứng chỉ lên S3
                 try {
                     java.io.InputStream is = certificatePart.getInputStream();
                     long size = certificatePart.getSize();
@@ -372,30 +370,30 @@ public class LoginServlet extends HttpServlet {
                     System.out.println("📄 [Certificate] Đã upload certificate: " + certificatePath);
                 } catch (Exception e) {
                     System.err.println("❌ [Certificate] Upload error: " + e.getMessage());
-                    request.setAttribute("message", "❌ Lỗi upload file chứng chỉ. Vui lòng thử lại!");
+                    request.setAttribute("message_signup", "❌ Lỗi upload file chứng chỉ. Vui lòng thử lại!");
+                    request.setAttribute("registerActive", "true");
                     request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                     return;
                 }
             }
             
             // ===== SEND OTP =====
-            // Gửi OTP qua email
             try {
                 String otp = String.format("%06d", new java.util.Random().nextInt(999999));
                 EmailUtil.sendOtpEmail(email, otp);
-                // Lưu OTP vào session để verify
                 HttpSession session = request.getSession();
                 session.setAttribute("otp_" + email, otp);
+                session.setAttribute("otp_time_" + email, System.currentTimeMillis());
                 System.out.println("📧 [OTP] Đã gửi OTP cho email: " + email);
             } catch (MessagingException e) {
                 System.err.println("❌ [OTP] Send error: " + e.getMessage());
-                request.setAttribute("message", "❌ Lỗi gửi OTP. Vui lòng thử lại!");
+                request.setAttribute("message_signup", "❌ Lỗi gửi OTP. Vui lòng thử lại!");
+                request.setAttribute("registerActive", "true");
                 request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
                 return;
             }
             
             // ===== SESSION STORAGE =====
-            // Lưu thông tin đăng ký vào session để sử dụng trong OTP verification
             HttpSession session = request.getSession();
             session.setAttribute("pending_email", email);
             session.setAttribute("pending_password", password);
@@ -405,15 +403,23 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("pending_isTeacherPending", isTeacherPending);
             session.setAttribute("pending_certificatePath", certificatePath);
             
-            // ===== REDIRECT TO OTP PAGE =====
-            // Chuyển hướng đến trang nhập OTP
-            response.sendRedirect("LoginJSP/VerifyOtp.jsp");
+            // ===== FORWARD TO LOGIN PAGE WITH OTP FORM =====
+            // Forward về LoginIndex.jsp với registerActive=true để hiển thị form OTP
+            request.setAttribute("email", email);
+            request.setAttribute("password", password);
+            request.setAttribute("fullName", fullName);
+            request.setAttribute("gender", gender);
+            request.setAttribute("role", role);
+            request.setAttribute("registerActive", "true");
+            System.out.println("✅ [LoginServlet] Forward về LoginIndex.jsp với registerActive=true");
+            System.out.println("✅ [LoginServlet] Email: " + email);
+            System.out.println("✅ [LoginServlet] FullName: " + fullName);
+            request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
             
         } catch (Exception e) {
-            // ===== ERROR HANDLING =====
-            // Xử lý lỗi database
             System.err.println("❌ [SignUp] Database error: " + e.getMessage());
-            request.setAttribute("message", "❌ Lỗi hệ thống. Vui lòng thử lại sau!");
+            request.setAttribute("message_signup", "❌ Lỗi hệ thống. Vui lòng thử lại sau!");
+            request.setAttribute("registerActive", "true");
             request.getRequestDispatcher("LoginJSP/LoginIndex.jsp").forward(request, response);
         }
     }

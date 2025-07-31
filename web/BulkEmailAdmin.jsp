@@ -66,11 +66,11 @@
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="roleTeacher" name="roles" value="Teacher" class="h-4 w-4 text-blue-600">
-                            <label for="roleTeacher" class="ml-2 text-sm text-gray-900">Teacher</label>
+                            <label for="roleTeacher" class="ml-2 text-sm text-gray-900">Giáo viên</label>
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="roleStudent" name="roles" value="Student" class="h-4 w-4 text-blue-600">
-                            <label for="roleStudent" class="ml-2 text-sm text-gray-900">Student</label>
+                            <label for="roleStudent" class="ml-2 text-sm text-gray-900">Người dùng Premium</label>
                         </div>
                     </div>
                 </div>

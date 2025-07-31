@@ -22,5 +22,15 @@
         </session-timeout>
     </session-config>
     
+    <!-- WebSocket Configuration -->
+    <listener>
+        <listener-class>controller.RealTime.ChatWebSocket</listener-class>
+    </listener>
+    
+    <!-- Context Path Configuration -->
+    <context-param>
+        <param-name>contextPath</param-name>
+        <param-value>/Wasabii</param-value>
+    </context-param>
    
 </web-app>

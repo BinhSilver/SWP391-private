@@ -234,3 +234,20 @@ html, body {
 .recall-btn .fas {
     margin: 0;
 }
+
+/* Error message styling */
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+    margin: 20px;
+    font-weight: 500;
+}
+
+.error-message::before {
+    content: "⚠️ ";
+    margin-right: 8px;
+}

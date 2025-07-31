@@ -15,7 +15,6 @@
                     <a class="nav-link px-2" href="<c:url value='HomeServlet'/>">Trang Chủ</a>
                     <a class="nav-link px-2" href="${pageContext.request.contextPath}/introduce.jsp">Giới Thiệu</a>
                     <a class="nav-link px-2" href="CoursesServlet">Khóa Học</a>
-                    <a class="nav-link px-2" href="#">Liên Hệ</a>
                     <c:choose>
                         <c:when test="${empty authUser}">
                             <a class="nav-link px-2" href="<c:url value='login'/>">Premium</a>

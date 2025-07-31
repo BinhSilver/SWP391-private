@@ -50,6 +50,7 @@ const API_CONFIG = {
     // Chat APIs
     CHAT_WEBSOCKET: '/chat',
     GET_CHAT_HISTORY: '/getChatHistory',
+    SEND_MESSAGE: '/sendMessage',
     SEARCH_USERS: '/searchUsers',
     CHAT_USERS: '/chatUsers',
     CHECK_BLOCK: '/checkBlock',

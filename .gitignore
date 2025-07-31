@@ -11,6 +11,8 @@
 !nbproject/**
 !src/java/
 !src/java/**
+!lib/
+!lib/**
 
 
 # Nhưng vẫn ignore nbproject/private và mọi file bên trong
@@ -20,13 +22,13 @@ nbproject/private/
 src/java/DB/db.properties
 src/java/resources/
 src/java/DB/JDBCConnection.java
-lib/
+# lib/  # Comment out để cho phép đẩy thư mục lib
 
 # Ignore build artifacts and IDE files
 *.class
 *.log
 *.ctxt
-*.jar
+# *.jar  # Comment out để cho phép đẩy file .jar trong lib
 *.war
 *.orig
 *.iml

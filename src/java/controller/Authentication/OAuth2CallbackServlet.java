@@ -43,7 +43,7 @@ public class OAuth2CallbackServlet extends HttpServlet {
     private static final String CLIENT_SECRET = "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";
     
     // URL callback sau khi Google xác thực xong
-    private static final String REDIRECT_URI = "http://localhost:8080/Wasabii/oauth2callback";
+    private static final String REDIRECT_URI = "https://wasabii.id.vn/oauth2callback";
 
     // ===== GET METHOD - HANDLE OAUTH CALLBACK =====
     /**

@@ -5,6 +5,7 @@
     <!-- Form Đăng ký -->
     <form id="registerForm" action="${pageContext.request.contextPath}/login" method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="signup">
+        <input type="hidden" id="registerActive" name="registerActive" value="${registerActive}" />
         <h1>Đăng kí</h1>
 
         <div class="input-box">
@@ -25,7 +26,7 @@
         </div>
 
         <div class="input-box">
-            <input type="password" name="repass" placeholder="Xác nhận mật khẩu" required>
+            <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required>
             <i class='bx bxs-lock-alt'></i>
         </div>
 
@@ -85,7 +86,7 @@
 
     <!-- Form OTP -->
     <form id="otpForm" action="${pageContext.request.contextPath}/verifyOtp" method="post" style="display: none;">
-        <input type="hidden" name="email" value="${email}">
+        <input type="hidden" name="email" id="otpEmail" value="${sessionScope.pending_email != null ? sessionScope.pending_email : param.email}" />
         <input type="hidden" name="password" value="${password}">
         <input type="hidden" name="fullName" value="${fullName}">
         <input type="hidden" name="gender" value="${gender}">
@@ -119,38 +120,35 @@
         const emailInput = document.getElementById("registerEmail");
         const otpForm = document.getElementById("otpForm");
         const registerForm = document.getElementById("registerForm");
-        const email = emailInput ? emailInput.value : "";
+        const registerActive = document.getElementById("registerActive") ? document.getElementById("registerActive").value : "";
         const otpEmail = document.getElementById("otpEmail") ? document.getElementById("otpEmail").value : "";
+        const email = emailInput ? emailInput.value : otpEmail;
 
-        // Chỉ chuyển sang form OTP khi có session data từ server (sau khi submit form)
-        const hasSessionData = "${not empty email}" === "true";
-        const isFromFormSubmit = "${not empty registerActive}" === "true";
+        // Debug: Log các giá trị để kiểm tra
+        console.log("=== [SignUp.jsp] Debug ===");
+        console.log("registerActive:", registerActive);
+        console.log("registerForm:", registerForm);
+        console.log("otpForm:", otpForm);
+        console.log("email:", email);
+        console.log("email.trim():", email ? email.trim() : "null");
         
         // Chỉ chuyển sang OTP khi thực sự submit form đăng ký
-        if (hasSessionData && isFromFormSubmit && registerForm && otpForm && email && email.trim() !== "") {
+        if (registerActive === "true" && registerForm && otpForm && email && email.trim() !== "") {
+            console.log("✅ [SignUp.jsp] Chuyển sang form OTP");
             registerForm.style.display = "none";
             otpForm.style.display = "block";
-
             const container = document.querySelector(".container");
             if (container) {
                 container.classList.add('active');
                 container.classList.remove('active-change');
             }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "${pageContext.request.contextPath}/send-otp", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.onload = function () {
-                if (xhr.responseText.trim() === "ok") {
-                    otpMessage.textContent = "Mã OTP đã được gửi thành công.";
-                    otpMessage.style.color = "green";
-                    startOtpTimeout();
-                } else {
-                    otpMessage.textContent = "Gửi OTP thất bại.";
-                    otpMessage.style.color = "red";
-                }
-            };
-            xhr.send("email=" + encodeURIComponent(email));
+        } else {
+            console.log("❌ [SignUp.jsp] KHÔNG chuyển sang form OTP");
+            console.log("- registerActive === 'true':", registerActive === "true");
+            console.log("- registerForm exists:", !!registerForm);
+            console.log("- otpForm exists:", !!otpForm);
+            console.log("- email exists:", !!email);
+            console.log("- email.trim() !== '':", email ? email.trim() !== "" : false);
         }
 
         let otpTimeout;
@@ -227,7 +225,7 @@
                     setTimeout(function () {                 
                         otpMessage.textContent = "✅ Xác thực thành công, tài khoản đã được tạo!";
                         
-                        window.location.href = "${pageContext.request.contextPath}/index.jsp";
+                        window.location.href = "${pageContext.request.contextPath}/HomeServlet";
                     }, 3000);
                 } else {
                     otpMessage.textContent = responseJson.message || "Mã OTP không chính xác.";

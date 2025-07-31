@@ -32,7 +32,7 @@ public class GoogleLoginServlet extends HttpServlet {
     private static final String CLIENT_ID = "1025289027596-qkbrdlnf5s31pjg2s7mkmdg0tj8s5c65.apps.googleusercontent.com";
     
     // URL callback sau khi Google xác thực xong
-    private static final String REDIRECT_URI = "http://localhost:8080/Wasabii/oauth2callback";
+    private static final String REDIRECT_URI = "https://wasabii.id.vn/oauth2callback";
     
     // Quyền truy cập cần thiết từ Google
     private static final String SCOPE = "openid email profile";
