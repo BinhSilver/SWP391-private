@@ -1,5 +1,22 @@
 package model;
 
+/**
+ * PremiumPlan - Entity model cho bảng PremiumPlans trong database
+ * Đại diện cho một gói premium có thể mua
+ *
+ * Các thuộc tính:
+ * - planID: ID duy nhất của gói premium
+ * - planName: Tên gói (Basic, Pro, Enterprise)
+ * - description: Mô tả chi tiết về gói
+ * - price: Giá tiền của gói
+ * - duration: Thời hạn gói (số ngày)
+ * - features: Các tính năng của gói (JSON string)
+ *
+ * Sử dụng để:
+ * - Hiển thị danh sách gói premium cho user
+ * - Xử lý thanh toán và mua gói
+ * - Quản lý các tính năng của từng gói
+ */
 public class PremiumPlan {
     private int planID;
     private String planName;

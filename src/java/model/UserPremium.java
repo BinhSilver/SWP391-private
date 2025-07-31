@@ -2,6 +2,21 @@ package model;
 
 import java.util.Date;
 
+/**
+ * UserPremium - Entity model cho bảng UserPremium trong database
+ * Đại diện cho thông tin premium của một user
+ *
+ * Các thuộc tính:
+ * - userID: ID của user
+ * - planID: ID của gói premium (1: Basic, 2: Pro, 3: Enterprise)
+ * - startDate: Ngày bắt đầu gói premium
+ * - endDate: Ngày kết thúc gói premium
+ *
+ * Sử dụng để:
+ * - Theo dõi trạng thái premium của user
+ * - Kiểm tra premium có còn hạn không
+ * - Tự động downgrade khi hết hạn
+ */
 public class UserPremium {
     private int userID;
     private int planID;

@@ -1,5 +1,23 @@
 package model;
 
+/**
+ * Lesson - Entity model cho bảng Lessons trong database
+ * Đại diện cho một bài học trong khóa học
+ *
+ * Các thuộc tính:
+ * - lessonID: ID duy nhất của bài học
+ * - courseID: ID của khóa học chứa bài học này
+ * - title: Tiêu đề bài học
+ * - description: Mô tả chi tiết bài học
+ * - isHidden: Trạng thái ẩn/hiện bài học
+ * - orderIndex: Thứ tự bài học trong khóa học
+ *
+ * Sử dụng để:
+ * - Quản lý bài học trong khóa học
+ * - Hiển thị danh sách bài học cho user
+ * - Sắp xếp thứ tự bài học
+ * - Kiểm soát quyền truy cập bài học
+ */
 public class Lesson {
 
     private int lessonID;

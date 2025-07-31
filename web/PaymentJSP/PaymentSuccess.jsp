@@ -1,8 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="jakarta.servlet.http.*, model.User" %>
+<%@ page import="jakarta.servlet.http.*, model.User, model.PremiumPlan" %>
 <%
     HttpSession currentSession = request.getSession(false);
     User user = (currentSession != null) ? (User) currentSession.getAttribute("authUser") : null;
+    
+    // Lấy thông tin gói premium đã mua từ session
+    PremiumPlan purchasedPlan = (PremiumPlan) currentSession.getAttribute("purchasedPlan");
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -55,6 +58,67 @@
             color: #28a745;
             margin-bottom: 20px;
         }
+        
+        .plan-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .plan-info h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .plan-info p {
+            margin: 8px 0;
+            color: #6c757d;
+        }
+        
+        .plan-info .price {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 16px;
+        }
+        
+        .plan-info .duration {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 14px;
+        }
+        
+        .benefits {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .benefits h4 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .benefits li {
+            margin: 8px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+
     </style>
 </head>
 <body>
@@ -62,11 +126,31 @@
     <div class="success-icon">✓</div>
     <h1>Thanh toán thành công!</h1>
     <p>
-        Cảm ơn <strong><%= user != null ? user.getUserID() : "bạn" %></strong>, tài khoản của bạn đã được nâng cấp.
+        Cảm ơn <strong><%= user != null ? user.getFullName() : "bạn" %></strong>, tài khoản của bạn đã được nâng cấp thành công!
     </p>
+    <% if (purchasedPlan != null) { %>
+    <div class="plan-info">
+        <h3>🎉 Gói Premium: <%= purchasedPlan.getPlanName() %></h3>
+        <p><%= purchasedPlan.getDescription() %></p>
+        <p class="price">💰 Giá: <%= String.format("%,d", (int)purchasedPlan.getPrice()) %> VNĐ</p>
+        <p class="duration">⏰ Thời hạn: <%= purchasedPlan.getDurationInMonths() %> tháng</p>
+    </div>
+    <% } %>
+    <div class="benefits">
+        <h4>🎁 Bạn sẽ được hưởng:</h4>
+        <ul>
+            <li>✅ Truy cập không giới hạn tất cả khóa học</li>
+            <li>✅ Tạo flashcard không giới hạn</li>
+            <li>✅ Chat với AI không giới hạn</li>
+            <li>✅ Không quảng cáo</li>
+            <li>✅ Hỗ trợ ưu tiên</li>
+        </ul>
+    </div>
     <div class="countdown">
         Tự động chuyển về trang chủ sau <span id="timer">10</span> giây
     </div>
+    
+
     <div class="button-container">
         <a href="${pageContext.request.contextPath}/HomeServlet" class="home-button">Về trang chủ ngay</a>
     </div>

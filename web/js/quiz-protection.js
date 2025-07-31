@@ -1,35 +1,64 @@
 /**
  * Quiz Protection System
  * Bảo vệ trang quiz khỏi các hành vi gian lận
+ * 
+ * Chức năng chính:
+ * - Cấm chuột phải (contextmenu)
+ * - Cấm F12 và các phím tắt developer tools
+ * - Cấm chuyển tab quá 3 lần (tự động nộp bài)
+ * - Cấm copy/paste/cut
+ * - Cấm select text và drag
+ * - Cấm console access
+ * - Cấm print screen
  */
 
+// ===== QUIZ PROTECTION CLASS =====
+/**
+ * QuizProtection - Class chính để bảo vệ quiz
+ * Quản lý tất cả các biện pháp bảo vệ chống gian lận
+ */
 class QuizProtection {
+    
+    // ===== CONSTRUCTOR =====
+    /**
+     * Khởi tạo Quiz Protection System
+     * @param {Object} options - Các tùy chọn cấu hình
+     * @param {number} options.maxViolations - Số lần vi phạm tối đa (mặc định: 3)
+     * @param {string} options.autoSubmitUrl - URL để auto submit (mặc định: doQuiz)
+     * @param {boolean} options.enabled - Bật/tắt protection (mặc định: true)
+     * @param {boolean} options.debugMode - Bật debug mode (mặc định: false)
+     */
     constructor(options = {}) {
         console.log('=== [QuizProtection] Khởi tạo Quiz Protection System ===');
         console.log(`[QuizProtection] Options:`, options);
         
-        this.violationCount = 0;
-        this.maxViolations = options.maxViolations || 3;
-        this.isSubmitted = false;
-        this.autoSubmitUrl = options.autoSubmitUrl || 'http://localhost:8080/Wasabii/doQuiz?lessonId=1';
-        this.enabled = options.enabled !== false; // Mặc định bật
+        // ===== INSTANCE VARIABLES =====
+        this.violationCount = 0;                    // Số lần vi phạm hiện tại
+        this.maxViolations = options.maxViolations || 3;  // Số lần vi phạm tối đa
+        this.isSubmitted = false;                   // Flag kiểm tra đã nộp bài chưa
+        this.autoSubmitUrl = options.autoSubmitUrl || 'http://localhost:8080/Wasabii/doQuiz?lessonId=1';  // URL auto submit
+        this.enabled = options.enabled !== false;   // Mặc định bật protection
         this.debugMode = options.debugMode || false; // Debug mode
-        this.isInitializing = true; // Flag để tránh warning khi khởi tạo
+        this.isInitializing = true;                 // Flag để tránh warning khi khởi tạo
         
+        // ===== LOG CONFIGURATION =====
         console.log(`[QuizProtection] Max violations: ${this.maxViolations}`);
         console.log(`[QuizProtection] Auto submit URL: ${this.autoSubmitUrl}`);
         console.log(`[QuizProtection] Enabled: ${this.enabled}`);
         console.log(`[QuizProtection] Debug mode: ${this.debugMode}`);
         
+        // ===== RESET ON START =====
         // Reset hoàn toàn khi bắt đầu quiz
         this.resetAllOnStart();
         
+        // ===== DEBUG MODE HANDLING =====
         // Bật debug mode nếu cần
         if (this.debugMode) {
             sessionStorage.setItem('quizDebugMode', 'true');
             console.log('[QuizProtection] Debug mode enabled - F12 will be allowed');
         }
         
+        // ===== INITIALIZE PROTECTION =====
         if (this.enabled) {
             console.log(`[QuizProtection] Initializing protection...`);
             this.initProtection();
@@ -38,6 +67,7 @@ class QuizProtection {
             console.log(`[QuizProtection] Protection disabled by configuration`);
         }
         
+        // ===== INITIALIZATION PERIOD =====
         // Tắt flag khởi tạo sau 5 giây
         setTimeout(() => {
             this.isInitializing = false;
@@ -47,33 +77,44 @@ class QuizProtection {
         console.log('=== [QuizProtection] Khởi tạo hoàn tất ===');
     }
 
+    // ===== INITIALIZE PROTECTION METHODS =====
+    /**
+     * Khởi tạo tất cả các biện pháp bảo vệ
+     */
     initProtection() {
         console.log('=== [QuizProtection] Khởi tạo các biện pháp bảo vệ ===');
         
+        // ===== RIGHT CLICK PREVENTION =====
         // Cấm chuột phải
         console.log(`[QuizProtection] Setting up right-click prevention...`);
         this.preventRightClick();
         
+        // ===== KEYBOARD SHORTCUTS PREVENTION =====
         // Cấm F12 và các phím tắt
         console.log(`[QuizProtection] Setting up keyboard shortcuts prevention...`);
         this.preventKeyboardShortcuts();
         
+        // ===== TAB SWITCH PREVENTION =====
         // Cấm thoát tab
         console.log(`[QuizProtection] Setting up tab switch prevention...`);
         this.preventTabSwitch();
         
+        // ===== COPY/PASTE PREVENTION =====
         // Cấm copy/paste/cut
         console.log(`[QuizProtection] Setting up copy/paste prevention...`);
         this.preventCopyPaste();
         
+        // ===== TEXT SELECTION PREVENTION =====
         // Cấm select text và drag
         console.log(`[QuizProtection] Setting up text selection prevention...`);
         this.preventTextSelection();
         
+        // ===== CONSOLE ACCESS PREVENTION =====
         // Cấm console access
         console.log(`[QuizProtection] Setting up console access prevention...`);
         this.preventConsoleAccess();
         
+        // ===== PRINT SCREEN PREVENTION =====
         // Cấm print screen
         console.log(`[QuizProtection] Setting up print screen prevention...`);
         this.preventPrintScreen();
@@ -81,16 +122,23 @@ class QuizProtection {
         console.log('=== [QuizProtection] Quiz Protection System đã được kích hoạt thành công ===');
     }
 
+    // ===== RIGHT CLICK PREVENTION =====
+    /**
+     * Ngăn chặn chuột phải và inspect element
+     */
     preventRightClick() {
+        // ===== CONTEXT MENU PREVENTION =====
+        // Cấm menu chuột phải
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             this.handleViolation('Chuột phải bị cấm!', false);
             return false;
         });
 
+        // ===== INSPECT ELEMENT PREVENTION =====
         // Cấm inspect element bằng chuột phải
         document.addEventListener('mousedown', (e) => {
-            if (e.button === 2) {
+            if (e.button === 2) {  // Right mouse button
                 e.preventDefault();
                 this.handleViolation('Inspect bằng chuột phải bị cấm!', false);
                 return false;

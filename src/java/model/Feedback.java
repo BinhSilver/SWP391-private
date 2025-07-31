@@ -2,6 +2,24 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Feedback - Entity model cho bảng Feedback trong database
+ * Đại diện cho một đánh giá/feedback của user về khóa học
+ *
+ * Các thuộc tính chính:
+ * - feedbackID: ID duy nhất của feedback
+ * - userID: ID của user viết feedback
+ * - courseID: ID của khóa học được đánh giá
+ * - content: Nội dung feedback
+ * - rating: Đánh giá sao (1-5 sao)
+ * - createdAt: Thời gian tạo feedback
+ *
+ * Các thuộc tính hiển thị (không lưu trong DB):
+ * - userName: Tên user để hiển thị
+ * - userAvatar: Avatar user để hiển thị
+ * - totalLikes: Tổng số lượt like
+ * - totalDislikes: Tổng số lượt dislike
+ */
 public class Feedback {
     private int feedbackID;
     private int userID;

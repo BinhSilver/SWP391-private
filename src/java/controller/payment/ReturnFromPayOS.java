@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Payment;
+import model.PremiumPlan;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -141,6 +142,10 @@ public class ReturnFromPayOS extends HttpServlet {
                         UserPremiumDAO userPremiumDAO = new UserPremiumDAO();
                         userPremiumDAO.extendOrCreatePremium(payment.getUserID(), payment.getPlanID(), durationInMonths, conn);
                         
+                        // Lấy thông tin gói premium đã mua
+                        PremiumPlanDAO premiumPlanDAO = new PremiumPlanDAO();
+                        PremiumPlan purchasedPlan = premiumPlanDAO.getPremiumPlanByID(payment.getPlanID());
+                        
                         // Commit transaction
                         conn.commit();
                         System.out.println("Premium upgrade transaction committed successfully");
@@ -151,6 +156,11 @@ public class ReturnFromPayOS extends HttpServlet {
                             session.setAttribute("authUser", user);
                             session.setAttribute("paymentSuccess", true);
                             session.setAttribute("paymentMessage", "Thanh toán thành công!");
+                            
+                            // Lưu thông tin gói premium đã mua vào session
+                            if (purchasedPlan != null) {
+                                session.setAttribute("purchasedPlan", purchasedPlan);
+                            }
                             
                             // Clean up session
                             session.removeAttribute("currentPaymentId");

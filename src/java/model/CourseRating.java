@@ -2,6 +2,25 @@ package model;
 
 import java.util.Date;
 
+/**
+ * CourseRating - Entity model cho bảng CourseRatings trong database
+ * Đại diện cho đánh giá sao của user về khóa học
+ *
+ * Các thuộc tính:
+ * - ratingID: ID duy nhất của đánh giá
+ * - userID: ID của user đánh giá
+ * - courseID: ID của khóa học được đánh giá
+ * - rating: Số sao đánh giá (1-5)
+ * - comment: Nhận xét chi tiết (có thể null)
+ * - createdAt: Thời gian tạo đánh giá
+ * - updatedAt: Thời gian cập nhật cuối cùng
+ *
+ * Sử dụng để:
+ * - Lưu trữ đánh giá sao của user về khóa học
+ * - Tính điểm trung bình của khóa học
+ * - Hiển thị đánh giá cho user khác
+ * - Phân tích chất lượng khóa học
+ */
 public class CourseRating {
     private int ratingID;
     private int userID;

@@ -6,6 +6,27 @@ import DB.JDBCConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+// ===== LESSONS DATA ACCESS OBJECT =====
+/**
+ * LessonsDAO - Data Access Object cho bảng Lessons
+ * Quản lý tất cả các thao tác CRUD với bài học
+ * 
+ * Chức năng chính:
+ * - Thêm, sửa, xóa bài học
+ * - Lấy danh sách bài học theo khóa học
+ * - Quản lý thứ tự bài học
+ * - Kiểm soát trạng thái ẩn/hiện bài học
+ * - Xóa bài học và các dependencies
+ * 
+ * Sử dụng JDBC để kết nối và thao tác với SQL Server
+ * 
+ * Các nhóm phương thức chính:
+ * - add, addAndReturnID: Thêm bài học mới
+ * - update: Cập nhật thông tin bài học
+ * - delete, deleteLessonAndDependencies: Xóa bài học
+ * - getLessonsByCourseID: Lấy danh sách bài học theo khóa học
+ * - getLessonById: Lấy bài học theo ID
+ */
 public class LessonsDAO {
 
     // Thêm bài học

@@ -1,7 +1,27 @@
 package model;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
+/**
+ * Message - Entity model cho bảng Messages trong database
+ * Đại diện cho một tin nhắn trong hệ thống chat
+ *
+ * Các thuộc tính:
+ * - messageID: ID duy nhất của tin nhắn
+ * - senderID: ID của người gửi
+ * - receiverID: ID của người nhận
+ * - content: Nội dung tin nhắn
+ * - messageType: Loại tin nhắn (text, image, file)
+ * - isRead: Trạng thái đã đọc chưa
+ * - createdAt: Thời gian gửi tin nhắn
+ * - updatedAt: Thời gian cập nhật cuối cùng
+ *
+ * Sử dụng để:
+ * - Lưu trữ tin nhắn giữa các user
+ * - Hiển thị lịch sử chat
+ * - Đánh dấu tin nhắn đã đọc
+ * - Hỗ trợ nhiều loại tin nhắn (text, file, image)
+ */
 public class Message {
     private int messageId;
     private int conversationId;
@@ -10,12 +30,12 @@ public class Message {
     private String type;
     private boolean isRead;
     private boolean isRecall;
-    private Timestamp sentAt;
+    private Date sentAt;
 
     // Constructors
     public Message() {}
 
-    public Message(int messageId, int conversationId, int senderId, String content, String type, boolean isRead, boolean isRecall, Timestamp sentAt) {
+    public Message(int messageId, int conversationId, int senderId, String content, String type, boolean isRead, boolean isRecall, Date sentAt) {
         this.messageId = messageId;
         this.conversationId = conversationId;
         this.senderId = senderId;
@@ -83,11 +103,11 @@ public class Message {
         this.isRecall = isRecall;
     }
 
-    public Timestamp getSentAt() {
+    public Date getSentAt() {
         return sentAt;
     }
 
-    public void setSentAt(Timestamp sentAt) {
+    public void setSentAt(Date sentAt) {
         this.sentAt = sentAt;
     }
 }

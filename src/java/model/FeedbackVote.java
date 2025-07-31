@@ -1,5 +1,15 @@
 package model;
 
+/**
+ * FeedbackVote - Entity model cho bảng FeedbackVote trong database
+ * Đại diện cho một lượt vote (like/dislike) cho feedback của khóa học
+ *
+ * Các thuộc tính:
+ * - voteID: ID duy nhất của lượt vote
+ * - feedbackID: ID của feedback được vote
+ * - userID: ID của user thực hiện vote
+ * - voteType: Loại vote (1: like, -1: dislike)
+ */
 public class FeedbackVote {
     private int voteID;
     private int feedbackID;
