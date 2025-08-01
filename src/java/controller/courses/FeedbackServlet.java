@@ -51,6 +51,7 @@ public class FeedbackServlet extends HttpServlet {
                 feedback.setRating(rating);
                 feedbackDAO.addFeedback(feedback);
                 if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    // Sử dụng đường dẫn tuyệt đối để tránh Mixed Content
                     resp.sendRedirect(req.getContextPath() + "/" + redirectUrl);
                 } else {
                     resp.sendRedirect(req.getContextPath() + "/course/feedback?courseId=" + courseId);

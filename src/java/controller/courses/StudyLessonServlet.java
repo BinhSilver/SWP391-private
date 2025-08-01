@@ -128,7 +128,7 @@ public class StudyLessonServlet extends HttpServlet {
             request.setAttribute("errorMessage", 
                     "Bạn cần hoàn thành các bài học trước để mở khóa bài này.");
             
-            response.sendRedirect("CourseDetailServlet?id=" + courseId);
+            response.sendRedirect(request.getContextPath() + "/CourseDetailServlet?id=" + courseId);
             return;
         }
 

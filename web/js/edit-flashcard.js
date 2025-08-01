@@ -190,7 +190,7 @@ async function saveItem(itemId) {
             
             // Reload page after a short delay to show updated data
             setTimeout(() => {
-                location.reload();
+                window.location.href = window.location.href;
             }, 1000);
         } else {
             showAlert('danger', data.message);
@@ -563,7 +563,7 @@ async function saveAllItems() {
             window.hasUnsavedChanges = false;
             // Reload page to show updated data
             setTimeout(() => {
-                location.reload();
+                window.location.href = window.location.href;
             }, 1500);
         } else {
             showAlert('warning', `Đã lưu ${successCount} thẻ, ${errorCount} thẻ lỗi. Vui lòng kiểm tra lại.`);

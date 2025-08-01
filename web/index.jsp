@@ -44,7 +44,7 @@
                         <h1>Học tiếng Nhật cùng Wasabii</h1>
                         <p>Nền tảng học tiếng Nhật hiệu quả, tương tác, và dễ dàng.</p>
                         <!-- Call-to-action buttons -->
-                        <a href="<c:url value='/Courses/Course.jsp'/>" class="btn-primary">Bắt đầu ngay</a>
+                        <a href="<c:url value='/CoursesServlet'/>" class="btn-primary">Bắt đầu ngay</a>
                         <a href="<c:url value='/introduce.jsp'/>" class="btn-secondary">Tìm hiểu thêm</a>
                     </div>
                     <!-- Hero image -->

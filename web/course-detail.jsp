@@ -308,7 +308,7 @@
                                                         <ul class="pagination pagination-sm justify-content-center">
                                                             <c:if test="${currentPage > 1}">
                                                                 <li class="page-item">
-                                                                    <a class="page-link" href="CourseDetailServlet?id=${course.courseID}&page=${currentPage - 1}${showAllLessons ? '&showAllLessons=true' : ''}">
+                                                                    <a class="page-link" href="${pageContext.request.contextPath}/CourseDetailServlet?id=${course.courseID}&page=${currentPage - 1}${showAllLessons ? '&showAllLessons=true' : ''}">
                                                                         <i class="fas fa-chevron-left"></i>
                                                                     </a>
                                                                 </li>
@@ -316,13 +316,13 @@
                                                             
                                                             <c:forEach begin="1" end="${totalPages}" var="pageNum">
                                                                 <li class="page-item ${pageNum == currentPage ? 'active' : ''}">
-                                                                    <a class="page-link" href="CourseDetailServlet?id=${course.courseID}&page=${pageNum}${showAllLessons ? '&showAllLessons=true' : ''}">${pageNum}</a>
+                                                                    <a class="page-link" href="${pageContext.request.contextPath}/CourseDetailServlet?id=${course.courseID}&page=${pageNum}${showAllLessons ? '&showAllLessons=true' : ''}">${pageNum}</a>
                                                                 </li>
                                                             </c:forEach>
                                                             
                                                             <c:if test="${currentPage < totalPages}">
                                                                 <li class="page-item">
-                                                                    <a class="page-link" href="CourseDetailServlet?id=${course.courseID}&page=${currentPage + 1}${showAllLessons ? '&showAllLessons=true' : ''}">
+                                                                    <a class="page-link" href="${pageContext.request.contextPath}/CourseDetailServlet?id=${course.courseID}&page=${currentPage + 1}${showAllLessons ? '&showAllLessons=true' : ''}">
                                                                         <i class="fas fa-chevron-right"></i>
                                                                     </a>
                                                                 </li>
@@ -347,7 +347,7 @@
                         <div class="alert alert-warning">
                             <h3>Không tìm thấy khóa học!</h3>
                             <p>Khóa học này không tồn tại hoặc đã bị xóa.</p>
-                            <a href="CoursesServlet" class="btn-back mt-3">
+                            <a href="${pageContext.request.contextPath}/CoursesServlet" class="btn-back mt-3">
                                 <i class="fas fa-arrow-left"></i> Quay lại trang khóa học
                             </a>
                         </div>

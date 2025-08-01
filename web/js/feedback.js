@@ -150,7 +150,8 @@ function addFeedback(event) {
         console.log('[addFeedback] response status:', res.status);
         if (res.ok) {
             console.log('[addFeedback] Add thành công!');
-            location.reload();
+            // Sử dụng window.location.href thay vì location.reload() để tránh Mixed Content
+            window.location.href = window.location.href;
         } else {
             console.error('[addFeedback] Add thất bại! Status:', res.status);
             alert('Thêm feedback thất bại!');
@@ -188,7 +189,8 @@ function updateFeedback(feedbackId, content, rating) {
         if (res.ok) {
             console.log('[updateFeedback] Update thành công!');
             closeEditModal();
-            location.reload();
+            // Sử dụng window.location.href thay vì location.reload() để tránh Mixed Content
+            window.location.href = window.location.href;
         } else {
             console.error('[updateFeedback] Update thất bại! Status:', res.status);
             alert('Cập nhật feedback thất bại!');
@@ -228,7 +230,8 @@ function deleteFeedback(feedbackId) {
         console.log('[deleteFeedback] response status:', res.status);
         if (res.ok) {
             console.log('[deleteFeedback] Delete thành công!');
-            location.reload();
+            // Sử dụng window.location.href thay vì location.reload() để tránh Mixed Content
+            window.location.href = window.location.href;
         } else {
             console.error('[deleteFeedback] Delete thất bại! Status:', res.status);
             alert('Xóa feedback thất bại!');
@@ -270,7 +273,8 @@ function voteFeedback(feedbackId, voteType) {
         console.log('[voteFeedback] response status:', res.status);
         if (res.ok) {
             console.log('[voteFeedback] Vote thành công!');
-            location.reload();
+            // Sử dụng window.location.href thay vì location.reload() để tránh Mixed Content
+            window.location.href = window.location.href;
         } else {
             console.error('[voteFeedback] Vote thất bại! Status:', res.status);
             alert('Vote thất bại!');
