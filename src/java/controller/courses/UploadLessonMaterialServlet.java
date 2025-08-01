@@ -44,7 +44,7 @@ public class UploadLessonMaterialServlet extends HttpServlet {
             Logger.getLogger(UploadLessonMaterialServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        response.sendRedirect("CourseDetailServlet?id=" + request.getParameter("courseID"));
+        response.sendRedirect(request.getContextPath() + "/CourseDetailServlet?id=" + request.getParameter("courseID"));
     }
 
     private void uploadAndSave(HttpServletRequest request, int lessonID, String partName, String materialType, String fileType, LessonMaterialsDAO dao)

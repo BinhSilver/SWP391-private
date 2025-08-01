@@ -120,7 +120,7 @@
     <!-- ===== CALL-TO-ACTION ===== -->
     <div class="promo-action">
         <!-- Button "Đăng ký ngay" với hiệu ứng nhấp nháy -->
-        <button class="blink-button" onclick="window.location.href = '<c:url value='/login' />'">Đăng ký ngay</button>
+        <button class="blink-button" onclick="window.location.href = '<c:url value='/CoursesServlet' />'">Đăng ký ngay</button>
     </div>
     
     <!-- ===== CLOSE BUTTON ===== -->

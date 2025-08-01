@@ -301,7 +301,7 @@ public class EditCourseServlet extends HttpServlet {
                 }
             }
 
-            response.sendRedirect("CourseDetailServlet?id=" + courseId);
+            response.sendRedirect(request.getContextPath() + "/CourseDetailServlet?id=" + courseId);
         } catch (Exception e) {
             System.out.println("[ERROR] " + e.getMessage());
             e.printStackTrace();

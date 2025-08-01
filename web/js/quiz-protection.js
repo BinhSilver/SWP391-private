@@ -36,7 +36,7 @@ class QuizProtection {
         this.violationCount = 0;                    // Số lần vi phạm hiện tại
         this.maxViolations = options.maxViolations || 3;  // Số lần vi phạm tối đa
         this.isSubmitted = false;                   // Flag kiểm tra đã nộp bài chưa
-        this.autoSubmitUrl = options.autoSubmitUrl || 'http://localhost:8080/Wasabii/doQuiz?lessonId=1';  // URL auto submit
+        this.autoSubmitUrl = options.autoSubmitUrl || '/Wasabii/doQuiz?lessonId=1';  // URL auto submit
         this.enabled = options.enabled !== false;   // Mặc định bật protection
         this.debugMode = options.debugMode || false; // Debug mode
         this.isInitializing = true;                 // Flag để tránh warning khi khởi tạo
